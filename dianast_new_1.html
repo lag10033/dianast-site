@@ -1503,10 +1503,14 @@ function closeLightbox(){
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
 
 // Кнопка наверх
-window.addEventListener('scroll', function(){
+function updateBackBtn(){
   var b = document.getElementById('back-to-top');
-  if(b) b.style.display = window.scrollY > 400 ? 'flex' : 'none';
-});
+  if(!b) return;
+  var scrolled = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  b.style.display = scrolled > 400 ? 'flex' : 'none';
+}
+window.addEventListener('scroll', updateBackBtn, {passive:true});
+window.addEventListener('touchmove', updateBackBtn, {passive:true});
 </script>
 
 <!-- Кнопка наверх -->

@@ -1516,16 +1516,18 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
 <!-- Кнопка наверх -->
 <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:90px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--dark);color:white;border:none;cursor:pointer;z-index:900;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-size:20px;transition:background 0.2s" onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--dark)'" aria-label="Наверх">↑</button>
 
-<!-- Яндекс.Метрика — вставьте свой номер счётчика вместо XXXXXXXX -->
-<!--
+<!-- Yandex.Metrika counter -->
 <script type="text/javascript">
-(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-ym(XXXXXXXX, "init", {clickmap:true, trackLinks:true, accurateTrackBounce:true});
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110181067', 'ym');
+    ym(110181067, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
 </script>
-<noscript><div><img src="https://mc.yandex.ru/watch/XXXXXXXX" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
--->
+<noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
 
 </body>
 </html>

@@ -6,6 +6,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/zabor</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/brest</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>

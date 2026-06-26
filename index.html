@@ -862,7 +862,6 @@ function submitLead(e){
               <img src="assets/photos/pf-korch-14.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
               <img src="assets/photos/pf-korch-15.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
               <img src="assets/photos/pf-korch-16.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-17.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:28px">
@@ -886,8 +885,6 @@ function submitLead(e){
               <img src="assets/photos/pf-kras-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
               <img src="assets/photos/pf-kras-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
               <img src="assets/photos/pf-kras-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-kras-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-kras-5.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
     </div>
@@ -1504,6 +1501,27 @@ function closeLightbox(){
   document.body.style.overflow='';
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+
+// Кнопка наверх
+window.addEventListener('scroll', function(){
+  var b = document.getElementById('back-to-top');
+  if(b) b.style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
 </script>
+
+<!-- Кнопка наверх -->
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:90px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--dark);color:white;border:none;cursor:pointer;z-index:900;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-size:20px;transition:background 0.2s" onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--dark)'" aria-label="Наверх">↑</button>
+
+<!-- Яндекс.Метрика — вставьте свой номер счётчика вместо XXXXXXXX -->
+<!--
+<script type="text/javascript">
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+ym(XXXXXXXX, "init", {clickmap:true, trackLinks:true, accurateTrackBounce:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/XXXXXXXX" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+-->
+
 </body>
 </html>

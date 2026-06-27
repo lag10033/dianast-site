@@ -6,6 +6,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/vybor-kirpicha</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/stoimost-zabora</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/kirpich-vs-profnastil</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/zabor</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>

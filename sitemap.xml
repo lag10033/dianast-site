@@ -26,6 +26,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/quiz</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/kirpichnyj-zabor-svoimi-rukami</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>

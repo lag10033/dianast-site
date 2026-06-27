@@ -122,6 +122,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/img/hero-bg.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -152,7 +153,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .nav-cta:hover{background:var(--orange-light)}
 
 /* HERO */
-.hero{padding-top:68px;min-height:100vh;display:flex;align-items:center;background:url("assets/img/hero-bg.jpg") center/cover no-repeat;position:relative;overflow:hidden}
+.hero{padding-top:68px;min-height:100vh;display:flex;align-items:center;background:url("assets/img/hero-bg.webp") center/cover no-repeat;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0}
 .hero-inner{max-width:1200px;margin:0 auto;padding:80px 5%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
 .hero-label{display:inline-block;background:rgba(212,82,30,0.15);color:var(--orange-light);border:1px solid rgba(212,82,30,0.3);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:6px 14px;border-radius:4px;margin-bottom:24px}
@@ -356,7 +357,7 @@ footer{position:relative;background:#111;padding:25px 5%}
   </div>
 </div>
 
-<script>
+<script defer>
 function openLeadModal(){document.getElementById('leadModal').style.display='flex'}
 function closeLeadModal(){document.getElementById('leadModal').style.display='none'}
 document.getElementById('leadModal').addEventListener('click',function(e){if(e.target===this)closeLeadModal()})
@@ -382,7 +383,7 @@ function submitLead(e){
 <nav>
   <div class="nav-inner">
     <a href="#" class="logo">
-      <img src="assets/img/portfolio-1.png" alt="Dianast — Заборы под ключ" style="height:52px;width:auto;display:block">
+      <img loading="lazy" src="assets/img/portfolio-1.webp" alt="Dianast — Заборы под ключ" style="height:52px;width:auto;display:block">
     </a>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
       <span style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.03em;text-align:center"><span style="color:var(--dark)">Кирпич </span><span style="color:var(--orange)">Dianast</span><span style="color:var(--dark)"> — соберёт даже ребёнок!</span></span>
@@ -514,7 +515,7 @@ function submitLead(e){
       <div class="catalog-grid">
         <div class="product-card" onclick="openCard('ug-gorch')" style="cursor:pointer">
           <div class="product-img" style="background:#f5f0e8;position:relative">
-            <img src="assets/photos/ug-gorch.jpeg" alt="Угловой горчичный" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/ug-gorch.jpeg" alt="Угловой горчичный" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -526,7 +527,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ug-kras')" style="cursor:pointer">
           <div class="product-img" style="background:#f0e8e8;position:relative">
-            <img src="assets/photos/ug-kras.jpeg" alt="Угловой красный" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/ug-kras.jpeg" alt="Угловой красный" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -538,7 +539,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ug-kor')" style="cursor:pointer">
           <div class="product-img" style="background:#ede8e0;position:relative">
-            <img src="assets/photos/ug-korch.jpeg" alt="Угловой коричневый" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/ug-korch.jpeg" alt="Угловой коричневый" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -550,7 +551,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ug-graf')" style="cursor:pointer">
           <div class="product-img" style="background:#e8e8e8;position:relative">
-            <img src="assets/photos/ug-graf.jpeg" alt="Угловой графит" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/ug-graf.jpeg" alt="Угловой графит" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -572,7 +573,7 @@ function submitLead(e){
       <div class="catalog-grid">
         <div class="product-card" onclick="openCard('ry-gorch')" style="cursor:pointer">
           <div class="product-img" style="background:#f5f0e8;position:relative">
-            <img src="assets/photos/row-gorch.jpeg" alt="Рядовой горчичный" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/row-gorch.jpeg" alt="Рядовой горчичный" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -584,7 +585,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ry-kras')" style="cursor:pointer">
           <div class="product-img" style="background:#f0e8e8;position:relative">
-            <img src="assets/photos/row-kras.jpeg" alt="Рядовой красный" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/row-kras.jpeg" alt="Рядовой красный" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -596,7 +597,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ry-kor')" style="cursor:pointer">
           <div class="product-img" style="background:#ede8e0;position:relative">
-            <img src="assets/photos/row-korch.jpeg" alt="Рядовой коричневый" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/row-korch.jpeg" alt="Рядовой коричневый" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -608,7 +609,7 @@ function submitLead(e){
         </div>
         <div class="product-card" onclick="openCard('ry-graf')" style="cursor:pointer">
           <div class="product-img" style="background:#e8e8e8;position:relative">
-            <img src="assets/photos/row-graf.jpeg" alt="Рядовой графит" style="width:100%;height:100%;object-fit:cover">
+            <img loading="lazy" src="assets/photos/row-graf.jpeg" alt="Рядовой графит" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
@@ -853,19 +854,19 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Графит</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img src="assets/photos/pf-graf-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-5.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-6.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-7.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-8.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-9.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-10.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-11.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-12.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-graf-13.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-5.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-6.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-7.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-8.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-9.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-10.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-11.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-12.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-graf-13.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:28px">
@@ -874,22 +875,22 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Коричневый</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img src="assets/photos/pf-korch-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-5.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-6.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-7.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-8.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-9.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-10.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-11.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-12.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-13.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-14.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-15.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-korch-16.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-5.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-6.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-7.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-8.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-9.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-10.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-11.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-12.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-13.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-14.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-15.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-korch-16.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:28px">
@@ -898,10 +899,10 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Горчичный</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img src="assets/photos/pf-gorch-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-gorch-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-gorch-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-gorch-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-gorch-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-gorch-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-gorch-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-gorch-4.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:8px">
@@ -910,9 +911,9 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Красный</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img src="assets/photos/pf-kras-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-kras-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img src="assets/photos/pf-kras-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-kras-1.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-kras-2.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img loading="lazy" src="assets/photos/pf-kras-3.jpg" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
     </div>
@@ -1034,7 +1035,7 @@ calcFence();
   <div class="container">
     <div class="master-inner">
       <div class="master-img">
-        <div class="master-img-frame" style="padding-bottom:115%;background:url(assets/img/portfolio-2.jpg) top center/cover no-repeat;border-radius:12px"></div>
+        <div class="master-img-frame" style="padding-bottom:115%;background:url(assets/img/portfolio-2.webp) top center/cover no-repeat;border-radius:12px"></div>
         <div class="master-years">
           <div class="master-years-num">25</div>
           <div class="master-years-label">лет в строительстве</div>
@@ -1288,7 +1289,7 @@ calcFence();
   </div>
   <div class="footer-inner">
     <div style="position:absolute;left:20px;bottom:50px;">
-      <img style="border-radius:50%;overflow:hidden;display:block;width:100px;height:100px;object-fit:cover;" src="assets/img/portfolio-3.png" alt="Dianast" style="height:64px;width:auto;display:block">
+      <img loading="lazy" style="border-radius:50%;overflow:hidden;display:block;width:100px;height:100px;object-fit:cover;" src="assets/img/portfolio-3.webp" alt="Dianast" style="height:64px;width:auto;display:block">
       
     </div>
     <div class="footer-contacts">
@@ -1515,7 +1516,7 @@ function sendForm(e){
   <div class="pcard-box">
     <button class="pcard-x" onclick="pcClose()">✕</button>
     <div class="pcard-gallery">
-      <div class="pcard-big"><img id="pcBig" src="" alt="" referrerpolicy="no-referrer"></div>
+      <div class="pcard-big"><img loading="lazy" id="pcBig" src="" alt="" referrerpolicy="no-referrer"></div>
       <div class="pcard-row" id="pcRow"></div>
     </div>
     <div class="pcard-info">
@@ -1663,7 +1664,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')pcClose();})
 
 <!-- LIGHTBOX -->
 <div id="lb-overlay" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out">
-  <img id="lb-img" src="" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+  <img loading="lazy" id="lb-img" src="" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
   <div onclick="closeLightbox()" style="position:absolute;top:16px;right:20px;color:#fff;font-size:32px;line-height:1;cursor:pointer;user-select:none">&#x2715;</div>
 </div>
 <script>
@@ -1704,7 +1705,7 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
     })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110181067', 'ym');
     ym(110181067, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
 </script>
-<noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<noscript><div><img loading="lazy" src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
 </body>

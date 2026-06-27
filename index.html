@@ -395,13 +395,13 @@ function submitLead(e){
 <nav>
   <div class="nav-inner">
     <a href="/" class="logo" aria-label="Dianast — главная страница">
-      <img width="400" height="400" loading="lazy" src="assets/img/portfolio-1.webp" alt="Dianast — Заборы под ключ" style="height:52px;width:auto;display:block">
+      <img width="400" height="400" loading="lazy" src="assets/img/portfolio-1.webp" alt="Dianast — Заборы под ключ" style="height:62px;width:auto;display:block">
     </a>
     <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-      <span style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.03em;text-align:center"><span style="color:var(--dark)">Кирпич </span><span style="color:var(--orange)">Dianast</span><span style="color:var(--dark)"> — соберёт даже ребёнок!</span></span>
+      <span id="nav-tagline" style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.03em;text-align:center"><span style="color:var(--dark)">Кирпич </span><span style="color:var(--orange)">Dianast</span><span style="color:var(--dark)"> — соберёт даже ребёнок!</span></span>
       <a href="tel:+375297974362" class="nav-phone">+375 29 797-43-62</a>
     </div>
-    <a href="#calculator" class="nav-cta">Рассчитать стоимость</a>
+    <a href="#calculator" class="nav-cta" id="nav-cta">Рассчитать стоимость</a>
   </div>
 </nav>
 
@@ -525,27 +525,15 @@ function submitLead(e){
 <div style="font-family:Inter,sans-serif;font-size:13px;color:var(--mid);margin-top:6px">Предназначен для строительства столбов забора, входных групп, террас, навесов.</div>
       </div>
       <div class="catalog-grid">
-        <div class="product-card" onclick="openCard('ug-gorch')" style="cursor:pointer">
-          <div class="product-img" style="background:#f5f0e8;position:relative">
-            <img loading="lazy" src="assets/photos/ug-gorch.webp" alt="Угловой горчичный" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
+        <div class="product-card" onclick="openCard('ug-graf')" style="cursor:pointer">
+          <div class="product-img" style="background:#e8e8e8;position:relative">
+            <img loading="lazy" src="assets/photos/ug-graf.webp" alt="Угловой графит" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
-            <div class="product-name">Угловой горчичный</div>
+            <div class="product-name">Угловой графит</div>
             <div class="product-size">125 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#C8A84B"></div></div>
-            <div class="product-price">3,40 <span>руб/шт</span></div>
-          </div>
-        </div>
-        <div class="product-card" onclick="openCard('ug-kras')" style="cursor:pointer">
-          <div class="product-img" style="background:#f0e8e8;position:relative">
-            <img loading="lazy" src="assets/photos/ug-kras.webp" alt="Угловой красный" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
-            <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
-          </div>
-          <div class="product-info">
-            <div class="product-name">Угловой красный</div>
-            <div class="product-size">125 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#C0392B"></div></div>
+            <div class="product-colors"><div class="color-dot" style="background:#3A3A3A"></div></div>
             <div class="product-price">3,40 <span>руб/шт</span></div>
           </div>
         </div>
@@ -561,15 +549,27 @@ function submitLead(e){
             <div class="product-price">3,40 <span>руб/шт</span></div>
           </div>
         </div>
-        <div class="product-card" onclick="openCard('ug-graf')" style="cursor:pointer">
-          <div class="product-img" style="background:#e8e8e8;position:relative">
-            <img loading="lazy" src="assets/photos/ug-graf.webp" alt="Угловой графит" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
+        <div class="product-card" onclick="openCard('ug-kras')" style="cursor:pointer">
+          <div class="product-img" style="background:#f0e8e8;position:relative">
+            <img loading="lazy" src="assets/photos/ug-kras.webp" alt="Угловой красный" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
-            <div class="product-name">Угловой графит</div>
+            <div class="product-name">Угловой красный</div>
             <div class="product-size">125 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#3A3A3A"></div></div>
+            <div class="product-colors"><div class="color-dot" style="background:#C0392B"></div></div>
+            <div class="product-price">3,40 <span>руб/шт</span></div>
+          </div>
+        </div>
+        <div class="product-card" onclick="openCard('ug-gorch')" style="cursor:pointer">
+          <div class="product-img" style="background:#f5f0e8;position:relative">
+            <img loading="lazy" src="assets/photos/ug-gorch.webp" alt="Угловой горчичный" width="600" height="600" style="width:100%;height:100%;object-fit:cover">
+            <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
+          </div>
+          <div class="product-info">
+            <div class="product-name">Угловой горчичный</div>
+            <div class="product-size">125 × 250 × 96 мм</div>
+            <div class="product-colors"><div class="color-dot" style="background:#C8A84B"></div></div>
             <div class="product-price">3,40 <span>руб/шт</span></div>
           </div>
         </div>
@@ -583,27 +583,15 @@ function submitLead(e){
 <div style="font-family:Inter,sans-serif;font-size:13px;color:var(--mid);margin-top:6px">Предназначен для кладки пролётов забора между столбами и декоративных перегородок.</div>
       </div>
       <div class="catalog-grid">
-        <div class="product-card" onclick="openCard('ry-gorch')" style="cursor:pointer">
-          <div class="product-img" style="background:#f5f0e8;position:relative">
-            <img loading="lazy" src="assets/photos/row-gorch.webp" alt="Рядовой горчичный" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
+        <div class="product-card" onclick="openCard('ry-graf')" style="cursor:pointer">
+          <div class="product-img" style="background:#e8e8e8;position:relative">
+            <img loading="lazy" src="assets/photos/row-graf.webp" alt="Рядовой графит" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
-            <div class="product-name">Рядовой горчичный</div>
+            <div class="product-name">Рядовой графит</div>
             <div class="product-size">135 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#C8A84B"></div></div>
-            <div class="product-price">3,60 <span>руб/шт</span></div>
-          </div>
-        </div>
-        <div class="product-card" onclick="openCard('ry-kras')" style="cursor:pointer">
-          <div class="product-img" style="background:#f0e8e8;position:relative">
-            <img loading="lazy" src="assets/photos/row-kras.webp" alt="Рядовой красный" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
-            <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
-          </div>
-          <div class="product-info">
-            <div class="product-name">Рядовой красный</div>
-            <div class="product-size">135 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#C0392B"></div></div>
+            <div class="product-colors"><div class="color-dot" style="background:#3A3A3A"></div></div>
             <div class="product-price">3,60 <span>руб/шт</span></div>
           </div>
         </div>
@@ -619,15 +607,27 @@ function submitLead(e){
             <div class="product-price">3,60 <span>руб/шт</span></div>
           </div>
         </div>
-        <div class="product-card" onclick="openCard('ry-graf')" style="cursor:pointer">
-          <div class="product-img" style="background:#e8e8e8;position:relative">
-            <img loading="lazy" src="assets/photos/row-graf.webp" alt="Рядовой графит" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
+        <div class="product-card" onclick="openCard('ry-kras')" style="cursor:pointer">
+          <div class="product-img" style="background:#f0e8e8;position:relative">
+            <img loading="lazy" src="assets/photos/row-kras.webp" alt="Рядовой красный" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
             <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
           </div>
           <div class="product-info">
-            <div class="product-name">Рядовой графит</div>
+            <div class="product-name">Рядовой красный</div>
             <div class="product-size">135 × 250 × 96 мм</div>
-            <div class="product-colors"><div class="color-dot" style="background:#3A3A3A"></div></div>
+            <div class="product-colors"><div class="color-dot" style="background:#C0392B"></div></div>
+            <div class="product-price">3,60 <span>руб/шт</span></div>
+          </div>
+        </div>
+        <div class="product-card" onclick="openCard('ry-gorch')" style="cursor:pointer">
+          <div class="product-img" style="background:#f5f0e8;position:relative">
+            <img loading="lazy" src="assets/photos/row-gorch.webp" alt="Рядовой горчичный" width="900" height="675" style="width:100%;height:100%;object-fit:cover">
+            <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:white;font-size:11px;padding:4px 10px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:600">Смотреть фото →</div>
+          </div>
+          <div class="product-info">
+            <div class="product-name">Рядовой горчичный</div>
+            <div class="product-size">135 × 250 × 96 мм</div>
+            <div class="product-colors"><div class="color-dot" style="background:#C8A84B"></div></div>
             <div class="product-price">3,60 <span>руб/шт</span></div>
           </div>
         </div>
@@ -641,8 +641,8 @@ function submitLead(e){
 </section>
 
 <!-- CALCULATOR -->
-<section id="calculator" style="background:var(--light);padding:80px 5%">
-  <div class="container">
+<section id="calculator">
+  <div class="container" style="background:var(--light);border-radius:16px;padding:48px 40px">
     <div class="section-label">Калькулятор</div>
     <h2 class="section-title">Рассчитайте количество кирпича</h2>
     <div class="section-sub">Введите параметры забора — получите предварительное количество кирпича и стоимость.</div>
@@ -933,10 +933,19 @@ function submitLead(e){
 </section>
 
 <style>
-@media(max-width:768px){
-  #calculator .container > div[style*="grid-template-columns:1fr 1fr"]{
+@media(max-width:600px){
+  #calculator [style*="grid-template-columns:1fr 1fr"]{
     grid-template-columns:1fr!important;
   }
+  #portfolio [style*="grid-template-columns:repeat(4,1fr)"]{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+  #nav-tagline{display:none}
+  .nav-phone{display:none}
+  #nav-cta{padding:10px 16px;font-size:12px;white-space:nowrap}
+  #leadBar span{font-size:11px}
+  #leadBar button:first-of-type{padding:6px 12px;font-size:11px}
+  .hero-inner{padding:60px 5%}
 }
 </style>
 
@@ -1300,10 +1309,6 @@ calcFence();
     </a>
   </div>
   <div class="footer-inner">
-    <div style="position:absolute;left:20px;bottom:50px;">
-      <img width="400" height="400" loading="lazy" style="border-radius:50%;overflow:hidden;display:block;width:100px;height:100px;object-fit:cover;" src="assets/img/portfolio-3.webp" alt="Dianast" style="height:64px;width:auto;display:block">
-      
-    </div>
     <div class="footer-contacts">
       <a href="tel:+375297974362" class="footer-phone">+375 29 797-43-62</a>
       <div class="footer-address">Кобрин, Беларусь</div>

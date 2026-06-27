@@ -968,6 +968,12 @@ document.querySelectorAll('.pf-slider').forEach(function(slider){
   slider.addEventListener('mouseup',function(){isDown=false;});
   slider.addEventListener('mousemove',function(e){if(!isDown)return;var x=e.pageX-slider.offsetLeft;var walk=x-startX;if(Math.abs(walk)>5){dragged=true;e.preventDefault();slider.scrollLeft=scrollLeft-walk*1.5;}});
   slider.addEventListener('click',function(e){if(dragged)return;var img=e.target.closest('img');if(img)openLightbox(img.src);});
+  var touchStartX=0;
+  slider.addEventListener('touchstart',function(e){touchStartX=e.touches[0].clientX;},{passive:true});
+  slider.addEventListener('touchend',function(e){
+    var dx=Math.abs(e.changedTouches[0].clientX-touchStartX);
+    if(dx<8){var img=e.target.closest('img');if(img)openLightbox(img.src);}
+  });
 });
 function syncPilRows(){
   var r = parseInt(document.getElementById('c-hpil-rows').value) || 0;

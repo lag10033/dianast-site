@@ -1747,6 +1747,7 @@ document.addEventListener('keydown',function(e){
   var o=document.getElementById('lb-overlay'),tx=0;
   o.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
   o.addEventListener('touchend',function(e){
+    if(e.target.tagName==='BUTTON')return;
     var dx=e.changedTouches[0].clientX-tx;
     if(Math.abs(dx)>40){dx<0?lbShow(lbIndex+1):lbShow(lbIndex-1);}
     else if(Math.abs(dx)<8){closeLightbox();}

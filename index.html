@@ -160,10 +160,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .hero-label{display:inline-block;background:rgba(212,82,30,0.15);color:var(--orange-light);border:1px solid rgba(212,82,30,0.3);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:6px 14px;border-radius:4px;margin-bottom:24px}
 .hero h1{font-family:'Montserrat',sans-serif;font-size:clamp(36px,4vw,56px);font-weight:800;line-height:1.1;color:white;margin-bottom:20px}
 .hero h1 span{color:var(--orange-light)}
-.hero-desc{font-size:17px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:36px;max-width:480px}
+.hero-desc{font-size:17px;color:rgba(255,255,255,0.80);line-height:1.7;margin-bottom:36px;max-width:480px}
 .hero-stats{display:flex;gap:32px;margin-bottom:40px}
 .hero-stat-num{font-family:'Montserrat',sans-serif;font-size:28px;font-weight:800;color:white}
-.hero-stat-label{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.hero-stat-label{font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px}
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
 .btn-primary{background:var(--orange);color:white;padding:15px 30px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s;display:inline-block}
 .btn-primary:hover{background:var(--orange-light);transform:translateY(-1px)}
@@ -238,7 +238,7 @@ section{padding:80px 5%}
 .master-years-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-align:center;line-height:1.2;margin-top:2px}
 .master h2{font-family:'Montserrat',sans-serif;font-size:clamp(28px,3vw,42px);font-weight:800;color:white;line-height:1.15;margin-bottom:20px}
 .master h2 span{color:var(--orange-light)}
-.master p{color:rgba(255,255,255,0.65);font-size:16px;line-height:1.7;margin-bottom:16px}
+.master p{color:rgba(255,255,255,0.80);font-size:16px;line-height:1.7;margin-bottom:16px}
 .master-facts{margin-top:32px;display:flex;flex-direction:column;gap:14px}
 .master-fact{display:flex;align-items:flex-start;gap:14px}
 .master-fact-dot{width:8px;height:8px;background:var(--orange);border-radius:50%;flex-shrink:0;margin-top:7px}
@@ -282,7 +282,7 @@ footer{position:relative;background:#111;padding:25px 5%}
 .footer-contacts{text-align:right}
 .footer-phone{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;color:white;text-decoration:none}
 .footer-phone:hover{color:var(--orange-light)}
-.footer-address{font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px}
+.footer-address{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px}
 .footer-socials{display:flex;gap:14px;justify-content:center;margin-bottom:20px}
 .footer-social{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:transform 0.2s,opacity 0.2s;opacity:0.85}
 .footer-social:hover{transform:scale(1.12);opacity:1}
@@ -330,7 +330,7 @@ footer{position:relative;background:#111;padding:25px 5%}
 <div id="leadBar" style="background:linear-gradient(90deg,#1a0a02,#2d1205,#1a0a02);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:999">
   <span style="font-size:13px;color:rgba(255,255,255,0.85);font-family:Inter,sans-serif">🎁 <strong style="color:#FF6B35">Бесплатно:</strong> узнайте 10 ошибок, которые стоят денег при строительстве забора</span>
   <button onclick="openLeadModal()" style="background:#F5C400;color:#1A1A1A;border:none;border-radius:6px;padding:7px 18px;font-family:Montserrat,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background 0.2s" onmouseover="this.style.background='#d4a800'" onmouseout="this.style.background='#F5C400'">Скачать руководство →</button>
-  <button onclick="document.getElementById('leadBar').style.display='none'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;line-height:1;padding:4px">×</button>
+  <button onclick="document.getElementById('leadBar').style.display='none'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.75);font-size:18px;cursor:pointer;line-height:1;padding:4px" aria-label="Закрыть">×</button>
 </div>
 
 <!-- LEAD MODAL -->
@@ -345,16 +345,16 @@ footer{position:relative;background:#111;padding:25px 5%}
       <p style="font-size:13px;color:#4A4A4A;margin-bottom:20px;line-height:1.6">Оставьте номер телефона — мы отправим руководство и при необходимости бесплатно проконсультируем по выбору кирпича.</p>
       <form onsubmit="submitLead(event)">
         <div style="margin-bottom:14px">
-          <input type="text" id="leadName" placeholder="Ваше имя" style="width:100%;border:1.5px solid #E8E3DC;border-radius:8px;padding:12px 16px;font-size:15px;font-family:Inter,sans-serif;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#D4521E'" onblur="this.style.borderColor='#E8E3DC'">
+          <input type="text" id="leadName" aria-label="Ваше имя" placeholder="Ваше имя" style="width:100%;border:1.5px solid #E8E3DC;border-radius:8px;padding:12px 16px;font-size:15px;font-family:Inter,sans-serif;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#D4521E'" onblur="this.style.borderColor='#E8E3DC'">
         </div>
         <div style="margin-bottom:20px">
-          <input type="tel" id="leadPhone" placeholder="+375 __ ___-__-__" required style="width:100%;border:1.5px solid #E8E3DC;border-radius:8px;padding:12px 16px;font-size:15px;font-family:Inter,sans-serif;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#D4521E'" onblur="this.style.borderColor='#E8E3DC'">
+          <input type="tel" id="leadPhone" aria-label="Номер телефона" placeholder="+375 __ ___-__-__" required style="width:100%;border:1.5px solid #E8E3DC;border-radius:8px;padding:12px 16px;font-size:15px;font-family:Inter,sans-serif;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#D4521E'" onblur="this.style.borderColor='#E8E3DC'">
         </div>
         <button type="submit" style="width:100%;background:#D4521E;color:white;border:none;border-radius:8px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#b83d10'" onmouseout="this.style.background='#D4521E'">Скачать бесплатно →</button>
       </form>
       <p style="font-size:11px;color:#BDBDBD;text-align:center;margin-top:14px">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
     </div>
-    <button onclick="closeLeadModal()" style="position:absolute;top:14px;right:18px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+    <button onclick="closeLeadModal()" style="position:absolute;top:14px;right:18px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1" aria-label="Закрыть">×</button>
   </div>
 </div>
 
@@ -426,13 +426,13 @@ function submitLead(e){
       <p>На квалифицированную строительную консультацию</p>
       <div class="form-group" style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Ваше имя</label>
-        <input type="text" id="hero-name" placeholder="Иван Иванов" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);outline:none;transition:border-color 0.2s;background:white;box-sizing:border-box" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+        <input type="text" id="hero-name" aria-label="Ваше имя" placeholder="Иван Иванов" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);outline:none;transition:border-color 0.2s;background:white;box-sizing:border-box" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
       </div>
       <div class="form-group" style="margin-bottom:20px">
         <label style="display:block;font-size:12px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Телефон</label>
         <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;background:white;transition:border-color 0.2s" id="hero-phone-wrap">
           <span style="padding:11px 0 11px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);user-select:none;">+375</span>
-          <input type="tel" id="hero-phone" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('hero-phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('hero-phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
+          <input type="tel" id="hero-phone" aria-label="Номер телефона" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('hero-phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('hero-phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
         </div>
       </div>
       <button class="btn-calc" onclick="sendHeroForm(event)">Отправить заявку →</button>
@@ -647,14 +647,14 @@ function submitLead(e){
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Длина забора</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="number" id="c-len" value="30" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="number" id="c-len" aria-label="Длина забора в метрах" value="30" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
               <span style="padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border)">м</span>
             </div>
           </div>
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Кол-во столбов</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="number" id="c-cols" value="11" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="number" id="c-cols" aria-label="Количество секций" value="11" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
               <span style="padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border)">шт</span>
             </div>
           </div>
@@ -666,7 +666,7 @@ function submitLead(e){
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Высота столбов</label>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;flex:1" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-                <input type="number" id="c-hpil-rows" value="19" min="1" step="1" oninput="syncPilRows()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0">
+                <input type="number" id="c-hpil-rows" aria-label="Рядов в столбе" value="19" min="1" step="1" oninput="syncPilRows()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0">
                 <span style="padding:10px 10px;background:var(--light);font-size:11px;color:var(--mid);font-weight:500;border-left:1px solid var(--border);white-space:nowrap">ряд.</span>
               </div>
               <span style="font-size:12px;color:var(--mid);white-space:nowrap"><span id="c-hpil-m" style="font-weight:700;color:var(--dark)">1.82</span>м</span>
@@ -676,7 +676,7 @@ function submitLead(e){
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Высота продлёнки</label>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;flex:1" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-                <input type="number" id="c-hrow-rows" value="3" min="0" step="1" oninput="syncRowRows()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0">
+                <input type="number" id="c-hrow-rows" aria-label="Рядов в пролёте" value="3" min="0" step="1" oninput="syncRowRows()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0">
                 <span style="padding:10px 10px;background:var(--light);font-size:11px;color:var(--mid);font-weight:500;border-left:1px solid var(--border);white-space:nowrap">ряд.</span>
               </div>
               <span style="font-size:12px;color:var(--mid);white-space:nowrap"><span id="c-hrow-m" style="font-weight:700;color:var(--dark)">0.29</span>м</span>
@@ -689,14 +689,14 @@ function submitLead(e){
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Ширина ворот</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="number" id="c-gate" value="4" min="0" step="0.5" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="number" id="c-gate" aria-label="Ширина ворот в метрах" value="4" min="0" step="0.5" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
               <span style="padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border)">м</span>
             </div>
           </div>
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Ширина калитки</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="number" id="c-wicket" value="1" min="0" step="0.5" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="number" id="c-wicket" aria-label="Ширина калитки в метрах" value="1" min="0" step="0.5" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
               <span style="padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border)">м</span>
             </div>
           </div>
@@ -705,7 +705,7 @@ function submitLead(e){
         <!-- Строка 4: Город доставки -->
         <div>
           <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Город доставки</label>
-          <select id="c-city" onchange="calcFence()" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:white;outline:none;appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path fill=%22%234A4A4A%22 d=%22M6 8L0 0h12z%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;cursor:pointer">
+          <select id="c-city" aria-label="Выберите город доставки" onchange="calcFence()" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:white;outline:none;appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path fill=%22%234A4A4A%22 d=%22M6 8L0 0h12z%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;cursor:pointer">
             <option value="kobrin">Кобрин</option>
             <option value="50">Дрогичин (~50 км)</option>
             <option value="50">Брест (~50 км)</option>
@@ -753,7 +753,7 @@ function submitLead(e){
           </select>
           <div id="c-city-manual-wrap" style="display:none;margin-top:8px">
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="number" id="c-city-km" placeholder="Расстояние от Кобрина" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="number" id="c-city-km" aria-label="Расстояние от Кобрина в км" placeholder="Расстояние от Кобрина" min="1" step="1" oninput="calcFence()" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
               <span style="padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border)">км</span>
             </div>
           </div>
@@ -764,13 +764,13 @@ function submitLead(e){
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Имя</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="text" id="c-name" placeholder="Ваше имя" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
+              <input type="text" id="c-name" aria-label="Ваше имя" placeholder="Ваше имя" style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent">
             </div>
           </div>
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Телефон</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
-              <input type="tel" id="c-phone" value="+375 " style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent" oninput="(function(el){var v=el.value;var prefix='+375 ';if(!v.startsWith(prefix)){el.value=prefix;return;}var d=v.slice(prefix.length).replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=prefix+f;})(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)">
+              <input type="tel" id="c-phone" aria-label="Номер телефона" value="+375 " style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent" oninput="(function(el){var v=el.value;var prefix='+375 ';if(!v.startsWith(prefix)){el.value=prefix;return;}var d=v.slice(prefix.length).replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=prefix+f;})(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)">
             </div>
           </div>
         </div>
@@ -783,7 +783,7 @@ function submitLead(e){
           <div style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:700;margin-bottom:24px;color:rgba(255,255,255,0.9)">Результат расчёта</div>
 
           <div style="border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:20px;margin-bottom:20px">
-            <div style="font-size:12px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Угловой кирпич (столбы)</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Угловой кирпич (столбы)</div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Количество</span>
               <span id="r-ang-pcs" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:white">—</span>
@@ -799,7 +799,7 @@ function submitLead(e){
           </div>
 
           <div style="border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:20px;margin-bottom:20px">
-            <div style="font-size:12px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Рядовой кирпич (продлёнка)</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Рядовой кирпич (продлёнка)</div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Количество</span>
               <span id="r-row-pcs" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:white">—</span>
@@ -855,19 +855,19 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Графит</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img loading="lazy" src="assets/photos/pf-graf-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-5.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-6.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-7.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-8.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-9.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-10.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-11.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-12.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-graf-13.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 1" loading="lazy" src="assets/photos/pf-graf-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 2" loading="lazy" src="assets/photos/pf-graf-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 3" loading="lazy" src="assets/photos/pf-graf-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 4" loading="lazy" src="assets/photos/pf-graf-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 5" loading="lazy" src="assets/photos/pf-graf-5.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 6" loading="lazy" src="assets/photos/pf-graf-6.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 7" loading="lazy" src="assets/photos/pf-graf-7.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 8" loading="lazy" src="assets/photos/pf-graf-8.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 9" loading="lazy" src="assets/photos/pf-graf-9.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 10" loading="lazy" src="assets/photos/pf-graf-10.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 11" loading="lazy" src="assets/photos/pf-graf-11.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 12" loading="lazy" src="assets/photos/pf-graf-12.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича графит 13" loading="lazy" src="assets/photos/pf-graf-13.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:28px">
@@ -876,22 +876,22 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Коричневый</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img loading="lazy" src="assets/photos/pf-korch-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-5.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-6.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-7.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-8.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-9.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-10.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-11.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-12.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-13.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-14.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-15.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-korch-16.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 1" loading="lazy" src="assets/photos/pf-korch-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 2" loading="lazy" src="assets/photos/pf-korch-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 3" loading="lazy" src="assets/photos/pf-korch-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 4" loading="lazy" src="assets/photos/pf-korch-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 5" loading="lazy" src="assets/photos/pf-korch-5.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 6" loading="lazy" src="assets/photos/pf-korch-6.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 7" loading="lazy" src="assets/photos/pf-korch-7.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 8" loading="lazy" src="assets/photos/pf-korch-8.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 9" loading="lazy" src="assets/photos/pf-korch-9.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 10" loading="lazy" src="assets/photos/pf-korch-10.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 11" loading="lazy" src="assets/photos/pf-korch-11.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 12" loading="lazy" src="assets/photos/pf-korch-12.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 13" loading="lazy" src="assets/photos/pf-korch-13.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 14" loading="lazy" src="assets/photos/pf-korch-14.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 15" loading="lazy" src="assets/photos/pf-korch-15.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича коричневый 16" loading="lazy" src="assets/photos/pf-korch-16.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:28px">
@@ -900,10 +900,10 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Горчичный</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img loading="lazy" src="assets/photos/pf-gorch-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-gorch-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-gorch-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-gorch-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича горчичный 1" loading="lazy" src="assets/photos/pf-gorch-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича горчичный 2" loading="lazy" src="assets/photos/pf-gorch-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича горчичный 3" loading="lazy" src="assets/photos/pf-gorch-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича горчичный 4" loading="lazy" src="assets/photos/pf-gorch-4.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
           <div style="margin-bottom:8px">
@@ -912,9 +912,9 @@ function submitLead(e){
               <span style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em">Красный</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
-              <img loading="lazy" src="assets/photos/pf-kras-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-kras-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-              <img loading="lazy" src="assets/photos/pf-kras-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича красный 1" loading="lazy" src="assets/photos/pf-kras-1.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича красный 2" loading="lazy" src="assets/photos/pf-kras-2.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+              <img alt="Забор из колотого кирпича красный 3" loading="lazy" src="assets/photos/pf-kras-3.webp" onclick="openLightbox(this.src)" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:zoom-in;transition:opacity 0.2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
             </div>
           </div>
     </div>
@@ -1014,12 +1014,12 @@ function calcFence(){
   var delivWrap = document.getElementById('r-delivery-wrap');
   if(kobrinFixed && totalPal > 0){
     delivWrap.style.display = 'flex';
-    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.45)">(Кобрин)</span>';
+    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.75)">(Кобрин)</span>';
     document.getElementById('r-delivery-sum').textContent = deliveryCost.toFixed(2) + ' руб';
   } else if(km > 0){
     delivWrap.style.display = 'flex';
     var tripsWord = trips === 1 ? ' рейс' : trips < 5 ? ' рейса' : ' рейсов';
-    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.45)">(' + trips + tripsWord + ', ' + km + ' км)</span>';
+    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.75)">(' + trips + tripsWord + ', ' + km + ' км)</span>';
     document.getElementById('r-delivery-sum').textContent = deliveryCost.toFixed(2) + ' руб';
   } else {
     delivWrap.style.display = 'none';
@@ -1262,13 +1262,13 @@ calcFence();
       <div class="form-sub">Мы точно решим вашу задачу – имеем опыт в строительстве заборов более 10 лет</div>
       <div class="form-group">
         <label>Ваше имя</label>
-        <input type="text" placeholder="Иван Иванов">
+        <input type="text" aria-label="Ваше имя" placeholder="Иван Иванов">
       </div>
       <div class="form-group">
         <label>Телефон</label>
         <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;background:white;transition:border-color 0.2s" id="phone-wrap">
           <span style="padding:11px 0 11px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);user-select:none;">+375</span>
-          <input type="tel" id="contact-phone" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
+          <input type="tel" id="contact-phone" aria-label="Номер телефона" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
         </div>
       </div>
 
@@ -1303,37 +1303,37 @@ calcFence();
   <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:20px;padding-top:20px;max-width:1200px;margin-left:auto;margin-right:auto;padding-left:5%;padding-right:5%">
     <div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;text-align:center">Доставка по Беларуси</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
-      <a href="/brest" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Брест</a>
-      <a href="/baranovichi" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Барановичи</a>
-      <a href="/grodno" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Гродно</a>
-      <a href="/minsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Минск</a>
-      <a href="/soligorsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Солигорск</a>
-      <a href="/stolbtsy" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Столбцы</a>
-      <a href="/lida" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Лида</a>
-      <a href="/pinsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Пинск</a>
-      <a href="/bereza" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Береза</a>
-      <a href="/drogichin" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Дрогичин</a>
-      <a href="/ivatsevichi" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Ивацевичи</a>
-      <a href="/stolin" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Столин</a>
-      <a href="/slonim" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Слоним</a>
-      <a href="/volkovysk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Волковыск</a>
-      <a href="/novogrudok" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Новогрудок</a>
-      <a href="/smorgon" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Сморгонь</a>
-      <a href="/molodechno" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Молодечно</a>
-      <a href="/slutsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Слуцк</a>
-      <a href="/borisov" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Борисов</a>
-      <a href="/zhodino" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Жодино</a>
-      <a href="/nesvizh" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Несвиж</a>
-      <a href="/vileyka" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Вилейка</a>
-      <a href="/vitebsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Витебск</a>
-      <a href="/polotsk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Полоцк</a>
-      <a href="/orsha" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Орша</a>
-      <a href="/mogilev" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Могилёв</a>
-      <a href="/bobruisk" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Бобруйск</a>
-      <a href="/osipovichi" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Осиповичи</a>
-      <a href="/gomel" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Гомель</a>
-      <a href="/zhlobin" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Жлобин</a>
-      <a href="/mozyr" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Мозырь</a>
+      <a href="/brest" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Брест</a>
+      <a href="/baranovichi" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Барановичи</a>
+      <a href="/grodno" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Гродно</a>
+      <a href="/minsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Минск</a>
+      <a href="/soligorsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Солигорск</a>
+      <a href="/stolbtsy" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Столбцы</a>
+      <a href="/lida" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Лида</a>
+      <a href="/pinsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Пинск</a>
+      <a href="/bereza" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Береза</a>
+      <a href="/drogichin" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Дрогичин</a>
+      <a href="/ivatsevichi" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Ивацевичи</a>
+      <a href="/stolin" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Столин</a>
+      <a href="/slonim" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Слоним</a>
+      <a href="/volkovysk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Волковыск</a>
+      <a href="/novogrudok" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Новогрудок</a>
+      <a href="/smorgon" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Сморгонь</a>
+      <a href="/molodechno" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Молодечно</a>
+      <a href="/slutsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Слуцк</a>
+      <a href="/borisov" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Борисов</a>
+      <a href="/zhodino" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Жодино</a>
+      <a href="/nesvizh" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Несвиж</a>
+      <a href="/vileyka" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Вилейка</a>
+      <a href="/vitebsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Витебск</a>
+      <a href="/polotsk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Полоцк</a>
+      <a href="/orsha" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Орша</a>
+      <a href="/mogilev" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Могилёв</a>
+      <a href="/bobruisk" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Бобруйск</a>
+      <a href="/osipovichi" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Осиповичи</a>
+      <a href="/gomel" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Гомель</a>
+      <a href="/zhlobin" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Жлобин</a>
+      <a href="/mozyr" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Колотый кирпич Мозырь</a>
     </div>
   </div></footer>
 
@@ -1515,7 +1515,7 @@ function sendForm(e){
 
 <div class="pcard-overlay" id="pcOverlay">
   <div class="pcard-box">
-    <button class="pcard-x" onclick="pcClose()">✕</button>
+    <button class="pcard-x" onclick="pcClose()" aria-label="Закрыть">✕</button>
     <div class="pcard-gallery">
       <div class="pcard-big"><img loading="lazy" id="pcBig" src="" alt="" referrerpolicy="no-referrer"></div>
       <div class="pcard-row" id="pcRow"></div>
@@ -1665,7 +1665,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')pcClose();})
 
 <!-- LIGHTBOX -->
 <div id="lb-overlay" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out">
-  <img loading="lazy" id="lb-img" src="" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+  <img loading="lazy" id="lb-img" alt="Фото забора из колотого кирпича" src="" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
   <div onclick="closeLightbox()" style="position:absolute;top:16px;right:20px;color:#fff;font-size:32px;line-height:1;cursor:pointer;user-select:none">&#x2715;</div>
 </div>
 <script>

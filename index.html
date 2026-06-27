@@ -936,6 +936,7 @@ function submitLead(e){
 </section>
 
 <style>
+#lb-img{transition:opacity 0.18s ease;}
 .pf-group{margin-bottom:32px}
 .pf-color-label{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:0.06em}
 .pf-slider{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;cursor:grab;user-select:none;-webkit-overflow-scrolling:touch;padding-bottom:8px}
@@ -1725,13 +1726,10 @@ function openLightbox(src,slider){
 function lbShow(idx){
   lbIndex=(idx+lbImages.length)%lbImages.length;
   var img=document.getElementById('lb-img');
-  img.style.transition='opacity 0.15s';
   img.style.opacity='0';
-  setTimeout(function(){
-    img.onload=function(){img.style.opacity='1';};
-    img.src=lbImages[lbIndex];
-    if(img.complete)img.style.opacity='1';
-  },150);
+  img.src=lbImages[lbIndex];
+  img.onload=function(){img.style.opacity='1';};
+  if(img.complete)img.style.opacity='1';
 }
 function lbPrev(e){e.stopPropagation();lbShow(lbIndex-1);}
 function lbNext(e){e.stopPropagation();lbShow(lbIndex+1);}

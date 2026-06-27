@@ -122,7 +122,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/img/hero-bg.webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/img/hero-bg-mobile.webp" imagesrcset="assets/img/hero-bg-mobile.webp 640w, assets/img/hero-bg.webp 1200w" imagesizes="100vw" fetchpriority="high">
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
@@ -137,7 +137,7 @@
   --border:#E8E3DC;
 }
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;color:var(--dark);background:var(--white);line-height:1.6}
+body{font-family:'Inter','Arial',sans-serif;color:var(--dark);background:var(--white);line-height:1.6}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 5%}
@@ -154,11 +154,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .nav-cta:hover{background:var(--orange-light)}
 
 /* HERO */
-.hero{padding-top:68px;min-height:100vh;display:flex;align-items:center;background:url("assets/img/hero-bg.webp") center/cover no-repeat;position:relative;overflow:hidden}
+.hero{padding-top:68px;min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0}
 .hero-inner{max-width:1200px;margin:0 auto;padding:80px 5%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
 .hero-label{display:inline-block;background:rgba(212,82,30,0.15);color:var(--orange-light);border:1px solid rgba(212,82,30,0.3);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:6px 14px;border-radius:4px;margin-bottom:24px}
-.hero h1{font-family:'Montserrat',sans-serif;font-size:clamp(36px,4vw,56px);font-weight:800;line-height:1.1;color:white;margin-bottom:20px}
+.hero h1{font-family:'Montserrat','Arial Black','Arial',sans-serif;font-size-adjust:0.5;font-size:clamp(36px,4vw,56px);font-weight:800;line-height:1.1;color:white;margin-bottom:20px}
 .hero h1 span{color:var(--orange-light)}
 .hero-desc{font-size:17px;color:rgba(255,255,255,0.80);line-height:1.7;margin-bottom:36px;max-width:480px}
 .hero-stats{display:flex;gap:32px;margin-bottom:40px}
@@ -396,6 +396,10 @@ function submitLead(e){
 
 <!-- HERO -->
 <section class="hero" id="hero">
+  <picture style="position:absolute;inset:0;width:100%;height:100%">
+    <source media="(max-width:640px)" srcset="assets/img/hero-bg-mobile.webp" type="image/webp">
+    <img src="assets/img/hero-bg.webp" alt="Забор из колотого кирпича Dianast" fetchpriority="high" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center">
+  </picture>
   <div class="hero-bg" style="background:linear-gradient(105deg,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.55) 50%,rgba(0,0,0,0.75) 100%)"></div>
   <div class="hero-inner">
     <div>

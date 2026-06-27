@@ -1705,23 +1705,47 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')pcClose();})
 </script>
 
 <!-- LIGHTBOX -->
-<div id="lb-overlay" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out">
-  <img loading="lazy" id="lb-img" alt="Фото забора из колотого кирпича" src="" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+<div id="lb-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out">
+  <button onclick="lbPrev(event)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:44px;height:44px;font-size:22px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1">&#8249;</button>
+  <img loading="lazy" id="lb-img" alt="Фото забора из колотого кирпича" src="" onclick="closeLightbox()" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)">
+  <button onclick="lbNext(event)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:44px;height:44px;font-size:22px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1">&#8250;</button>
   <div onclick="closeLightbox()" style="position:absolute;top:16px;right:20px;color:#fff;font-size:32px;line-height:1;cursor:pointer;user-select:none">&#x2715;</div>
 </div>
 <script>
+var lbImages=[],lbIndex=0;
 function openLightbox(src){
-  document.getElementById('lb-img').src=src;
-  var o=document.getElementById('lb-overlay');
-  o.style.display='flex';
+  lbImages=Array.from(document.querySelectorAll('.pf-slider img')).map(function(i){return i.src;});
+  lbIndex=lbImages.indexOf(src);
+  if(lbIndex<0)lbIndex=0;
+  document.getElementById('lb-img').src=lbImages[lbIndex];
+  document.getElementById('lb-overlay').style.display='flex';
   document.body.style.overflow='hidden';
 }
+function lbShow(idx){
+  lbIndex=(idx+lbImages.length)%lbImages.length;
+  document.getElementById('lb-img').src=lbImages[lbIndex];
+}
+function lbPrev(e){e.stopPropagation();lbShow(lbIndex-1);}
+function lbNext(e){e.stopPropagation();lbShow(lbIndex+1);}
 function closeLightbox(){
   document.getElementById('lb-overlay').style.display='none';
   document.getElementById('lb-img').src='';
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeLightbox();
+  if(e.key==='ArrowLeft')lbShow(lbIndex-1);
+  if(e.key==='ArrowRight')lbShow(lbIndex+1);
+});
+(function(){
+  var o=document.getElementById('lb-overlay'),tx=0;
+  o.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  o.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>40){dx<0?lbShow(lbIndex+1):lbShow(lbIndex-1);}
+    else if(Math.abs(dx)<8){closeLightbox();}
+  });
+})();
 
 // Кнопка наверх
 function updateBackBtn(){

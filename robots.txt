@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Не индексировать старые страницы-редиректы
+Disallow: /blog/
+Disallow: /portfolios/
+Disallow: /profnastil/
+Disallow: /evroshtaketnik/
+Disallow: /setka-rabicza/
+Disallow: /zabory-zhalyuzi/
+Disallow: /credit/
+Disallow: /vacancy/
+Disallow: /certificates/
+Disallow: /about/
+Disallow: /delivery/
+Disallow: /price/
+Disallow: /catalog/
+
+Sitemap: https://dianast.by/sitemap.xml

@@ -967,12 +967,12 @@ document.querySelectorAll('.pf-slider').forEach(function(slider){
   slider.addEventListener('mouseleave',function(){isDown=false;});
   slider.addEventListener('mouseup',function(){isDown=false;});
   slider.addEventListener('mousemove',function(e){if(!isDown)return;var x=e.pageX-slider.offsetLeft;var walk=x-startX;if(Math.abs(walk)>5){dragged=true;e.preventDefault();slider.scrollLeft=scrollLeft-walk*1.5;}});
-  slider.addEventListener('click',function(e){if(dragged)return;var img=e.target.closest('img');if(img)openLightbox(img.src);});
+  slider.addEventListener('click',function(e){if(dragged)return;var img=e.target.closest('img');if(img)openLightbox(img.src,slider);});
   var touchStartX=0;
   slider.addEventListener('touchstart',function(e){touchStartX=e.touches[0].clientX;},{passive:true});
   slider.addEventListener('touchend',function(e){
     var dx=Math.abs(e.changedTouches[0].clientX-touchStartX);
-    if(dx<8){var img=e.target.closest('img');if(img)openLightbox(img.src);}
+    if(dx<8){var img=e.target.closest('img');if(img)openLightbox(img.src,slider);}
   });
 });
 function syncPilRows(){
@@ -1713,8 +1713,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')pcClose();})
 </div>
 <script>
 var lbImages=[],lbIndex=0;
-function openLightbox(src){
-  lbImages=Array.from(document.querySelectorAll('.pf-slider img')).map(function(i){return i.src;});
+function openLightbox(src,slider){
+  var container=slider||document.querySelector('.pf-slider');
+  lbImages=Array.from(container.querySelectorAll('img')).map(function(i){return i.src;});
   lbIndex=lbImages.indexOf(src);
   if(lbIndex<0)lbIndex=0;
   document.getElementById('lb-img').src=lbImages[lbIndex];

@@ -456,6 +456,83 @@ button { font-family: inherit; cursor: pointer; }
 }
 .info-note b { color: var(--orange-dk); font-weight: 700; }
 
+/* ── Height result (rows + meters) ── */
+.height-result {
+  text-align: center;
+  margin-top: 4px;
+}
+.hr-meters {
+  font-family: Montserrat, sans-serif;
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--orange);
+  letter-spacing: -0.02em;
+}
+.hr-rows {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--gray);
+  margin-top: 6px;
+}
+
+/* ── Wheel picker (rows of brick) ── */
+.wheel {
+  position: relative;
+  height: 180px;
+  margin-top: 16px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
+}
+.wheel-scroll {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 70px 0;
+}
+.wheel-scroll::-webkit-scrollbar { display: none; }
+.wheel-item {
+  height: 40px;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--gray-lt);
+  transition: color 150ms, font-size 150ms;
+  cursor: pointer;
+}
+.wheel-item.active {
+  color: var(--orange);
+  font-size: 26px;
+}
+.wheel-center {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  height: 40px;
+  border-top: 2px solid var(--orange-md);
+  border-bottom: 2px solid var(--orange-md);
+  pointer-events: none;
+}
+.wheel-unit {
+  position: absolute;
+  right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-family: Montserrat, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--gray-lt);
+  pointer-events: none;
+}
+
 .inp-full {
   width: 100%;
   padding: 15px 16px;
@@ -925,24 +1002,27 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step" id="step-2">
       <img class="step-photo" src="/assets/photos/pf-kras-4.webp" alt="Высота забора" loading="eager" style="object-position:center top">
       <h2 class="step-title">Высота забора</h2>
-      <p class="step-sub">Укажите желаемую высоту и откуда её считать</p>
-      <div class="inp-wrap">
-        <input type="number" id="height" placeholder="1.83" step="0.01" oninput="syncPresets()">
-        <span class="inp-suffix">метров</span>
+      <p class="step-sub">Крутите колесо — выберите количество рядов кирпича</p>
+
+      <div class="height-result">
+        <div class="hr-meters"><span id="hrMeters">1,83 м</span></div>
+        <div class="hr-rows"><span id="hrRows">18</span> рядов кирпича</div>
       </div>
+
       <div class="seg" id="heightFrom">
         <button type="button" class="seg-btn active" data-from="ground" onclick="setHeightFrom('ground',this)">От земли</button>
         <button type="button" class="seg-btn" data-from="foundation" onclick="setHeightFrom('foundation',this)">От фундамента</button>
       </div>
-      <div class="presets">
-        <div class="preset" data-h="1.5" onclick="setHeight('1.5',this)">1.5 м</div>
-        <div class="preset" data-h="1.83" onclick="setHeight('1.83',this)">1.83 м</div>
-        <div class="preset" data-h="2.0" onclick="setHeight('2.0',this)">2.0 м</div>
-        <div class="preset" data-h="2.5" onclick="setHeight('2.5',this)">2.5 м</div>
+
+      <div class="wheel">
+        <div class="wheel-scroll" id="wheelScroll"></div>
+        <div class="wheel-center"></div>
+        <div class="wheel-unit">рядов</div>
       </div>
+
       <div class="info-note">
         <span>💡</span>
-        <span>Чаще всего заказывают <b>18 рядов кирпича — это 1,73 м</b>. Фундамент обычно выступает над землёй на 10 см, поэтому итоговая высота от земли — около <b>1,83 м</b>.</span>
+        <span>1 ряд кладки ≈ 9,6 см. Например, <b>18 рядов = 1,73 м</b> кирпича. Фундамент добавляет ~10 см, поэтому «от земли» выходит <b>1,83 м</b>.</span>
       </div>
     </div>
 
@@ -1154,7 +1234,7 @@ button { font-family: inherit; cursor: pointer; }
 // ── State ──────────────────────────────────────────────
 const state = {
   fenceSide: null,
-  length: '', height: '', heightFrom: 'ground',
+  length: '', height: '', heightFrom: 'ground', heightRows: 18,
   ground: null,
   gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketOn: false, wicketWidth: '', wicketIntercom: false,
@@ -1252,6 +1332,8 @@ function showStep(idx) {
     // Scroll content to top on step change
     const content = document.getElementById('quizContent');
     if (content) content.scrollTop = 0;
+    // Wheel needs layout to set scrollTop — do it when the step is visible
+    if (steps[idx] === 2) positionWheel();
   }
 
   updateNav();
@@ -1303,7 +1385,7 @@ function submitQuiz() {
     + '🔧 Параметры:\n'
     + '▪ Сторона: '    + (sideMap[state.fenceSide]||'—') + '\n'
     + '▪ Длина: '      + (state.length||'—') + ' м\n'
-    + '▪ Высота: '     + (state.height||'—') + ' м (' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n'
+    + '▪ Высота: '     + (state.height||'—') + ' м (' + state.heightRows + ' рядов, ' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n'
     + '▪ Участок: '    + (groundMap[state.ground]||'—') + '\n'
     + '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
     + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '')
@@ -1349,20 +1431,60 @@ function selectGridCard(el) {
   updateNav();
 }
 
-// ── Height presets ─────────────────────────────────────
-function setHeight(val, el) {
-  document.getElementById('height').value = val;
-  state.height = val;
-  document.querySelectorAll('.preset').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  updateNav();
+// ── Height wheel (rows of brick) ───────────────────────
+const ROW_M        = 1.73 / 18;   // ≈ 0.0961 м на 1 ряд кладки
+const FOUNDATION_M = 0.10;        // фундамент выступает над землёй
+const MIN_ROWS = 10, MAX_ROWS = 30, ITEM_H = 40;
+
+function buildWheel() {
+  const list = document.getElementById('wheelScroll');
+  if (!list) return;
+  let html = '';
+  for (let r = MIN_ROWS; r <= MAX_ROWS; r++) {
+    html += '<div class="wheel-item" data-rows="' + r + '" onclick="snapToRows(' + r + ')">' + r + '</div>';
+  }
+  list.innerHTML = html;
+
+  let lastRows = state.heightRows;
+  list.addEventListener('scroll', function () {
+    const idx  = Math.round(list.scrollTop / ITEM_H);
+    const rows = Math.min(MAX_ROWS, Math.max(MIN_ROWS, MIN_ROWS + idx));
+    if (rows !== lastRows) {
+      lastRows = rows;
+      state.heightRows = rows;
+      renderHeight();
+    }
+  });
+
+  renderHeight();
 }
 
-function syncPresets() {
-  const val = document.getElementById('height').value;
-  state.height = val;
-  document.querySelectorAll('.preset').forEach(p => {
-    p.classList.toggle('selected', p.dataset.h === val);
+function positionWheel() {
+  const list = document.getElementById('wheelScroll');
+  if (!list) return;
+  list.scrollTop = (state.heightRows - MIN_ROWS) * ITEM_H;
+  renderHeight();
+}
+
+function snapToRows(rows) {
+  const list = document.getElementById('wheelScroll');
+  if (!list) return;
+  list.scrollTo({ top: (rows - MIN_ROWS) * ITEM_H, behavior: 'smooth' });
+}
+
+function renderHeight() {
+  const rows  = state.heightRows;
+  const brick = rows * ROW_M;
+  const meters = state.heightFrom === 'ground' ? brick + FOUNDATION_M : brick;
+  state.height = meters.toFixed(2);
+
+  const mEl = document.getElementById('hrMeters');
+  const rEl = document.getElementById('hrRows');
+  if (mEl) mEl.textContent = meters.toFixed(2).replace('.', ',') + ' м';
+  if (rEl) rEl.textContent = rows;
+
+  document.querySelectorAll('#wheelScroll .wheel-item').forEach(function (it) {
+    it.classList.toggle('active', parseInt(it.dataset.rows, 10) === rows);
   });
   updateNav();
 }
@@ -1371,6 +1493,7 @@ function setHeightFrom(val, el) {
   state.heightFrom = val;
   document.querySelectorAll('#heightFrom .seg-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  renderHeight();
 }
 
 // ── Toggles ────────────────────────────────────────────
@@ -1404,6 +1527,7 @@ function updateFillStep() {
 }
 
 // ── Init ───────────────────────────────────────────────
+buildWheel();
 updateNav();
 </script>
 </body>

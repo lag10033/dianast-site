@@ -57,6 +57,30 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* ── Step banner photo ── */
+  .step-photo {
+    width: 100%; height: 180px; object-fit: cover;
+    border-radius: 12px; display: block; margin-bottom: 20px;
+  }
+
+  /* ── Card photo ── */
+  .card-img {
+    width: calc(100% + 40px); height: 140px; object-fit: cover;
+    border-radius: 6px 6px 0 0; display: block;
+    margin: -16px -20px 14px;
+  }
+  .card.has-img { padding-top: 0; align-items: flex-start; flex-direction: column; }
+  .card.has-img .card-label { font-size: 15px; }
+  .card.has-img > div { padding: 0; }
+
+  /* ── Grid card photo ── */
+  .card-grid-img {
+    width: calc(100% + 24px); height: 90px; object-fit: cover;
+    border-radius: 6px 6px 0 0; display: block;
+    margin: -20px -12px 10px;
+  }
+  .card-grid.has-img { padding-top: 0; }
+
   /* ── Step ── */
   .step { display: none; }
   .step.active { display: block; }
@@ -317,14 +341,16 @@
       <h2 class="step-title">Какая сторона забора?</h2>
       <p class="step-sub">Выберите один вариант</p>
       <div class="cards">
-        <div class="card" data-group="fenceSide" data-val="face" onclick="selectCard(this)">
-          <div>
+        <div class="card has-img" data-group="fenceSide" data-val="face" onclick="selectCard(this)">
+          <img class="card-img" src="../assets/photos/pf-kras-1.webp" alt="Лицевая сторона забора" loading="lazy">
+          <div style="padding:0 4px 4px">
             <div class="card-label">Лицевая</div>
             <div class="card-sub">Главный въезд, улица</div>
           </div>
         </div>
-        <div class="card" data-group="fenceSide" data-val="side" onclick="selectCard(this)">
-          <div>
+        <div class="card has-img" data-group="fenceSide" data-val="side" onclick="selectCard(this)">
+          <img class="card-img" src="../assets/photos/pf-korch-1.webp" alt="Боковая сторона забора" loading="lazy">
+          <div style="padding:0 4px 4px">
             <div class="card-label">Боковая</div>
             <div class="card-sub">Смежный участок, соседи</div>
           </div>
@@ -334,6 +360,7 @@
 
     <!-- STEP 2: Длина -->
     <div class="step" id="step-1">
+      <img class="step-photo" src="../assets/photos/pf-korch-2.webp" alt="Длина забора" loading="lazy">
       <h2 class="step-title">Длина забора</h2>
       <p class="step-sub">Не знаете точно? Напишите примерно</p>
       <div class="inp-wrap">
@@ -345,6 +372,7 @@
 
     <!-- STEP 3: Высота -->
     <div class="step" id="step-2">
+      <img class="step-photo" src="../assets/photos/pf-kras-4.webp" alt="Высота забора" loading="lazy" style="object-position:center top">
       <h2 class="step-title">Высота забора</h2>
       <p class="step-sub">Стандартная высота — 1,8 м</p>
       <div class="inp-wrap">
@@ -361,6 +389,7 @@
 
     <!-- STEP 4: Участок -->
     <div class="step" id="step-3">
+      <img class="step-photo" src="../assets/photos/pf-graf-5.webp" alt="Участок" loading="lazy">
       <h2 class="step-title">Что сейчас на участке?</h2>
       <p class="step-sub">Это поможет рассчитать стоимость точнее</p>
       <div class="cards">
@@ -387,6 +416,7 @@
 
     <!-- STEP 5: Ворота -->
     <div class="step" id="step-4">
+      <img class="step-photo" src="../assets/photos/pf-gorch-1.webp" alt="Ворота" loading="lazy">
       <h2 class="step-title">Ворота</h2>
       <p class="step-sub">Нужны ли ворота на объект?</p>
       <div class="toggle-row">
@@ -431,6 +461,7 @@
 
     <!-- STEP 6: Калитка -->
     <div class="step" id="step-5">
+      <img class="step-photo" src="../assets/photos/pf-korch-3.webp" alt="Калитка" loading="lazy">
       <h2 class="step-title">Калитка</h2>
       <p class="step-sub">Нужна ли калитка на участок?</p>
       <div class="toggle-row">
@@ -461,20 +492,23 @@
       <h2 class="step-title">Тип забора</h2>
       <p class="step-sub">Выберите материал основного заполнения</p>
       <div class="cards">
-        <div class="card" data-group="fenceStyle" data-val="brick" onclick="selectCard(this);updateFillStep()">
-          <div>
+        <div class="card has-img" data-group="fenceStyle" data-val="brick" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="../assets/photos/pf-graf-1.webp" alt="Кирпич + металл" loading="lazy">
+          <div style="padding:0 4px 4px">
             <div class="card-label">Кирпич + заполнение металлом</div>
             <div class="card-sub">Столбы из кирпича, секции из металла</div>
           </div>
         </div>
-        <div class="card" data-group="fenceStyle" data-val="stake" onclick="selectCard(this);updateFillStep()">
-          <div>
+        <div class="card has-img" data-group="fenceStyle" data-val="stake" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="../assets/photos/pf-korch-8.webp" alt="Штакетник" loading="lazy">
+          <div style="padding:0 4px 4px">
             <div class="card-label">Металлический штакетник</div>
             <div class="card-sub">Современно, светло, практично</div>
           </div>
         </div>
-        <div class="card" data-group="fenceStyle" data-val="profile" onclick="selectCard(this);updateFillStep()">
-          <div>
+        <div class="card has-img" data-group="fenceStyle" data-val="profile" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="../assets/photos/pf-kras-5.webp" alt="Профнастил" loading="lazy">
+          <div style="padding:0 4px 4px">
             <div class="card-label">Профнастил</div>
             <div class="card-sub">Надёжно и экономично</div>
           </div>
@@ -487,19 +521,24 @@
       <h2 class="step-title">Тип заполнения</h2>
       <p class="step-sub">Из чего будут секции между кирпичными столбами?</p>
       <div class="cards-grid">
-        <div class="card-grid" data-group="fillType" data-val="stake" onclick="selectGridCard(this)">
+        <div class="card-grid has-img" data-group="fillType" data-val="stake" onclick="selectGridCard(this)">
+          <img class="card-grid-img" src="../assets/photos/pf-graf-1.webp" alt="Штакетник" loading="lazy">
           <span class="card-grid-label">Штакетник</span>
         </div>
-        <div class="card-grid" data-group="fillType" data-val="profile" onclick="selectGridCard(this)">
+        <div class="card-grid has-img" data-group="fillType" data-val="profile" onclick="selectGridCard(this)">
+          <img class="card-grid-img" src="../assets/photos/pf-graf-2.webp" alt="Профнастил" loading="lazy">
           <span class="card-grid-label">Профнастил</span>
         </div>
-        <div class="card-grid" data-group="fillType" data-val="rancho" onclick="selectGridCard(this)">
+        <div class="card-grid has-img" data-group="fillType" data-val="rancho" onclick="selectGridCard(this)">
+          <img class="card-grid-img" src="../assets/photos/pf-korch-1.webp" alt="Ранчо" loading="lazy">
           <span class="card-grid-label">Ранчо</span>
         </div>
-        <div class="card-grid" data-group="fillType" data-val="jaluzi" onclick="selectGridCard(this)">
+        <div class="card-grid has-img" data-group="fillType" data-val="jaluzi" onclick="selectGridCard(this)">
+          <img class="card-grid-img" src="../assets/photos/pf-gorch-1.webp" alt="Жалюзи" loading="lazy">
           <span class="card-grid-label">Жалюзи</span>
         </div>
-        <div class="card-grid full" data-group="fillType" data-val="brickfill" onclick="selectGridCard(this)">
+        <div class="card-grid has-img full" data-group="fillType" data-val="brickfill" onclick="selectGridCard(this)">
+          <img class="card-grid-img" src="../assets/photos/pf-kras-1.webp" alt="Кирпич" loading="lazy" style="height:100px">
           <span class="card-grid-label">Кирпич</span>
         </div>
       </div>
@@ -507,6 +546,7 @@
 
     <!-- STEP 9: Город -->
     <div class="step" id="step-8">
+      <img class="step-photo" src="../assets/photos/pf-gorch-3.webp" alt="Доставка по Беларуси" loading="lazy">
       <h2 class="step-title">Ваш город</h2>
       <p class="step-sub">Работаем по всей Беларуси, доставка в любой регион</p>
       <input type="text" class="inp-full" id="city" placeholder="Брест, Минск, Гомель..." oninput="updateNav()">
@@ -515,6 +555,7 @@
     <!-- STEP 10: Контакты -->
     <div class="step" id="step-9">
       <h2 class="step-title">Контакты</h2>
+      <img class="step-photo" src="../assets/master.jpg" alt="Мастер Dianast" loading="lazy" style="object-position:center top">
       <p class="step-sub">Пришлём расчёт на основе ваших параметров</p>
       <div class="field-group">
         <div>

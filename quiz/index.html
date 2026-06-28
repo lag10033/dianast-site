@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Квиз — Расчёт забора | DIANAST</title>
+<title>Расчёт забора бесплатно | DIANAST</title>
+<meta name="description" content="Получите точный расчёт забора из колотого кирпича за 2 минуты. Работаем по всей Беларуси.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=2">
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png?v=2">
@@ -11,293 +12,809 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #E2DDD8; font-family: Inter, sans-serif; min-height: 100vh; display: flex; justify-content: center; }
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-  input[type=number] { -moz-appearance: textfield; }
-  input::placeholder { color: #C4CBD4; }
-  button { font-family: inherit; }
+:root {
+  --orange:    #D4521E;
+  --orange-dk: #B83D0E;
+  --orange-lt: #FEF0E9;
+  --orange-md: #F5D5C3;
+  --dark:      #1A1A1A;
+  --gray:      #6B7280;
+  --gray-lt:   #9CA3AF;
+  --border:    #E2D9D0;
+  --bg:        #F0EDE9;
+  --card-bg:   #FFFFFF;
+  --surface:   #F8F6F3;
+  --radius:    12px;
+  --radius-sm: 8px;
+  --shadow:    0 2px 8px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
 
-  .quiz-wrap {
-    width: 100%; max-width: 480px; min-height: 100vh;
-    display: flex; flex-direction: column;
-    background: #F8F6F3;
-    box-shadow: 0 0 60px rgba(0,0,0,0.12);
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── Header ── */
-  .quiz-header {
-    padding: 18px 24px 0;
-    background: #F8F6F3;
-    flex-shrink: 0;
-  }
-  .quiz-header-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .quiz-brand {
-    font-family: Montserrat, sans-serif; font-weight: 900;
-    font-size: 14px; color: #D4521E; letter-spacing: 0.10em;
-  }
-  .quiz-step-label {
-    font-size: 12px; color: #6B7280; font-weight: 500;
-  }
-  .progress-track {
-    height: 4px; background: #E8E3DC; border-radius: 2px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; background: #D4521E; border-radius: 2px;
-    transition: width 300ms ease-out;
-  }
+html { scroll-behavior: smooth; }
 
-  /* ── Content ── */
-  .quiz-content {
-    flex: 1; overflow-y: auto; padding: 28px 24px 24px;
-    -webkit-overflow-scrolling: touch;
-  }
+body {
+  background: var(--bg);
+  font-family: Inter, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 
-  /* ── Step banner photo ── */
-  .step-photo {
-    width: 100%; height: 180px; object-fit: cover;
-    border-radius: 12px; display: block; margin-bottom: 20px;
-  }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type=number] { -moz-appearance: textfield; }
+input::placeholder { color: #C4CBD4; }
+button { font-family: inherit; cursor: pointer; }
 
-  /* ── Card photo ── */
-  .card-img {
-    width: calc(100% + 40px); height: 140px; object-fit: cover;
-    border-radius: 6px 6px 0 0; display: block;
-    margin: -16px -20px 14px;
-  }
-  .card.has-img { padding-top: 0; align-items: flex-start; flex-direction: column; }
-  .card.has-img .card-label { font-size: 15px; }
-  .card.has-img > div { padding: 0; }
+/* ══════════════════════════════
+   QUIZ WRAP
+══════════════════════════════ */
+.quiz-wrap {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
 
-  /* ── Grid card photo ── */
-  .card-grid-img {
-    width: calc(100% + 24px); height: 90px; object-fit: cover;
-    border-radius: 6px 6px 0 0; display: block;
-    margin: -20px -12px 10px;
-  }
-  .card-grid.has-img { padding-top: 0; }
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.quiz-header {
+  padding: 20px 24px 0;
+  background: var(--surface);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
 
-  /* ── Step ── */
-  .step { display: none; }
-  .step.active { display: block; }
+.quiz-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
 
-  .step-title {
-    font-family: Montserrat, sans-serif; font-weight: 800;
-    font-size: 22px; color: #1A1A1A; margin-bottom: 6px; line-height: 1.25;
-  }
-  .step-sub {
-    font-size: 14px; color: #6B7280; margin-bottom: 24px; line-height: 1.5;
-  }
+.quiz-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Montserrat, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--orange);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
 
-  /* ── Cards ── */
-  .cards { display: flex; flex-direction: column; gap: 12px; }
-  .card {
-    border: 2px solid #E8E3DC; border-radius: 8px; padding: 16px 20px;
-    background: #fff; cursor: pointer;
-    display: flex; align-items: center; gap: 12px;
-    transition: border-color 150ms, background 150ms;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    user-select: none;
-  }
-  .card:hover { border-color: #F0A080; }
-  .card.selected { border-color: #D4521E; background: #FEF5F0; }
-  .card-label {
-    font-family: Montserrat, sans-serif; font-weight: 700;
-    font-size: 16px; color: #1A1A1A; margin-bottom: 3px;
-  }
-  .card-sub { font-size: 13px; color: #6B7280; }
+.quiz-brand-icon {
+  width: 26px;
+  height: 26px;
+  background: var(--orange);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  /* Grid cards (step 8) */
-  .cards-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  }
-  .card-grid {
-    border: 2px solid #E8E3DC; border-radius: 8px; padding: 20px 12px;
-    background: #fff; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    transition: border-color 150ms, background 150ms;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    text-align: center; user-select: none;
-  }
-  .card-grid:hover { border-color: #F0A080; }
-  .card-grid.selected { border-color: #D4521E; background: #FEF5F0; }
-  .card-grid.full { grid-column: 1 / -1; }
-  .card-grid-label {
-    font-family: Montserrat, sans-serif; font-weight: 700;
-    font-size: 14px; color: #1A1A1A;
-  }
+.quiz-step-badge {
+  background: var(--orange-lt);
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: Montserrat, sans-serif;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
 
-  /* ── Input with suffix ── */
-  .inp-wrap {
-    display: flex; align-items: center; background: #fff;
-    border: 1.5px solid #E8E3DC; border-radius: 8px;
-    overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-  }
-  .inp-wrap:focus-within { border-color: #D4521E; }
-  .inp-wrap input {
-    flex: 1; padding: 14px 16px; border: none; outline: none;
-    font-size: 16px; font-family: Inter, sans-serif; font-weight: 500;
-    color: #1A1A1A; background: transparent; min-width: 0;
-  }
-  .inp-suffix {
-    padding: 0 20px; font-size: 14px; color: #6B7280;
-    border-left: 1px solid #E8E3DC; height: 52px;
-    display: flex; align-items: center; flex-shrink: 0;
-    background: #FAFAFA; font-weight: 500;
-  }
-  .inp-hint { font-size: 12px; color: #B0B8C4; margin-top: 10px; line-height: 1.5; }
+/* Progress */
+.progress-wrap { position: relative; }
 
-  /* Full input */
-  .inp-full {
-    width: 100%; padding: 14px 16px; background: #fff;
-    border: 1.5px solid #E8E3DC; border-radius: 8px; outline: none;
-    font-size: 16px; font-family: Inter, sans-serif; font-weight: 500;
-    color: #1A1A1A; display: block;
-    transition: border-color 150ms;
-  }
-  .inp-full:focus { border-color: #D4521E; }
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
 
-  /* ── Height presets ── */
-  .presets { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-  .preset {
-    padding: 7px 16px; border-radius: 20px; white-space: nowrap;
-    border: 1.5px solid #E8E3DC; background: #fff;
-    cursor: pointer; font-size: 13px; font-weight: 600;
-    color: #6B7280; font-family: Inter, sans-serif;
-    transition: border-color 150ms, background 150ms, color 150ms;
-  }
-  .preset:hover { border-color: #F0A080; }
-  .preset.selected { border-color: #D4521E; background: #FEF5F0; color: #D4521E; }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange-dk), var(--orange));
+  border-radius: 3px;
+  transition: width 400ms cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
 
-  /* ── Toggle ── */
-  .toggle-row {
-    background: #fff; border-radius: 10px; padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .toggle-label { font-size: 15px; font-weight: 600; color: #1A1A1A; }
-  .toggle {
-    width: 48px; height: 26px; border-radius: 13px;
-    background: #D1D5DB; position: relative; cursor: pointer;
-    transition: background 200ms; flex-shrink: 0;
-  }
-  .toggle.on { background: #D4521E; }
-  .toggle-thumb {
-    position: absolute; top: 3px; left: 3px;
-    width: 20px; height: 20px; border-radius: 50%;
-    background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-    transition: left 200ms;
-  }
-  .toggle.on .toggle-thumb { left: 25px; }
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35));
+  animation: shimmer 1.5s infinite;
+}
 
-  /* ── Conditional fields ── */
-  .conditional { display: none; flex-direction: column; gap: 16px; }
-  .conditional.visible { display: flex; }
-  .field-label {
-    font-size: 11px; font-weight: 700; color: #9CA3AF;
-    display: block; margin-bottom: 8px;
-    letter-spacing: 0.06em; text-transform: uppercase;
-  }
+@keyframes shimmer {
+  0%   { opacity: 0; }
+  50%  { opacity: 1; }
+  100% { opacity: 0; }
+}
 
-  /* ── Checkbox ── */
-  .checkbox-row {
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer; background: #fff; border-radius: 8px;
-    padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    user-select: none;
-  }
-  .checkbox-box {
-    width: 22px; height: 22px; border-radius: 5px;
-    border: 2px solid #D1D5DB; background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 150ms;
-  }
-  .checkbox-box.checked { border-color: #D4521E; background: #D4521E; }
-  .checkbox-box svg { display: none; }
-  .checkbox-box.checked svg { display: block; }
-  .checkbox-label { font-size: 15px; color: #1A1A1A; font-weight: 500; }
+/* ══════════════════════════════
+   CONTENT (scrollable)
+══════════════════════════════ */
+.quiz-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 24px 24px;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
 
-  /* ── Field labels group ── */
-  .field-group { display: flex; flex-direction: column; gap: 14px; }
-  .field-label-sm {
-    font-size: 11px; font-weight: 700; color: #9CA3AF;
-    display: block; margin-bottom: 7px;
-    letter-spacing: 0.06em; text-transform: uppercase;
-  }
-  .consent {
-    font-size: 11px; color: #B0B8C4; line-height: 1.65; margin-top: 4px;
-  }
+/* ══════════════════════════════
+   STEP TRANSITIONS
+══════════════════════════════ */
+.step { display: none; }
+.step.active {
+  display: block;
+  animation: stepIn 280ms cubic-bezier(0.4,0,0.2,1) both;
+}
+.step.exit {
+  animation: stepOut 200ms cubic-bezier(0.4,0,0.2,1) both;
+}
 
-  /* ── Navigation ── */
-  .quiz-nav {
-    padding: 14px 24px 28px; background: #F8F6F3;
-    border-top: 1px solid #E8E3DC;
-    display: flex; gap: 10px; flex-shrink: 0;
-  }
-  .btn-back {
-    padding: 14px 18px; background: #fff;
-    border: 1.5px solid #E8E3DC; border-radius: 8px;
-    font-family: Montserrat, sans-serif; font-size: 14px;
-    font-weight: 700; color: #6B7280; cursor: pointer;
-    flex-shrink: 0; white-space: nowrap;
-    display: none;
-    transition: background 150ms;
-  }
-  .btn-back:hover { background: #F5F5F5; }
-  .btn-back.visible { display: block; }
-  .btn-next {
-    flex: 1; padding: 16px 24px;
-    background: #E8E3DC; color: #9CA3AF;
-    border: none; border-radius: 8px;
-    font-family: Montserrat, sans-serif; font-size: 15px;
-    font-weight: 700; cursor: not-allowed;
-    transition: background 150ms, color 150ms;
-    letter-spacing: -0.01em; line-height: 1.25;
-  }
-  .btn-next.active {
-    background: #D4521E; color: #fff; cursor: pointer;
-  }
-  .btn-next.active:hover { background: #C0400A; }
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 
-  /* ── Thank You ── */
-  .thankyou {
-    display: none; flex: 1; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 48px 28px; text-align: center; background: #fff;
-  }
-  .thankyou.visible { display: flex; }
-  .ty-circle {
-    width: 88px; height: 88px; border-radius: 50%;
-    background: #D4521E; display: flex; align-items: center; justify-content: center;
-    margin-bottom: 28px;
-    box-shadow: 0 8px 28px rgba(212,82,30,0.30);
-  }
-  .ty-title {
-    font-family: Montserrat, sans-serif; font-weight: 800;
-    font-size: 26px; color: #1A1A1A; margin-bottom: 12px; line-height: 1.2;
-  }
-  .ty-body {
-    font-size: 16px; color: #6B7280; line-height: 1.65; margin-bottom: 20px;
-  }
-  .ty-body strong { color: #1A1A1A; font-weight: 600; }
-  .ty-info {
-    background: #FEF5F0; border-radius: 8px; padding: 14px 18px;
-    margin-bottom: 40px; font-size: 13px; color: #6B7280; line-height: 1.65;
-    width: 100%; text-align: left; border-left: 3px solid #D4521E;
-  }
-  .ty-download {
-    width: 100%; padding: 16px 20px; background: #1A1A1A; color: #fff;
-    border: none; border-radius: 8px; font-family: Inter, sans-serif;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    letter-spacing: -0.01em;
-    transition: background 150ms;
-  }
-  .ty-download:hover { background: #333; }
-  .ty-caption { font-size: 12px; color: #B0B8C4; margin-top: 10px; }
+@keyframes stepOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-20px); }
+}
+
+/* ══════════════════════════════
+   STEP PHOTO
+══════════════════════════════ */
+.step-photo {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow);
+}
+
+/* ══════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════ */
+.step-title {
+  font-family: Montserrat, sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 5vw, 24px);
+  color: var(--dark);
+  margin-bottom: 6px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.step-sub {
+  font-size: 14px;
+  color: var(--gray);
+  margin-bottom: 22px;
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════
+   CARDS (vertical list)
+══════════════════════════════ */
+.cards { display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  background: var(--card-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color 150ms, background 150ms, box-shadow 150ms, transform 100ms;
+  box-shadow: var(--shadow);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--orange);
+  transform: scaleY(0);
+  transition: transform 200ms;
+  border-radius: 0 2px 2px 0;
+}
+
+.card:hover {
+  border-color: var(--orange-md);
+  box-shadow: 0 4px 16px rgba(212,82,30,0.12);
+  transform: translateY(-1px);
+}
+
+.card:active { transform: translateY(0); }
+
+.card.selected {
+  border-color: var(--orange);
+  background: var(--orange-lt);
+  box-shadow: 0 4px 16px rgba(212,82,30,0.18);
+}
+
+.card.selected::before { transform: scaleY(1); }
+
+.card-label {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--dark);
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+
+.card.selected .card-label { color: var(--orange-dk); }
+
+.card-sub { font-size: 13px; color: var(--gray); line-height: 1.4; }
+
+/* Check mark for selected card */
+.card-check {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: background 150ms, border-color 150ms;
+}
+.card.selected .card-check {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+.card-check svg { display: none; }
+.card.selected .card-check svg { display: block; }
+
+/* ── Card with photo (top image) ── */
+.card-img {
+  width: calc(100% + 40px);
+  height: 145px;
+  object-fit: cover;
+  border-radius: var(--radius) var(--radius) 0 0;
+  display: block;
+  margin: -16px -20px 14px;
+  transition: transform 300ms;
+}
+.card.has-img {
+  padding-top: 0;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.card.has-img:hover .card-img { transform: scale(1.03); }
+.card.has-img .card-check {
+  position: absolute;
+  top: 155px;
+  right: 16px;
+}
+
+/* ══════════════════════════════
+   GRID CARDS (step 8)
+══════════════════════════════ */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.card-grid {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 12px 14px;
+  background: var(--card-bg);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 150ms, background 150ms, box-shadow 150ms, transform 100ms;
+  box-shadow: var(--shadow);
+  text-align: center;
+  user-select: none;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-grid:hover {
+  border-color: var(--orange-md);
+  box-shadow: 0 4px 16px rgba(212,82,30,0.12);
+  transform: translateY(-2px);
+}
+
+.card-grid.selected {
+  border-color: var(--orange);
+  background: var(--orange-lt);
+}
+
+.card-grid.full { grid-column: 1 / -1; }
+
+.card-grid-img {
+  width: calc(100% + 24px);
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--radius) var(--radius) 0 0;
+  display: block;
+  margin: -20px -12px 10px;
+  transition: transform 300ms;
+}
+.card-grid:hover .card-grid-img { transform: scale(1.04); }
+
+.card-grid-label {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--dark);
+  line-height: 1.3;
+}
+.card-grid.selected .card-grid-label { color: var(--orange-dk); }
+
+/* ══════════════════════════════
+   INPUTS
+══════════════════════════════ */
+.inp-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.inp-wrap:focus-within {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(212,82,30,0.10);
+}
+
+.inp-wrap input {
+  flex: 1;
+  padding: 15px 16px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  color: var(--dark);
+  background: transparent;
+  min-width: 0;
+}
+
+.inp-suffix {
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray);
+  border-left: 1px solid var(--border);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  background: #FAFAFA;
+}
+
+.inp-hint {
+  font-size: 12px;
+  color: var(--gray-lt);
+  margin-top: 10px;
+  line-height: 1.55;
+}
+
+.inp-full {
+  width: 100%;
+  padding: 15px 16px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 500;
+  color: var(--dark);
+  display: block;
+  box-shadow: var(--shadow);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.inp-full:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(212,82,30,0.10);
+}
+
+/* ══════════════════════════════
+   HEIGHT PRESETS
+══════════════════════════════ */
+.presets {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.preset {
+  padding: 8px 18px;
+  border-radius: 24px;
+  white-space: nowrap;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray);
+  font-family: Montserrat, sans-serif;
+  transition: border-color 150ms, background 150ms, color 150ms, transform 100ms;
+  box-shadow: var(--shadow);
+}
+
+.preset:hover {
+  border-color: var(--orange-md);
+  color: var(--orange);
+  transform: translateY(-1px);
+}
+
+.preset.selected {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(212,82,30,0.30);
+}
+
+/* ══════════════════════════════
+   TOGGLE
+══════════════════════════════ */
+.toggle-row {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid var(--border);
+  transition: border-color 200ms;
+}
+.toggle-row:has(.toggle.on) { border-color: var(--orange-md); }
+
+.toggle-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dark);
+  font-family: Montserrat, sans-serif;
+}
+
+.toggle {
+  width: 50px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 200ms;
+  flex-shrink: 0;
+}
+
+.toggle.on { background: var(--orange); box-shadow: 0 2px 8px rgba(212,82,30,0.35); }
+
+.toggle-thumb {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  transition: left 200ms cubic-bezier(0.4,0,0.2,1);
+}
+
+.toggle.on .toggle-thumb { left: 26px; }
+
+/* ══════════════════════════════
+   CONDITIONAL FIELDS
+══════════════════════════════ */
+.conditional {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeSlideDown 250ms ease both;
+}
+.conditional.visible { display: flex; }
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-lt);
+  display: block;
+  margin-bottom: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════
+   CHECKBOX
+══════════════════════════════ */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  user-select: none;
+  border: 2px solid var(--border);
+  transition: border-color 150ms;
+}
+.checkbox-row:hover { border-color: var(--orange-md); }
+
+.checkbox-box {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 150ms;
+}
+
+.checkbox-box.checked {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+.checkbox-box svg { display: none; }
+.checkbox-box.checked svg { display: block; }
+.checkbox-label { font-size: 15px; color: var(--dark); font-weight: 500; }
+
+/* ══════════════════════════════
+   FIELD GROUP
+══════════════════════════════ */
+.field-group { display: flex; flex-direction: column; gap: 14px; }
+
+.field-label-sm {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-lt);
+  display: block;
+  margin-bottom: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.consent {
+  font-size: 11px;
+  color: #B0B8C4;
+  line-height: 1.65;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════
+   NAVIGATION
+══════════════════════════════ */
+.quiz-nav {
+  padding: 14px 24px 30px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-back {
+  width: 50px;
+  height: 50px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 18px;
+  color: var(--gray);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms, border-color 150ms, transform 100ms;
+}
+
+.btn-back:hover { background: var(--bg); border-color: #C4B8AE; transform: translateX(-2px); }
+.btn-back:active { transform: translateX(0); }
+.btn-back.visible { display: flex; }
+
+.btn-next {
+  flex: 1;
+  padding: 0 24px;
+  height: 50px;
+  background: var(--border);
+  color: var(--gray-lt);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: Montserrat, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: not-allowed;
+  transition: background 200ms, color 200ms, box-shadow 200ms, transform 100ms;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-next .btn-arrow {
+  font-size: 16px;
+  transition: transform 200ms;
+  display: inline-block;
+}
+
+.btn-next.active {
+  background: linear-gradient(135deg, var(--orange-dk), var(--orange));
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212,82,30,0.35);
+}
+
+.btn-next.active:hover {
+  box-shadow: 0 6px 24px rgba(212,82,30,0.45);
+  transform: translateY(-1px);
+}
+.btn-next.active:hover .btn-arrow { transform: translateX(3px); }
+.btn-next.active:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(212,82,30,0.25); }
+
+/* ══════════════════════════════
+   THANK YOU
+══════════════════════════════ */
+.thankyou {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 28px 40px;
+  text-align: center;
+  background: var(--surface);
+  animation: fadeIn 500ms ease both;
+}
+
+.thankyou.visible { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.ty-circle {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange-dk), var(--orange));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  box-shadow: 0 12px 36px rgba(212,82,30,0.35);
+  animation: popIn 500ms cubic-bezier(0.34,1.56,0.64,1) 100ms both;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.ty-title {
+  font-family: Montserrat, sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--dark);
+  margin-bottom: 10px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ty-body {
+  font-size: 16px;
+  color: var(--gray);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.ty-body strong { color: var(--dark); font-weight: 700; }
+
+.ty-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--orange-lt);
+  border: 1px solid var(--orange-md);
+  border-radius: 24px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--orange-dk);
+  font-family: Montserrat, sans-serif;
+  margin-bottom: 28px;
+}
+
+.ty-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 24px;
+}
+
+.ty-bonus-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-lt);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.ty-download {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: background 200ms, box-shadow 200ms, transform 100ms;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ty-download:hover {
+  background: #333;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.20);
+  transform: translateY(-1px);
+}
+.ty-download:active { transform: translateY(0); }
+
+.ty-caption {
+  font-size: 12px;
+  color: var(--gray-lt);
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -307,30 +824,43 @@
   <!-- ── HEADER ── -->
   <div class="quiz-header" id="quizHeader">
     <div class="quiz-header-row">
-      <span class="quiz-brand">DIANAST</span>
-      <span class="quiz-step-label" id="stepLabel">Шаг 1 из 9</span>
+      <div class="quiz-brand">
+        <div class="quiz-brand-icon">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="2" width="5" height="4" rx="1" fill="white"/>
+            <rect x="8" y="2" width="5" height="4" rx="1" fill="white"/>
+            <rect x="1" y="8" width="5" height="4" rx="1" fill="white"/>
+            <rect x="8" y="8" width="5" height="4" rx="1" fill="white"/>
+          </svg>
+        </div>
+        DIANAST
+      </div>
+      <div class="quiz-step-badge" id="stepLabel">Шаг 1 из 9</div>
     </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
   <!-- ── THANK YOU ── -->
   <div class="thankyou" id="thankyou">
     <div class="ty-circle">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
     </div>
     <h2 class="ty-title">Заявка принята!</h2>
     <p class="ty-body">Менеджер свяжется с вами<br>в течение <strong>30 минут</strong></p>
-    <div class="ty-info">
-      Расчёт будет подготовлен на основании ваших параметров. При необходимости уточним детали по телефону.
-    </div>
-    <a class="ty-download" href="../assets/10%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BE%D0%BA%20%D0%BF%D1%80%D0%B8%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%B5%20%D0%B7%D0%B0%D0%B1%D0%BE%D1%80%D0%B0.txt" download="10 ошибок при строительстве забора.txt" style="display:block;text-decoration:none;text-align:center">
-      📄 Скачать: 10 ошибок при строительстве забора
+    <div class="ty-timer">⏱ Работаем с 8:00 до 20:00</div>
+    <div class="ty-divider"></div>
+    <p class="ty-bonus-label">🎁 Ваш подарок</p>
+    <a class="ty-download" href="../assets/10%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BE%D0%BA%20%D0%BF%D1%80%D0%B8%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%B5%20%D0%B7%D0%B0%D0%B1%D0%BE%D1%80%D0%B0.txt" download="10 ошибок при строительстве забора.txt" style="text-decoration:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      10 ошибок при строительстве забора
     </a>
-    <p class="ty-caption">Бесплатно · 5 минут чтения</p>
+    <p class="ty-caption">Бесплатно · PDF · 5 минут чтения</p>
   </div>
 
   <!-- ── CONTENT ── -->
@@ -339,21 +869,23 @@
     <!-- STEP 1: Сторона забора -->
     <div class="step active" id="step-0">
       <h2 class="step-title">Какая сторона забора?</h2>
-      <p class="step-sub">Выберите один вариант</p>
+      <p class="step-sub">Выберите один вариант, чтобы мы подобрали нужный материал</p>
       <div class="cards">
         <div class="card has-img" data-group="fenceSide" data-val="face" onclick="selectCard(this)">
           <img class="card-img" src="../assets/photos/pf-kras-1.webp" alt="Лицевая сторона забора" loading="lazy">
-          <div style="padding:0 4px 4px">
+          <div style="padding:0 4px 8px; width:100%">
             <div class="card-label">Лицевая</div>
             <div class="card-sub">Главный въезд, улица</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
         <div class="card has-img" data-group="fenceSide" data-val="side" onclick="selectCard(this)">
           <img class="card-img" src="../assets/photos/pf-korch-1.webp" alt="Боковая сторона забора" loading="lazy">
-          <div style="padding:0 4px 4px">
+          <div style="padding:0 4px 8px; width:100%">
             <div class="card-label">Боковая</div>
             <div class="card-sub">Смежный участок, соседи</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
       </div>
     </div>
@@ -362,19 +894,19 @@
     <div class="step" id="step-1">
       <img class="step-photo" src="../assets/photos/pf-korch-2.webp" alt="Длина забора" loading="lazy">
       <h2 class="step-title">Длина забора</h2>
-      <p class="step-sub">Не знаете точно? Напишите примерно</p>
+      <p class="step-sub">Не знаете точно? Укажите примерно — уточним при звонке</p>
       <div class="inp-wrap">
         <input type="number" id="length" placeholder="30" oninput="updateNav()">
         <span class="inp-suffix">метров</span>
       </div>
-      <p class="inp-hint">Стандартный участок — 30–60 м.п.</p>
+      <p class="inp-hint">💡 Стандартный участок — 30–60 м.п.</p>
     </div>
 
     <!-- STEP 3: Высота -->
     <div class="step" id="step-2">
       <img class="step-photo" src="../assets/photos/pf-kras-4.webp" alt="Высота забора" loading="lazy" style="object-position:center top">
       <h2 class="step-title">Высота забора</h2>
-      <p class="step-sub">Стандартная высота — 1,8 м</p>
+      <p class="step-sub">Стандартная высота — 1,8 м. Можно выбрать из пресетов</p>
       <div class="inp-wrap">
         <input type="number" id="height" placeholder="1.8" step="0.1" oninput="syncPresets()">
         <span class="inp-suffix">метров</span>
@@ -391,25 +923,28 @@
     <div class="step" id="step-3">
       <img class="step-photo" src="../assets/photos/pf-graf-5.webp" alt="Участок" loading="lazy">
       <h2 class="step-title">Что сейчас на участке?</h2>
-      <p class="step-sub">Это поможет рассчитать стоимость точнее</p>
+      <p class="step-sub">Это поможет рассчитать стоимость монтажа точнее</p>
       <div class="cards">
         <div class="card" data-group="ground" data-val="old" onclick="selectCard(this)">
-          <div>
+          <div style="flex:1">
             <div class="card-label">Старый забор</div>
             <div class="card-sub">Потребуется демонтаж</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
         <div class="card" data-group="ground" data-val="open" onclick="selectCard(this)">
-          <div>
+          <div style="flex:1">
             <div class="card-label">Голая земля</div>
             <div class="card-sub">Без фундамента</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
         <div class="card" data-group="ground" data-val="foundation" onclick="selectCard(this)">
-          <div>
+          <div style="flex:1">
             <div class="card-label">Залит фундамент</div>
             <div class="card-sub">Готов к монтажу</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
       </div>
     </div>
@@ -418,7 +953,7 @@
     <div class="step" id="step-4">
       <img class="step-photo" src="../assets/photos/pf-gorch-1.webp" alt="Ворота" loading="lazy">
       <h2 class="step-title">Ворота</h2>
-      <p class="step-sub">Нужны ли ворота на объект?</p>
+      <p class="step-sub">Нужны ли ворота на объект? Это повлияет на цену</p>
       <div class="toggle-row">
         <span class="toggle-label">Нужны ворота?</span>
         <div class="toggle" id="gateToggle" onclick="toggleField('gate')">
@@ -437,16 +972,18 @@
           <label class="field-label">Тип ворот</label>
           <div class="cards">
             <div class="card" data-group="gateType" data-val="sliding" onclick="selectCard(this)">
-              <div>
+              <div style="flex:1">
                 <div class="card-label">Откатные</div>
                 <div class="card-sub">Сдвигаются вдоль забора</div>
               </div>
+              <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
             </div>
             <div class="card" data-group="gateType" data-val="swing" onclick="selectCard(this)">
-              <div>
+              <div style="flex:1">
                 <div class="card-label">Распашные</div>
                 <div class="card-sub">Открываются внутрь / наружу</div>
               </div>
+              <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
             </div>
           </div>
         </div>
@@ -494,24 +1031,27 @@
       <div class="cards">
         <div class="card has-img" data-group="fenceStyle" data-val="brick" onclick="selectCard(this);updateFillStep()">
           <img class="card-img" src="../assets/photos/pf-graf-1.webp" alt="Кирпич + металл" loading="lazy">
-          <div style="padding:0 4px 4px">
+          <div style="padding:0 4px 8px; width:100%">
             <div class="card-label">Кирпич + заполнение металлом</div>
             <div class="card-sub">Столбы из кирпича, секции из металла</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
         <div class="card has-img" data-group="fenceStyle" data-val="stake" onclick="selectCard(this);updateFillStep()">
           <img class="card-img" src="../assets/photos/pf-korch-8.webp" alt="Штакетник" loading="lazy">
-          <div style="padding:0 4px 4px">
+          <div style="padding:0 4px 8px; width:100%">
             <div class="card-label">Металлический штакетник</div>
             <div class="card-sub">Современно, светло, практично</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
         <div class="card has-img" data-group="fenceStyle" data-val="profile" onclick="selectCard(this);updateFillStep()">
           <img class="card-img" src="../assets/photos/pf-kras-5.webp" alt="Профнастил" loading="lazy">
-          <div style="padding:0 4px 4px">
+          <div style="padding:0 4px 8px; width:100%">
             <div class="card-label">Профнастил</div>
             <div class="card-sub">Надёжно и экономично</div>
           </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
       </div>
     </div>
@@ -554,9 +1094,9 @@
 
     <!-- STEP 10: Контакты -->
     <div class="step" id="step-9">
-      <h2 class="step-title">Контакты</h2>
       <img class="step-photo" src="../assets/master.jpg" alt="Мастер Dianast" loading="lazy" style="object-position:center top">
-      <p class="step-sub">Пришлём расчёт на основе ваших параметров</p>
+      <h2 class="step-title">Контакты для расчёта</h2>
+      <p class="step-sub">Пришлём точную смету на ваш телефон в течение 30 минут</p>
       <div class="field-group">
         <div>
           <label class="field-label-sm">Ваше имя</label>
@@ -574,8 +1114,11 @@
 
   <!-- ── NAV ── -->
   <div class="quiz-nav" id="quizNav">
-    <button class="btn-back" id="btnBack" onclick="goBack()">← Назад</button>
-    <button class="btn-next" id="btnNext" onclick="goNext()">Далее →</button>
+    <button class="btn-back" id="btnBack" onclick="goBack()" aria-label="Назад">←</button>
+    <button class="btn-next" id="btnNext" onclick="goNext()">
+      <span id="btnText">Далее</span>
+      <span class="btn-arrow" id="btnArrow">→</span>
+    </button>
   </div>
 
 </div><!-- /quiz-wrap -->
@@ -592,7 +1135,6 @@ const state = {
   city: '', name: '', phone: '',
 };
 
-// Logical step IDs (0..9, step 7 = fill type is conditional)
 function getSteps() {
   const s = [0,1,2,3,4,5,6];
   if (state.fenceStyle === 'brick') s.push(7);
@@ -600,7 +1142,7 @@ function getSteps() {
   return s;
 }
 
-let stepIdx = 0; // index in getSteps()
+let stepIdx = 0;
 
 // ── Validation ─────────────────────────────────────────
 function canGo() {
@@ -620,17 +1162,16 @@ function canGo() {
 
 // ── Update UI ──────────────────────────────────────────
 function updateNav() {
-  // Sync input values to state
-  const lenEl = document.getElementById('length');
-  const hEl   = document.getElementById('height');
-  const cityEl = document.getElementById('city');
-  const nameEl = document.getElementById('name');
+  const lenEl   = document.getElementById('length');
+  const hEl     = document.getElementById('height');
+  const cityEl  = document.getElementById('city');
+  const nameEl  = document.getElementById('name');
   const phoneEl = document.getElementById('phone');
-  if (lenEl)  state.length  = lenEl.value;
-  if (hEl)    state.height  = hEl.value;
-  if (cityEl) state.city    = cityEl.value;
-  if (nameEl) state.name    = nameEl.value;
-  if (phoneEl)state.phone   = phoneEl.value;
+  if (lenEl)   state.length = lenEl.value;
+  if (hEl)     state.height = hEl.value;
+  if (cityEl)  state.city   = cityEl.value;
+  if (nameEl)  state.name   = nameEl.value;
+  if (phoneEl) state.phone  = phoneEl.value;
 
   const steps = getSteps();
   const total = steps.length;
@@ -642,25 +1183,50 @@ function updateNav() {
 
   const btnBack = document.getElementById('btnBack');
   const btnNext = document.getElementById('btnNext');
+  const btnText = document.getElementById('btnText');
+  const btnArrow = document.getElementById('btnArrow');
 
   btnBack.classList.toggle('visible', stepIdx > 0);
 
   const ok = canGo();
   btnNext.classList.toggle('active', ok);
+  btnNext.disabled = false;
+  btnNext.style.cursor = ok ? 'pointer' : 'not-allowed';
 
   const isLast = stepIdx === total - 1;
-  btnNext.textContent = isLast ? 'Получить расчёт бесплатно' : 'Далее →';
-  btnNext.style.fontSize = isLast ? '14px' : '15px';
+  if (isLast) {
+    btnText.textContent = 'Получить расчёт';
+    btnArrow.textContent = '🎉';
+    btnNext.style.fontSize = '14px';
+  } else {
+    btnText.textContent = 'Далее';
+    btnArrow.textContent = '→';
+    btnNext.style.fontSize = '15px';
+  }
 }
 
 // ── Navigation ─────────────────────────────────────────
 function showStep(idx) {
   const steps = getSteps();
-  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-  const id = 'step-' + steps[idx];
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
+
+  // Animate current step out
+  const curId = 'step-' + steps[stepIdx];
+  const curEl = document.getElementById(curId);
+
   stepIdx = idx;
+  const newId = 'step-' + steps[idx];
+  const newEl = document.getElementById(newId);
+
+  document.querySelectorAll('.step').forEach(el => {
+    el.classList.remove('active');
+  });
+  if (newEl) {
+    newEl.classList.add('active');
+    // Scroll content to top on step change
+    const content = document.getElementById('quizContent');
+    if (content) content.scrollTop = 0;
+  }
+
   updateNav();
 }
 
@@ -685,12 +1251,13 @@ var TG_CHAT  = '335993206';
 function submitQuiz() {
   var btn = document.getElementById('btnNext');
   btn.disabled = true;
-  btn.textContent = 'Отправляем...';
+  document.getElementById('btnText').textContent = 'Отправляем...';
+  document.getElementById('btnArrow').textContent = '⏳';
 
-  var sideMap  = {face:'Лицевая', side:'Боковая'};
-  var groundMap= {old:'Старый забор', open:'Голая земля', foundation:'Залит фундамент'};
-  var styleMap = {brick:'Кирпич + металл', stake:'Штакетник', profile:'Профнастил'};
-  var fillMap  = {stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи', brickfill:'Кирпич'};
+  var sideMap     = {face:'Лицевая', side:'Боковая'};
+  var groundMap   = {old:'Старый забор', open:'Голая земля', foundation:'Залит фундамент'};
+  var styleMap    = {brick:'Кирпич + металл', stake:'Штакетник', profile:'Профнастил'};
+  var fillMap     = {stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи', brickfill:'Кирпич'};
   var gateTypeMap = {sliding:'Откатные', swing:'Распашные'};
 
   var gateInfo = state.gateOn
@@ -716,7 +1283,6 @@ function submitQuiz() {
     + '▪ Ворота: '     + gateInfo + '\n'
     + '▪ Калитка: '    + wicketInfo + '\n';
 
-  // Telegram
   var tgUrl = 'https://api.telegram.org/bot' + TG_TOKEN
     + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT)
     + '&text=' + encodeURIComponent(text);
@@ -725,7 +1291,6 @@ function submitQuiz() {
     .then(function(){ showThankyou(); })
     .catch(function(){ showThankyou(); });
 
-  // Email (открывает почтовый клиент параллельно)
   var mailLink = document.createElement('a');
   mailLink.href = 'mailto:lag10033@gmail.com'
     + '?subject=' + encodeURIComponent('Заявка с квиза — ' + state.name)
@@ -798,7 +1363,6 @@ function toggleCheckbox(id) {
 
 // ── Fence style → fill step ────────────────────────────
 function updateFillStep() {
-  // When user goes back from step 8 and changes style away from brick, clear fillType
   if (state.fenceStyle !== 'brick') {
     state.fillType = null;
     document.querySelectorAll('.card-grid[data-group="fillType"]').forEach(c => c.classList.remove('selected'));

@@ -411,6 +411,51 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1.55;
 }
 
+/* ── Segmented toggle (от земли / от фундамента) ── */
+.seg {
+  display: flex;
+  gap: 4px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-top: 14px;
+  box-shadow: var(--shadow);
+}
+.seg-btn {
+  flex: 1;
+  padding: 11px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-family: Montserrat, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray);
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.seg-btn.active {
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(212,82,30,0.25);
+}
+
+/* ── Info note (расчёт высоты) ── */
+.info-note {
+  display: flex;
+  gap: 10px;
+  background: var(--orange-lt);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--dark);
+  line-height: 1.55;
+}
+.info-note b { color: var(--orange-dk); font-weight: 700; }
+
 .inp-full {
   width: 100%;
   padding: 15px 16px;
@@ -880,16 +925,24 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step" id="step-2">
       <img class="step-photo" src="/assets/photos/pf-kras-4.webp" alt="Высота забора" loading="eager" style="object-position:center top">
       <h2 class="step-title">Высота забора</h2>
-      <p class="step-sub">Стандартная высота — 1,8 м. Измеряется от земли или от верха фундамента (если он уже залит)</p>
+      <p class="step-sub">Укажите желаемую высоту и откуда её считать</p>
       <div class="inp-wrap">
-        <input type="number" id="height" placeholder="1.8" step="0.1" oninput="syncPresets()">
+        <input type="number" id="height" placeholder="1.83" step="0.01" oninput="syncPresets()">
         <span class="inp-suffix">метров</span>
+      </div>
+      <div class="seg" id="heightFrom">
+        <button type="button" class="seg-btn active" data-from="ground" onclick="setHeightFrom('ground',this)">От земли</button>
+        <button type="button" class="seg-btn" data-from="foundation" onclick="setHeightFrom('foundation',this)">От фундамента</button>
       </div>
       <div class="presets">
         <div class="preset" data-h="1.5" onclick="setHeight('1.5',this)">1.5 м</div>
-        <div class="preset" data-h="1.8" onclick="setHeight('1.8',this)">1.8 м</div>
+        <div class="preset" data-h="1.83" onclick="setHeight('1.83',this)">1.83 м</div>
         <div class="preset" data-h="2.0" onclick="setHeight('2.0',this)">2.0 м</div>
         <div class="preset" data-h="2.5" onclick="setHeight('2.5',this)">2.5 м</div>
+      </div>
+      <div class="info-note">
+        <span>💡</span>
+        <span>Чаще всего заказывают <b>18 рядов кирпича — это 1,73 м</b>. Фундамент обычно выступает над землёй на 10 см, поэтому итоговая высота от земли — около <b>1,83 м</b>.</span>
       </div>
     </div>
 
@@ -1101,7 +1154,7 @@ button { font-family: inherit; cursor: pointer; }
 // ── State ──────────────────────────────────────────────
 const state = {
   fenceSide: null,
-  length: '', height: '',
+  length: '', height: '', heightFrom: 'ground',
   ground: null,
   gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketOn: false, wicketWidth: '', wicketIntercom: false,
@@ -1250,7 +1303,7 @@ function submitQuiz() {
     + '🔧 Параметры:\n'
     + '▪ Сторона: '    + (sideMap[state.fenceSide]||'—') + '\n'
     + '▪ Длина: '      + (state.length||'—') + ' м\n'
-    + '▪ Высота: '     + (state.height||'—') + ' м\n'
+    + '▪ Высота: '     + (state.height||'—') + ' м (' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n'
     + '▪ Участок: '    + (groundMap[state.ground]||'—') + '\n'
     + '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
     + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '')
@@ -1312,6 +1365,12 @@ function syncPresets() {
     p.classList.toggle('selected', p.dataset.h === val);
   });
   updateNav();
+}
+
+function setHeightFrom(val, el) {
+  state.heightFrom = val;
+  document.querySelectorAll('#heightFrom .seg-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
 }
 
 // ── Toggles ────────────────────────────────────────────

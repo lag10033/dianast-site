@@ -1217,6 +1217,54 @@ button { font-family: inherit; cursor: pointer; }
       </div>
     </div>
 
+    <!-- STEP 10 (боковая ветка): Высота в метрах -->
+    <div class="step" id="step-10">
+      <img class="step-photo" src="/assets/photos/pf-korch-8.webp" alt="Высота бокового забора" loading="eager">
+      <h2 class="step-title">Высота забора</h2>
+      <p class="step-sub">Укажите нужную высоту бокового забора</p>
+      <div class="inp-wrap">
+        <input type="number" id="heightSide" placeholder="1.8" step="0.1" oninput="syncHeightSide()">
+        <span class="inp-suffix">метров</span>
+      </div>
+      <div class="presets">
+        <div class="preset" data-h="1.5" onclick="setHeightSide('1.5',this)">1.5 м</div>
+        <div class="preset" data-h="1.8" onclick="setHeightSide('1.8',this)">1.8 м</div>
+      </div>
+      <p class="inp-hint">💡 Для боковой стороны чаще выбирают 1,5–1,8 м.</p>
+    </div>
+
+    <!-- STEP 11 (боковая ветка): Тип бокового забора (бюджетный) -->
+    <div class="step" id="step-11">
+      <h2 class="step-title">Тип бокового забора</h2>
+      <p class="step-sub">Выберите материал — это влияет на стоимость</p>
+      <div class="cards">
+        <div class="card has-img" data-group="sideStyle" data-val="profile" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-kras-5.webp" alt="Профнастил" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Профнастил</div>
+            <div class="card-sub">Сплошной, не видно участок</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card has-img" data-group="sideStyle" data-val="stake" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-korch-8.webp" alt="Металлический штакетник" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Металлический штакетник</div>
+            <div class="card-sub">Продувается, светлее на участке</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card has-img" data-group="sideStyle" data-val="setka" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-graf-5.webp" alt="Сетка-рабица" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Сетка-рабица</div>
+            <div class="card-sub">Самый бюджетный вариант</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /quiz-content -->
 
   <!-- ── NAV ── -->
@@ -1235,14 +1283,20 @@ button { font-family: inherit; cursor: pointer; }
 const state = {
   fenceSide: null,
   length: '', height: '', heightFrom: 'ground', heightRows: 18,
+  heightSide: '',
   ground: null,
   gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketOn: false, wicketWidth: '', wicketIntercom: false,
-  fenceStyle: null, fillType: null,
+  fenceStyle: null, fillType: null, sideStyle: null,
   city: '', name: '', phone: '',
 };
 
 function getSteps() {
+  // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, калитка, город, контакты
+  if (state.fenceSide === 'side') {
+    return [0, 1, 10, 3, 11, 4, 5, 8, 9];
+  }
+  // Лицевая ветка (основной сценарий)
   const s = [0,1,2,3,4,5,6];
   if (state.fenceStyle === 'brick') s.push(7);
   s.push(8,9);
@@ -1264,6 +1318,8 @@ function canGo() {
   if (cur === 7) return !!state.fillType;
   if (cur === 8) return state.city.trim().length > 0;
   if (cur === 9) return state.name.trim().length > 0 && state.phone.trim().length > 0;
+  if (cur === 10) return state.heightSide !== '' && parseFloat(state.heightSide) > 0;
+  if (cur === 11) return !!state.sideStyle;
   return true;
 }
 
@@ -1366,8 +1422,19 @@ function submitQuiz() {
   var sideMap     = {face:'Лицевая', side:'Боковая'};
   var groundMap   = {old:'Старый забор', open:'Голая земля', foundation:'Залит фундамент'};
   var styleMap    = {brick:'Кирпич + металл', stake:'Штакетник', profile:'Профнастил'};
+  var sideStyleMap= {profile:'Профнастил', stake:'Металлический штакетник', setka:'Сетка-рабица'};
   var fillMap     = {stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи', brickfill:'Кирпич'};
   var gateTypeMap = {sliding:'Откатные', swing:'Распашные'};
+  var isSide      = state.fenceSide === 'side';
+
+  var heightLine = isSide
+    ? '▪ Высота: ' + (state.heightSide||'—') + ' м\n'
+    : '▪ Высота: ' + (state.height||'—') + ' м (' + state.heightRows + ' рядов, ' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n';
+
+  var styleLine = isSide
+    ? '▪ Тип забора: ' + (sideStyleMap[state.sideStyle]||'—') + '\n'
+    : '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
+      + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '');
 
   var gateInfo = state.gateOn
     ? 'Да — ' + (state.gateWidth||'—') + ' м, ' + (gateTypeMap[state.gateType]||'тип не указан')
@@ -1385,10 +1452,9 @@ function submitQuiz() {
     + '🔧 Параметры:\n'
     + '▪ Сторона: '    + (sideMap[state.fenceSide]||'—') + '\n'
     + '▪ Длина: '      + (state.length||'—') + ' м\n'
-    + '▪ Высота: '     + (state.height||'—') + ' м (' + state.heightRows + ' рядов, ' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n'
+    + heightLine
     + '▪ Участок: '    + (groundMap[state.ground]||'—') + '\n'
-    + '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
-    + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '')
+    + styleLine
     + '▪ Ворота: '     + gateInfo + '\n'
     + '▪ Калитка: '    + wicketInfo + '\n';
 
@@ -1494,6 +1560,23 @@ function setHeightFrom(val, el) {
   document.querySelectorAll('#heightFrom .seg-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderHeight();
+}
+
+// ── Height in meters (боковая ветка) ───────────────────
+function syncHeightSide() {
+  const el = document.getElementById('heightSide');
+  state.heightSide = el ? el.value : '';
+  document.querySelectorAll('#step-10 .preset').forEach(p =>
+    p.classList.toggle('selected', p.dataset.h === state.heightSide));
+  updateNav();
+}
+
+function setHeightSide(val, el) {
+  document.getElementById('heightSide').value = val;
+  state.heightSide = val;
+  document.querySelectorAll('#step-10 .preset').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  updateNav();
 }
 
 // ── Toggles ────────────────────────────────────────────

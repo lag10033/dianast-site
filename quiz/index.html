@@ -667,6 +667,14 @@ button { font-family: inherit; cursor: pointer; }
   text-transform: uppercase;
 }
 
+.block-title {
+  font-family: Montserrat, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
 /* ══════════════════════════════
    CHECKBOX
 ══════════════════════════════ */
@@ -1060,14 +1068,15 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step" id="step-4">
       <img class="step-photo" src="/assets/photos/pf-gorch-1.webp" alt="Ворота" loading="eager">
       <h2 class="step-title">Ворота</h2>
-      <p class="step-sub">Планируется ли ворота на этой стороне? Это повлияет на цену</p>
+      <p class="step-sub">Это повлияет на стоимость монтажа</p>
       <div class="toggle-row">
-        <span class="toggle-label">Заказать ворота</span>
+        <span class="toggle-label">Планируется ли ворота на этой стороне?</span>
         <div class="toggle" id="gateToggle" onclick="toggleField('gate')">
           <div class="toggle-thumb"></div>
         </div>
       </div>
       <div class="conditional" id="gateDetails">
+        <div class="block-title">Заказать ворота</div>
         <div>
           <label class="field-label">Ширина ворот <span style="color:var(--orange)">*</span></label>
           <div class="inp-wrap">

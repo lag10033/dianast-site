@@ -1076,7 +1076,7 @@ button { font-family: inherit; cursor: pointer; }
           </div>
         </div>
         <div>
-          <label class="field-label">Тип ворот</label>
+          <label class="field-label">Тип ворот <span style="color:var(--orange)">*</span></label>
           <div class="cards">
             <div class="card" data-group="gateType" data-val="sliding" onclick="selectCard(this)">
               <div style="flex:1">
@@ -1116,17 +1116,11 @@ button { font-family: inherit; cursor: pointer; }
       </div>
       <div class="conditional" id="wicketDetails">
         <div>
-          <label class="field-label">Ширина калитки</label>
+          <label class="field-label">Ширина калитки <span style="color:var(--orange)">*</span></label>
           <div class="inp-wrap">
             <input type="number" id="wicketWidth" placeholder="1.0" step="0.1" oninput="updateNav()">
             <span class="inp-suffix">м</span>
           </div>
-        </div>
-        <div class="checkbox-row" onclick="toggleCheckbox('wicketIntercom')">
-          <div class="checkbox-box" id="wicketIntercom">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
-          <span class="checkbox-label">Нужен видеодомофон?</span>
         </div>
       </div>
     </div>
@@ -1336,8 +1330,8 @@ function canGo() {
   if (cur === 1) return state.length !== '' && parseFloat(state.length) > 0;
   if (cur === 2) return state.height !== '' && parseFloat(state.height) > 0;
   if (cur === 3) return !!state.ground;
-  if (cur === 4) return !state.gateOn || (state.gateWidth !== '' && parseFloat(state.gateWidth) > 0);
-  if (cur === 5) return true;
+  if (cur === 4) return !state.gateOn || (state.gateWidth !== '' && parseFloat(state.gateWidth) > 0 && !!state.gateType);
+  if (cur === 5) return !state.wicketOn || (state.wicketWidth !== '' && parseFloat(state.wicketWidth) > 0);
   if (cur === 6) return !!state.fenceStyle;
   if (cur === 7) return !!state.fillType;
   if (cur === 8) return state.city.trim().length > 0;
@@ -1471,7 +1465,6 @@ function submitQuiz() {
     : 'Нет';
   var wicketInfo = state.wicketOn
     ? 'Да — ' + (state.wicketWidth||'—') + ' м'
-      + (state.wicketIntercom ? ', видеодомофон' : '')
     : 'Нет';
 
   var text = '📋 Новая заявка с квиза\n\n'

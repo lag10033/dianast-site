@@ -1071,12 +1071,11 @@ button { font-family: inherit; cursor: pointer; }
       <p class="step-sub">Это повлияет на стоимость монтажа</p>
       <div class="toggle-row">
         <span class="toggle-label">Планируется ли ворота на этой стороне?</span>
-        <div class="toggle" id="gateToggle" onclick="toggleField('gate')">
+        <div class="toggle" id="gatePlannedToggle" onclick="toggleField('gatePlanned')">
           <div class="toggle-thumb"></div>
         </div>
       </div>
-      <div class="conditional" id="gateDetails">
-        <div class="block-title">Заказать ворота</div>
+      <div class="conditional" id="gatePlannedDetails">
         <div>
           <label class="field-label">Ширина ворот <span style="color:var(--orange)">*</span></label>
           <div class="inp-wrap">
@@ -1084,6 +1083,14 @@ button { font-family: inherit; cursor: pointer; }
             <span class="inp-suffix">м</span>
           </div>
         </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Заказать ворота</span>
+          <div class="toggle" id="gateToggle" onclick="toggleField('gate')">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+      </div>
+      <div class="conditional" id="gateDetails">
         <div>
           <label class="field-label">Тип ворот <span style="color:var(--orange)">*</span></label>
           <div class="cards">
@@ -1311,7 +1318,7 @@ const state = {
   length: '', height: '', heightFrom: 'ground', heightRows: 18,
   heightSide: '',
   ground: null,
-  gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
+  gatePlanned: false, gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketOn: false, wicketWidth: '', wicketIntercom: false,
   fenceStyle: null, fillType: null, sideStyle: null,
   city: '', name: '', phone: '',
@@ -1339,7 +1346,12 @@ function canGo() {
   if (cur === 1) return state.length !== '' && parseFloat(state.length) > 0;
   if (cur === 2) return state.height !== '' && parseFloat(state.height) > 0;
   if (cur === 3) return !!state.ground;
-  if (cur === 4) return !state.gateOn || (state.gateWidth !== '' && parseFloat(state.gateWidth) > 0 && !!state.gateType);
+  if (cur === 4) {
+    if (!state.gatePlanned) return true;
+    if (state.gateWidth === '' || parseFloat(state.gateWidth) <= 0) return false;
+    if (state.gateOn && !state.gateType) return false;
+    return true;
+  }
   if (cur === 5) return !state.wicketOn || (state.wicketWidth !== '' && parseFloat(state.wicketWidth) > 0);
   if (cur === 6) return !!state.fenceStyle;
   if (cur === 7) return !!state.fillType;
@@ -1468,10 +1480,15 @@ function submitQuiz() {
     : '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
       + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '');
 
-  var gateInfo = state.gateOn
-    ? 'Да — ' + (state.gateWidth||'—') + ' м, ' + (gateTypeMap[state.gateType]||'тип не указан')
-      + (state.gateAuto ? ', автоматика' : '')
-    : 'Нет';
+  var gateInfo;
+  if (!state.gatePlanned) {
+    gateInfo = 'Не планируется';
+  } else if (state.gateOn) {
+    gateInfo = 'Заказать — ' + (state.gateWidth||'—') + ' м, ' + (gateTypeMap[state.gateType]||'тип не указан')
+      + (state.gateAuto ? ', автоматика' : '');
+  } else {
+    gateInfo = 'Планируется — ' + (state.gateWidth||'—') + ' м';
+  }
   var wicketInfo = state.wicketOn
     ? 'Да — ' + (state.wicketWidth||'—') + ' м'
     : 'Нет';
@@ -1612,7 +1629,17 @@ function setHeightSide(val, el) {
 
 // ── Toggles ────────────────────────────────────────────
 function toggleField(type) {
-  if (type === 'gate') {
+  if (type === 'gatePlanned') {
+    state.gatePlanned = !state.gatePlanned;
+    document.getElementById('gatePlannedToggle').classList.toggle('on', state.gatePlanned);
+    document.getElementById('gatePlannedDetails').classList.toggle('visible', state.gatePlanned);
+    // Выключили планирование → сбрасываем заказ ворот
+    if (!state.gatePlanned && state.gateOn) {
+      state.gateOn = false;
+      document.getElementById('gateToggle').classList.remove('on');
+      document.getElementById('gateDetails').classList.remove('visible');
+    }
+  } else if (type === 'gate') {
     state.gateOn = !state.gateOn;
     document.getElementById('gateToggle').classList.toggle('on', state.gateOn);
     document.getElementById('gateDetails').classList.toggle('visible', state.gateOn);

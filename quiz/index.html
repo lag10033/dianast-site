@@ -929,6 +929,20 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--gray-lt);
   margin-top: 10px;
 }
+
+/* ── Компактная вёрстка шага «Ворота», чтобы всё влезало без прокрутки ── */
+#step-4 .step-photo { height: 120px; margin-bottom: 14px; }
+#step-4 .step-title { margin-bottom: 12px; }
+#step-4 .toggle-row { padding: 12px 18px; margin-bottom: 10px; }
+#step-4 .conditional { gap: 10px; }
+#step-4 .field-label { margin-bottom: 6px; }
+#step-4 .inp-wrap input { padding: 12px 16px; }
+#step-4 .inp-suffix { height: 46px; }
+#step-4 .inp-hint { margin-top: 4px; }
+#step-4 .cards { gap: 8px; }
+#step-4 .card { padding: 11px 16px; }
+#step-4 .card-sub { display: none; }
+#step-4 .checkbox-row { padding: 11px 16px; }
 </style>
 </head>
 <body>
@@ -1003,7 +1017,7 @@ button { font-family: inherit; cursor: pointer; }
         <input type="number" id="length" placeholder="30" oninput="updateNav()">
         <span class="inp-suffix">метров</span>
       </div>
-      <p class="inp-hint">💡 Стандартный участок — 30–60 м.п.</p>
+      <p class="inp-hint">💡 Стандартный участок: 28–32 м.п.<br>Угловой участок: 63–65 м.п.</p>
     </div>
 
     <!-- STEP 3: Высота -->
@@ -1061,6 +1075,10 @@ button { font-family: inherit; cursor: pointer; }
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
+      </div>
+      <div class="info-note ground-old-note" style="display:none">
+        <span>💡</span>
+        <span>Демонтаж старого забора можно выполнить своими силами или нанять стороннюю мини-бригаду — возможно, так будет дешевле. Мы за рациональный труд. Но если нужно — конечно, демонтируем сами; учтите, это повлечёт дополнительные затраты.</span>
       </div>
     </div>
 
@@ -1129,10 +1147,11 @@ button { font-family: inherit; cursor: pointer; }
           <div class="toggle-thumb"></div>
         </div>
       </div>
+      <p class="inp-hint" id="foundationOffNote">Фундамент нужен в основном для удобства окашивания травы вдоль забора и защиты участка от чужих и соседских животных.</p>
       <div class="conditional" id="foundationDetails">
         <div class="info-note">
           <span>💡</span>
-          <span>Мы используем <b>оригинальный фундамент</b> — он подходит для более-менее ровных участков. На участках с перепадом высоты делаем <b>ступени фундамента</b>.</span>
+          <span>Мы используем <b>сборный ригельный фундамент</b> — он предназначен для более-менее ровных участков. На участках с перепадом высоты делаем <b>ступени фундамента</b>. Важно понимать: установка фундамента может составлять <b>до 30% от стоимости забора</b>.</span>
         </div>
       </div>
     </div>
@@ -1319,6 +1338,10 @@ button { font-family: inherit; cursor: pointer; }
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
+      </div>
+      <div class="info-note ground-old-note" style="display:none">
+        <span>💡</span>
+        <span>Демонтаж старого забора можно выполнить своими силами или нанять стороннюю мини-бригаду — возможно, так будет дешевле. Мы за рациональный труд. Но если нужно — конечно, демонтируем сами; учтите, это повлечёт дополнительные затраты.</span>
       </div>
     </div>
 
@@ -1570,6 +1593,12 @@ function selectCard(el) {
   document.querySelectorAll(`.card[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   state[group] = el.dataset.val;
+  // Подсказка про демонтаж — только при выборе «Старый забор»
+  if (group === 'ground') {
+    document.querySelectorAll('.ground-old-note').forEach(n => {
+      n.style.display = (el.dataset.val === 'old') ? 'flex' : 'none';
+    });
+  }
   updateNav();
 }
 
@@ -1685,6 +1714,7 @@ function toggleField(type) {
     state.foundationOn = !state.foundationOn;
     document.getElementById('foundationToggle').classList.toggle('on', state.foundationOn);
     document.getElementById('foundationDetails').classList.toggle('visible', state.foundationOn);
+    document.getElementById('foundationOffNote').style.display = state.foundationOn ? 'none' : 'block';
   } else if (type === 'wicketPlanned') {
     state.wicketPlanned = !state.wicketPlanned;
     document.getElementById('wicketPlannedToggle').classList.toggle('on', state.wicketPlanned);

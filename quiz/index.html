@@ -411,6 +411,15 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1.55;
 }
 
+.inp-error {
+  font-size: 12px;
+  color: #D14343;
+  font-weight: 600;
+  margin-top: 8px;
+  display: none;
+}
+.inp-error.show { display: block; }
+
 /* ── Segmented toggle (от земли / от фундамента) ── */
 .seg {
   display: flex;
@@ -1249,7 +1258,8 @@ button { font-family: inherit; cursor: pointer; }
       <img class="step-photo" src="/assets/photos/pf-gorch-3.webp" alt="Доставка по Беларуси" loading="eager">
       <h2 class="step-title">Ваш город</h2>
       <p class="step-sub">Работаем по всей Беларуси, доставка в любой регион</p>
-      <input type="text" class="inp-full" id="city" placeholder="Брест, Минск, Гомель..." oninput="updateNav()">
+      <input type="text" class="inp-full" id="city" placeholder="Брест, Минск, Гомель..." oninput="updateNav()" autocomplete="off">
+      <p class="inp-error" id="cityError">Укажите город Беларуси</p>
     </div>
 
     <!-- STEP 10: Контакты -->
@@ -1264,7 +1274,8 @@ button { font-family: inherit; cursor: pointer; }
         </div>
         <div>
           <label class="field-label-sm">Телефон</label>
-          <input type="tel" class="inp-full" id="phone" placeholder="+375 (__) ___-__-__" oninput="updateNav()">
+          <input type="tel" class="inp-full" id="phone" placeholder="+375 29 123-45-67" oninput="formatPhone()" onfocus="formatPhone()">
+          <p class="inp-error" id="phoneError">Введите номер: +375 и 9 цифр</p>
         </div>
         <p class="consent">Нажимая «Получить расчёт», вы соглашаетесь с обработкой персональных данных.</p>
       </div>
@@ -1372,6 +1383,59 @@ const state = {
   city: '', name: '', phone: '',
 };
 
+// ── Города Беларуси (для проверки шага «Город») ─────────
+const BY_CITIES = new Set([
+  'минск','брест','гродно','гомель','могилев','витебск',
+  'барановичи','бобруйск','борисов','пинск','орша','мозырь','солигорск','новополоцк',
+  'лида','молодечно','полоцк','жлобин','светлогорск','речица','жодино','слуцк','кобрин',
+  'слоним','волковыск','калинковичи','сморгонь','рогачев','осиповичи','горки','новогрудок',
+  'вилейка','дзержинск','лунинец','столбцы','береза','иваново','пружаны','дрогичин',
+  'ивацевичи','столин','несвиж','марьина горка','фаниполь','заславль','ляховичи','ганцевичи',
+  'микашевичи','белоозерск','кричев','климовичи','костюковичи','мстиславль','славгород',
+  'добруш','ветка','чечерск','петриков','житковичи','туров','ельск','наровля','хойники',
+  'брагин','лоев','корма','буда-кошелево','щучин','островец','ошмяны','поставы','глубокое',
+  'докшицы','браслав','миоры','верхнедвинск','лепель','чашники','сенно','толочин','дубровно',
+  'шклов','быхов','кличев','кировск','белыничи','чаусы','чериков','краснополье','хотимск',
+  'мосты','свислочь','дятлово','кореличи','мир','городея','каменец','жабинка','малорита',
+  'высокое','коссово','барань','дисна','давид-городок','василевичи','скидель','березино',
+  'червень','смолевичи','узда','копыль','клецк','любань','старые дороги','крупки','зельва',
+  'берестовица','ивье','вороново','берёзовка','новолукомль','чисть','логойск','воложин',
+  'столин','туров','шумилино','городок','лиозно','поставы','хойники','наровля','лельчицы',
+]);
+
+function normCity(s) {
+  return (s || '').toLowerCase().replace(/ё/g, 'е')
+    .replace(/^\s*(г\.?|город|гп|аг)\s+/i, '')
+    .trim().replace(/\s+/g, ' ');
+}
+function isValidCity(s) {
+  return BY_CITIES.has(normCity(s));
+}
+
+// ── Телефон: маска +375 и проверка количества цифр ──────
+function phoneDigits() {
+  let d = (state.phone || '').replace(/\D/g, '');
+  if (d.startsWith('375')) d = d.slice(3);
+  return d.slice(0, 9);
+}
+function formatPhone() {
+  const el = document.getElementById('phone');
+  if (!el) return;
+  let d = el.value.replace(/\D/g, '');
+  if (d.startsWith('375')) d = d.slice(3);
+  d = d.slice(0, 9);
+  let v = '+375';
+  if (d.length) {
+    v += ' ' + d.slice(0, 2);
+    if (d.length > 2) v += ' ' + d.slice(2, 5);
+    if (d.length > 5) v += '-' + d.slice(5, 7);
+    if (d.length > 7) v += '-' + d.slice(7, 9);
+  }
+  el.value = v;
+  state.phone = v;
+  updateNav();
+}
+
 function getSteps() {
   // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, калитка, фундамент, город, контакты
   if (state.fenceSide === 'side') {
@@ -1407,8 +1471,8 @@ function canGo() {
   }
   if (cur === 6) return !!state.fenceStyle;
   if (cur === 7) return !!state.fillType;
-  if (cur === 8) return state.city.trim().length > 0;
-  if (cur === 9) return state.name.trim().length > 0 && state.phone.trim().length > 0;
+  if (cur === 8) return isValidCity(state.city);
+  if (cur === 9) return state.name.trim().length > 0 && phoneDigits().length === 9;
   if (cur === 10) return state.heightSide !== '' && parseFloat(state.heightSide) > 0;
   if (cur === 11) return !!state.sideStyle;
   if (cur === 12) return !!state.ground;
@@ -1432,6 +1496,12 @@ function updateNav() {
   const wwEl = document.getElementById('wicketWidth');
   if (gwEl) state.gateWidth   = gwEl.value;
   if (wwEl) state.wicketWidth = wwEl.value;
+
+  // Подсветка ошибок города и телефона
+  const cityErr = document.getElementById('cityError');
+  if (cityErr) cityErr.classList.toggle('show', state.city.trim().length > 0 && !isValidCity(state.city));
+  const phoneErr = document.getElementById('phoneError');
+  if (phoneErr) phoneErr.classList.toggle('show', phoneDigits().length > 0 && phoneDigits().length !== 9);
 
   const steps = getSteps();
   const total = steps.length;

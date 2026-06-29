@@ -1068,7 +1068,6 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step" id="step-4">
       <img class="step-photo" src="/assets/photos/pf-gorch-1.webp" alt="Ворота" loading="eager">
       <h2 class="step-title">Ворота</h2>
-      <p class="step-sub">Это повлияет на стоимость монтажа</p>
       <div class="toggle-row">
         <span class="toggle-label">Планируется ли ворота на этой стороне?</span>
         <div class="toggle" id="gatePlannedToggle" onclick="toggleField('gatePlanned')">
@@ -1089,6 +1088,7 @@ button { font-family: inherit; cursor: pointer; }
             <div class="toggle-thumb"></div>
           </div>
         </div>
+        <p class="inp-hint">Это повлияет на стоимость монтажа</p>
       </div>
       <div class="conditional" id="gateDetails">
         <div>
@@ -1123,14 +1123,13 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step" id="step-5">
       <img class="step-photo" src="/assets/photos/pf-korch-3.webp" alt="Калитка" loading="eager">
       <h2 class="step-title">Калитка</h2>
-      <p class="step-sub">Нужна ли калитка на участок?</p>
       <div class="toggle-row">
-        <span class="toggle-label">Нужна калитка?</span>
-        <div class="toggle" id="wicketToggle" onclick="toggleField('wicket')">
+        <span class="toggle-label">Планируется ли калитка на этой стороне?</span>
+        <div class="toggle" id="wicketPlannedToggle" onclick="toggleField('wicketPlanned')">
           <div class="toggle-thumb"></div>
         </div>
       </div>
-      <div class="conditional" id="wicketDetails">
+      <div class="conditional" id="wicketPlannedDetails">
         <div>
           <label class="field-label">Ширина калитки <span style="color:var(--orange)">*</span></label>
           <div class="inp-wrap">
@@ -1138,6 +1137,13 @@ button { font-family: inherit; cursor: pointer; }
             <span class="inp-suffix">м</span>
           </div>
         </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Заказать калитку</span>
+          <div class="toggle" id="wicketToggle" onclick="toggleField('wicket')">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+        <p class="inp-hint">Это повлияет на стоимость монтажа</p>
       </div>
     </div>
 
@@ -1319,7 +1325,7 @@ const state = {
   heightSide: '',
   ground: null,
   gatePlanned: false, gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
-  wicketOn: false, wicketWidth: '', wicketIntercom: false,
+  wicketPlanned: false, wicketOn: false, wicketWidth: '', wicketIntercom: false,
   fenceStyle: null, fillType: null, sideStyle: null,
   city: '', name: '', phone: '',
 };
@@ -1352,7 +1358,11 @@ function canGo() {
     if (state.gateOn && !state.gateType) return false;
     return true;
   }
-  if (cur === 5) return !state.wicketOn || (state.wicketWidth !== '' && parseFloat(state.wicketWidth) > 0);
+  if (cur === 5) {
+    if (!state.wicketPlanned) return true;
+    if (state.wicketWidth === '' || parseFloat(state.wicketWidth) <= 0) return false;
+    return true;
+  }
   if (cur === 6) return !!state.fenceStyle;
   if (cur === 7) return !!state.fillType;
   if (cur === 8) return state.city.trim().length > 0;
@@ -1489,9 +1499,14 @@ function submitQuiz() {
   } else {
     gateInfo = 'Планируется — ' + (state.gateWidth||'—') + ' м';
   }
-  var wicketInfo = state.wicketOn
-    ? 'Да — ' + (state.wicketWidth||'—') + ' м'
-    : 'Нет';
+  var wicketInfo;
+  if (!state.wicketPlanned) {
+    wicketInfo = 'Не планируется';
+  } else if (state.wicketOn) {
+    wicketInfo = 'Заказать — ' + (state.wicketWidth||'—') + ' м';
+  } else {
+    wicketInfo = 'Планируется — ' + (state.wicketWidth||'—') + ' м';
+  }
 
   var text = '📋 Новая заявка с квиза\n\n'
     + '👤 Имя: ' + state.name + '\n'
@@ -1561,6 +1576,8 @@ function buildWheel() {
 
   let lastRows = state.heightRows;
   list.addEventListener('scroll', function () {
+    // Игнорируем скролл, когда колесо скрыто (иначе scrollTop=0 сбрасывает выбор)
+    if (!list.offsetParent) return;
     const idx  = Math.round(list.scrollTop / ITEM_H);
     const rows = Math.min(MAX_ROWS, Math.max(MIN_ROWS, MIN_ROWS + idx));
     if (rows !== lastRows) {
@@ -1643,10 +1660,18 @@ function toggleField(type) {
     state.gateOn = !state.gateOn;
     document.getElementById('gateToggle').classList.toggle('on', state.gateOn);
     document.getElementById('gateDetails').classList.toggle('visible', state.gateOn);
+  } else if (type === 'wicketPlanned') {
+    state.wicketPlanned = !state.wicketPlanned;
+    document.getElementById('wicketPlannedToggle').classList.toggle('on', state.wicketPlanned);
+    document.getElementById('wicketPlannedDetails').classList.toggle('visible', state.wicketPlanned);
+    // Выключили планирование → сбрасываем заказ калитки
+    if (!state.wicketPlanned && state.wicketOn) {
+      state.wicketOn = false;
+      document.getElementById('wicketToggle').classList.remove('on');
+    }
   } else {
     state.wicketOn = !state.wicketOn;
     document.getElementById('wicketToggle').classList.toggle('on', state.wicketOn);
-    document.getElementById('wicketDetails').classList.toggle('visible', state.wicketOn);
   }
   updateNav();
 }

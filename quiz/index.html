@@ -1254,11 +1254,34 @@ button { font-family: inherit; cursor: pointer; }
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
-        <div class="card has-img" data-group="sideStyle" data-val="setka" onclick="selectCard(this)">
-          <img class="card-img" src="/assets/photos/pf-graf-5.webp" alt="Сетка-рабица" loading="eager">
+        <div class="card has-img" data-group="sideStyle" data-val="3d" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-graf-5.webp" alt="3D забор" loading="eager">
           <div style="padding:0 4px 8px; width:100%">
-            <div class="card-label">Сетка-рабица</div>
-            <div class="card-sub">Самый бюджетный вариант</div>
+            <div class="card-label">3D забор</div>
+            <div class="card-sub">Сварная 3D-панель, аккуратный вид</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 12 (боковая ветка): Что на участке (без фундамента) -->
+    <div class="step" id="step-12">
+      <img class="step-photo" src="/assets/photos/pf-graf-5.webp" alt="Участок" loading="eager">
+      <h2 class="step-title">Что сейчас на участке?</h2>
+      <p class="step-sub">Это поможет рассчитать стоимость монтажа точнее</p>
+      <div class="cards">
+        <div class="card" data-group="ground" data-val="open" onclick="selectCard(this)">
+          <div style="flex:1">
+            <div class="card-label">Голая земля</div>
+            <div class="card-sub">Без фундамента</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card" data-group="ground" data-val="old" onclick="selectCard(this)">
+          <div style="flex:1">
+            <div class="card-label">Старый забор</div>
+            <div class="card-sub">Потребуется демонтаж</div>
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
@@ -1294,7 +1317,7 @@ const state = {
 function getSteps() {
   // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, калитка, город, контакты
   if (state.fenceSide === 'side') {
-    return [0, 1, 10, 3, 11, 4, 5, 8, 9];
+    return [0, 1, 10, 12, 11, 4, 5, 8, 9];
   }
   // Лицевая ветка (основной сценарий)
   const s = [0,1,2,3,4,5,6];
@@ -1320,6 +1343,7 @@ function canGo() {
   if (cur === 9) return state.name.trim().length > 0 && state.phone.trim().length > 0;
   if (cur === 10) return state.heightSide !== '' && parseFloat(state.heightSide) > 0;
   if (cur === 11) return !!state.sideStyle;
+  if (cur === 12) return !!state.ground;
   return true;
 }
 
@@ -1422,7 +1446,7 @@ function submitQuiz() {
   var sideMap     = {face:'Лицевая', side:'Боковая'};
   var groundMap   = {old:'Старый забор', open:'Голая земля', foundation:'Залит фундамент'};
   var styleMap    = {brick:'Кирпич + металл', stake:'Штакетник', profile:'Профнастил'};
-  var sideStyleMap= {profile:'Профнастил', stake:'Металлический штакетник', setka:'Сетка-рабица'};
+  var sideStyleMap= {profile:'Профнастил', stake:'Металлический штакетник', '3d':'3D забор'};
   var fillMap     = {stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи', brickfill:'Кирпич'};
   var gateTypeMap = {sliding:'Откатные', swing:'Распашные'};
   var isSide      = state.fenceSide === 'side';

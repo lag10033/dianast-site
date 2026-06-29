@@ -1119,6 +1119,24 @@ button { font-family: inherit; cursor: pointer; }
       </div>
     </div>
 
+    <!-- STEP 13: Фундамент -->
+    <div class="step" id="step-13">
+      <img class="step-photo" src="/assets/photos/pf-kras-4.webp" alt="Фундамент" loading="eager" style="object-position:center bottom">
+      <h2 class="step-title">Фундамент</h2>
+      <div class="toggle-row">
+        <span class="toggle-label">Нужен ли фундамент?</span>
+        <div class="toggle" id="foundationToggle" onclick="toggleField('foundation')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="conditional" id="foundationDetails">
+        <div class="info-note">
+          <span>💡</span>
+          <span>Мы используем <b>оригинальный фундамент</b> — он подходит для более-менее ровных участков. На участках с перепадом высоты делаем <b>ступени фундамента</b>.</span>
+        </div>
+      </div>
+    </div>
+
     <!-- STEP 6: Калитка -->
     <div class="step" id="step-5">
       <img class="step-photo" src="/assets/photos/pf-korch-3.webp" alt="Калитка" loading="eager">
@@ -1326,17 +1344,18 @@ const state = {
   ground: null,
   gatePlanned: false, gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketPlanned: false, wicketOn: false, wicketWidth: '', wicketIntercom: false,
+  foundationOn: false,
   fenceStyle: null, fillType: null, sideStyle: null,
   city: '', name: '', phone: '',
 };
 
 function getSteps() {
-  // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, калитка, город, контакты
+  // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, фундамент, калитка, город, контакты
   if (state.fenceSide === 'side') {
-    return [0, 1, 10, 12, 11, 4, 5, 8, 9];
+    return [0, 1, 10, 12, 11, 4, 13, 5, 8, 9];
   }
   // Лицевая ветка (основной сценарий)
-  const s = [0,1,2,3,4,5,6];
+  const s = [0,1,2,3,4,13,5,6];
   if (state.fenceStyle === 'brick') s.push(7);
   s.push(8,9);
   return s;
@@ -1370,6 +1389,7 @@ function canGo() {
   if (cur === 10) return state.heightSide !== '' && parseFloat(state.heightSide) > 0;
   if (cur === 11) return !!state.sideStyle;
   if (cur === 12) return !!state.ground;
+  if (cur === 13) return true;
   return true;
 }
 
@@ -1519,6 +1539,7 @@ function submitQuiz() {
     + '▪ Участок: '    + (groundMap[state.ground]||'—') + '\n'
     + styleLine
     + '▪ Ворота: '     + gateInfo + '\n'
+    + '▪ Фундамент: '  + (state.foundationOn ? 'Да' : 'Нет') + '\n'
     + '▪ Калитка: '    + wicketInfo + '\n';
 
   var tgUrl = 'https://api.telegram.org/bot' + TG_TOKEN
@@ -1660,6 +1681,10 @@ function toggleField(type) {
     state.gateOn = !state.gateOn;
     document.getElementById('gateToggle').classList.toggle('on', state.gateOn);
     document.getElementById('gateDetails').classList.toggle('visible', state.gateOn);
+  } else if (type === 'foundation') {
+    state.foundationOn = !state.foundationOn;
+    document.getElementById('foundationToggle').classList.toggle('on', state.foundationOn);
+    document.getElementById('foundationDetails').classList.toggle('visible', state.foundationOn);
   } else if (type === 'wicketPlanned') {
     state.wicketPlanned = !state.wicketPlanned;
     document.getElementById('wicketPlannedToggle').classList.toggle('on', state.wicketPlanned);

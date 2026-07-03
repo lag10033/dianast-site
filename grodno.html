@@ -5,10 +5,10 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Колотый кирпич для забора в Гродно — Dianast | Производитель</title>
-<meta name="description" content="Купить колотый кирпич для забора в Гродно от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Гродненской области. Цена от 3,40 руб/шт. Расчёт бесплатно.">
+<meta name="description" content="Купить колотый кирпич (блок демлер) для забора в Гродно от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Гродненской области. Цена от 3,40 руб/шт. Расчёт бесплатно.">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="canonical" href="https://dianast.by/grodno">
-<meta name="keywords" content="колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
+<meta name="keywords" content="демлер, блок демлер, колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph -->
@@ -361,6 +361,7 @@ function closeLeadModal(){document.getElementById('leadModal').style.display='no
 document.getElementById('leadModal').addEventListener('click',function(e){if(e.target===this)closeLeadModal()})
 function submitLead(e){
   e.preventDefault();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
   var name=document.getElementById('leadName').value;
   var phone=document.getElementById('leadPhone').value;
   // Send email notification
@@ -1142,6 +1143,7 @@ calcFence();
 <section style="background:#f8f5f0;padding:60px 5%">
   <div style="max-width:800px;margin:0 auto">
     <h2 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:20px">Колотый кирпич в Гродно — от производителя</h2>
+    <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px"><strong>Ищете блок демлер в Гродно?</strong> Это он и есть: демлером в Беларуси называют колотый кирпич — тот же материал известен и как рваный камень. Мы производим его с 2014 года. Что такое демлер, цены, цвета и отличия форматов — на странице <a href="/demler" style="color:#E8600A">блок демлер от производителя</a>.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Доставляем колотый кирпич в Гродно и Гродненскую область. Расстояние от нашего производства в Кобрине составляет около 220 км — доставляем полными машинами, что делает стоимость перевозки на единицу кирпича выгодной.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Гродно — один из крупнейших городов Беларуси, и мы регулярно работаем с застройщиками региона. В нашем портфолио есть объекты из Гродненской области. Колотый кирпич Dianast производится методом раскола под давлением, что формирует уникальную природную текстуру поверхности.</p>
     <p style="font-size:16px;line-height:1.8;color:#555">Забор из такого кирпича выглядит дорого и презентабельно, при этом не требует специального ухода и служит десятилетиями. Оставьте заявку — менеджер перезвонит и рассчитает стоимость доставки в Гродно.</p>
@@ -1554,5 +1556,11 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
 <noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
+</script>
 </body>
 </html>

@@ -1581,6 +1581,7 @@ var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
 var TG_CHAT  = '335993206';
 
 function submitQuiz() {
+  if(typeof ym==='function'){ym(110181067,'reachGoal','quiz_submit');}
   var btn = document.getElementById('btnNext');
   btn.disabled = true;
   document.getElementById('btnText').textContent = 'Отправляем...';
@@ -1821,6 +1822,24 @@ function updateFillStep() {
 // ── Init ───────────────────────────────────────────────
 buildWheel();
 updateNav();
+</script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110181067', 'ym');
+
+    ym(110181067, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
 </script>
 </body>
 </html>

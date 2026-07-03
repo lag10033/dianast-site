@@ -5,10 +5,10 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Колотый кирпич для забора в Столбцах — Dianast | Производитель</title>
-<meta name="description" content="Купить колотый кирпич для забора в Столбцах от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Минской области. Цена от 3,40 руб/шт. Расчёт бесплатно.">
+<meta name="description" content="Купить колотый кирпич (блок демлер) для забора в Столбцах от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Минской области. Цена от 3,40 руб/шт. Расчёт бесплатно.">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="canonical" href="https://dianast.by/stolbtsy">
-<meta name="keywords" content="колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
+<meta name="keywords" content="демлер, блок демлер, колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph -->
@@ -362,6 +362,7 @@ function closeLeadModal(){document.getElementById('leadModal').style.display='no
 document.getElementById('leadModal').addEventListener('click',function(e){if(e.target===this)closeLeadModal()})
 function submitLead(e){
   e.preventDefault();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
   var name=document.getElementById('leadName').value;
   var phone=document.getElementById('leadPhone').value;
   // Send email notification
@@ -1143,6 +1144,7 @@ calcFence();
 <section style="background:#f8f5f0;padding:60px 5%">
   <div style="max-width:800px;margin:0 auto">
     <h2 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:20px">Колотый кирпич в Столбцах — от производителя</h2>
+    <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px"><strong>Ищете блок демлер в Столбцах?</strong> Это он и есть: демлером в Беларуси называют колотый кирпич — тот же материал известен и как рваный камень. Мы производим его с 2014 года. Что такое демлер, цены, цвета и отличия форматов — на странице <a href="/demler" style="color:#E8600A">блок демлер от производителя</a>.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Доставляем колотый кирпич в Столбцы и Столбцовский район. 290 км от производства, доставка транспортом компании. Если вы планируете строительство забора в Столбцах или прилегающих районах — мы поможем подобрать подходящий цвет и рассчитать точное количество материала.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Угловой кирпич формирует столбы — основу любого кирпичного забора. Рядовой кирпич заполняет пролёты между столбами. Вместе они создают законченный архитектурный облик, который гармонирует с домом и ландшафтом участка.</p>
     <p style="font-size:16px;line-height:1.8;color:#555">Четыре цвета на выбор: горчичный, красный, коричневый, графит. Воспользуйтесь калькулятором на этой странице для предварительного расчёта стоимости.</p>
@@ -1151,6 +1153,7 @@ calcFence();
 <section style="background:#f4f0eb;padding:40px 5%">
   <div style="max-width:800px;margin:0 auto">
     <p style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:14px">Полезные инструменты и статьи:</p>
+    <a href="/demler" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Блок демлер — что это и цены от производителя</a>
     <a href="/quiz" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Калькулятор кирпича для забора — рассчитать онлайн</a>
     <a href="/zabor" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Как рассчитать количество кирпича для забора</a>
     <a href="/stoimost-zabora" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Сколько стоит кирпичный забор в Беларуси</a>
@@ -1564,5 +1567,11 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
 <noscript><div><img loading="lazy" src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
+</script>
 </body>
 </html>

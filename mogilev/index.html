@@ -5,10 +5,10 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Колотый кирпич для забора в Могилёве — Dianast | Производитель</title>
-<meta name="description" content="Купить колотый кирпич для забора в Могилёве от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Могилёвской области. Цена от 3,40 руб/шт.">
+<meta name="description" content="Купить колотый кирпич (блок демлер) для забора в Могилёве от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Могилёвской области. Цена от 3,40 руб/шт.">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="canonical" href="https://dianast.by/mogilev">
-<meta name="keywords" content="колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
+<meta name="keywords" content="демлер, блок демлер, колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph -->
@@ -362,6 +362,7 @@ function closeLeadModal(){document.getElementById('leadModal').style.display='no
 document.getElementById('leadModal').addEventListener('click',function(e){if(e.target===this)closeLeadModal()})
 function submitLead(e){
   e.preventDefault();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
   var name=document.getElementById('leadName').value;
   var phone=document.getElementById('leadPhone').value;
   // Send email notification
@@ -1167,6 +1168,7 @@ calcFence();
 <section style="background:#f8f5f0;padding:60px 5%">
   <div style="max-width:800px;margin:0 auto">
     <h2 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:20px">Колотый кирпич в Могилёве — от производителя</h2>
+    <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px"><strong>Ищете блок демлер в Могилёве?</strong> Это он и есть: демлером в Беларуси называют колотый кирпич — тот же материал известен и как рваный камень. Мы производим его с 2014 года. Что такое демлер, цены, цвета и отличия форматов — на странице <a href="/demler" style="color:#E8600A">блок демлер от производителя</a>.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Доставляем колотый кирпич в Могилёв и Могилёвскую область. 490 км от производства в Кобрине. Могилёв — крупный промышленный и жилой центр, и мы регулярно поставляем кирпич для застройщиков региона.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Везём полными машинами, стоимость доставки на единицу кирпича при этом минимальна. Колотый кирпич Dianast отличается стабильным качеством: одинаковая геометрия, равномерный цвет, высокая прочность и морозостойкость.</p>
     <p style="font-size:16px;line-height:1.8;color:#555">Угловой и рядовой кирпич четырёх цветов в наличии. Оставьте заявку или рассчитайте стоимость в калькуляторе на этой странице.</p>
@@ -1175,6 +1177,7 @@ calcFence();
 <section style="background:#f4f0eb;padding:40px 5%">
   <div style="max-width:800px;margin:0 auto">
     <p style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:14px">Полезные инструменты и статьи:</p>
+    <a href="/demler" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Блок демлер — что это и цены от производителя</a>
     <a href="/quiz" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Калькулятор кирпича для забора — рассчитать онлайн</a>
     <a href="/zabor" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Как рассчитать количество кирпича для забора</a>
     <a href="/stoimost-zabora" style="display:block;font-size:15px;color:#E8600A;margin-bottom:8px;text-decoration:none">→ Сколько стоит кирпичный забор в Беларуси</a>
@@ -1611,5 +1614,11 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
 <noscript><div><img loading="lazy" src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
+</script>
 </body>
 </html>

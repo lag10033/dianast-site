@@ -5,10 +5,10 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Колотый кирпич для забора в Бобруйске — Dianast | Производитель</title>
-<meta name="description" content="Купить колотый кирпич для забора в Бобруйске от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Могилёвской области. Цена от 3,40 руб/шт.">
+<meta name="description" content="Купить колотый кирпич (блок демлер) для забора в Бобруйске от производителя Dianast. Угловой и рядовой, 4 цвета. Доставка по Могилёвской области. Цена от 3,40 руб/шт.">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="canonical" href="https://dianast.by/bobruisk">
-<meta name="keywords" content="колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
+<meta name="keywords" content="демлер, блок демлер, колотый кирпич для забора, купить кирпич Беларусь, кирпич Кобрин, кирпич для забора цена, угловой кирпич, рядовой кирпич, Dianast">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph -->
@@ -361,6 +361,7 @@ function closeLeadModal(){document.getElementById('leadModal').style.display='no
 document.getElementById('leadModal').addEventListener('click',function(e){if(e.target===this)closeLeadModal()})
 function submitLead(e){
   e.preventDefault();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
   var name=document.getElementById('leadName').value;
   var phone=document.getElementById('leadPhone').value;
   // Send email notification
@@ -1166,6 +1167,7 @@ calcFence();
 <section style="background:#f8f5f0;padding:60px 5%">
   <div style="max-width:800px;margin:0 auto">
     <h2 style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:20px">Колотый кирпич в Бобруйске — от производителя</h2>
+    <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px"><strong>Ищете блок демлер в Бобруйске?</strong> Это он и есть: демлером в Беларуси называют колотый кирпич — тот же материал известен и как рваный камень. Мы производим его с 2014 года. Что такое демлер, цены, цвета и отличия форматов — на странице <a href="/demler" style="color:#E8600A">блок демлер от производителя</a>.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Колотый кирпич Dianast с доставкой в Бобруйск и Бобруйский район. Около 420 км от производства. Мы работаем с частными застройщиками и строительными организациями по всей Могилёвской области.</p>
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">При больших объёмах заказа стоимость доставки на единицу кирпича снижается. Колотый кирпич для забора — это не просто строительный материал, но и элемент ландшафтного дизайна. Четыре цвета позволяют подобрать оттенок под кровлю, фасад дома или ворота.</p>
     <p style="font-size:16px;line-height:1.8;color:#555">Воспользуйтесь калькулятором для предварительного расчёта или позвоните менеджеру.</p>
@@ -1601,5 +1603,11 @@ window.addEventListener('touchmove', updateBackBtn, {passive:true});
 <noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
+</script>
 </body>
 </html>

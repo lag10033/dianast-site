@@ -16,6 +16,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/demler-ili-besser</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/zabor-bez-kamenschika</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/kolotyj-kirpich-ili-evrozabor</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/vybor-kirpicha</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>

@@ -1640,6 +1640,19 @@ function submitQuiz() {
     + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT)
     + '&text=' + encodeURIComponent(text);
 
+  // Заявка сразу в CRM (клиент + сделка «Новый лид» на экране «Сегодня»).
+  // Ошибки не блокируют клиента: Telegram и почта остаются резервом.
+  fetch('https://dianast-crm.vercel.app/api/lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: state.name,
+      phone: state.phone,
+      city: state.city,
+      note: text.replace('📋 Новая заявка с квиза\n\n', '')
+    })
+  }).catch(function(){});
+
   fetch(tgUrl)
     .then(function(){ showThankyou(); })
     .catch(function(){ showThankyou(); });

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Конструктор забора — прототип ядра расчёта | Dianast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#E8600A;--dark:#1a1a1a;--mid:#6b6b6b;--light:#f4f0eb;--line:#d9d2c7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#faf8f4;padding:24px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--mid);font-size:14px;margin-bottom:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end}
+.field{flex:1;min-width:150px}
+label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px}
+input,select{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:11px 13px;font-size:15px;font-family:Inter,sans-serif;outline:none}
+input:focus,select:focus{border-color:var(--orange)}
+.hint{font-size:12px;color:var(--mid);margin-top:5px}
+button{background:var(--orange);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;padding:13px 28px;border:none;border-radius:8px;cursor:pointer;margin-top:16px}
+button:hover{opacity:.92}
+.result{display:none}
+.result.on{display:block}
+.summary{font-size:16px;line-height:1.7}
+.summary b{color:var(--orange)}
+.pill{display:inline-block;background:var(--light);border-radius:6px;padding:3px 10px;font-size:14px;font-weight:600;margin:3px 4px 0 0}
+.warn{background:#fff3e8;border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:14px}
+.ok{background:#eef7ee;border-left:4px solid #3a9c48;border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:14px}
+.ladder{font-size:13px;color:var(--mid);margin-top:10px}
+svg{width:100%;height:auto;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+td,th{padding:8px 10px;border-bottom:1px solid #eee;text-align:left}
+th{font-family:Montserrat,sans-serif}
+.note{font-size:12px;color:var(--mid);margin-top:18px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Конструктор забора — ядро расчёта</h1>
+  <p class="sub">Прототип. Проверяем математику разбивки на пролёты. Количество кирпича — на следующем шаге (нужны высота и сечение продлёнки).</p>
+
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label>Длина участка между крайними столбами, м</label>
+        <input id="run" type="number" step="0.01" value="20.00">
+        <div class="hint">Прямой прогон, который делим на пролёты (без ворот/калитки — их считаем отдельными участками)</div>
+      </div>
+      <div class="field" style="max-width:220px">
+        <label>Цель длины пролёта</label>
+        <select id="target">
+          <option value="2980" selected>~3,0 м (2980) — по умолчанию</option>
+          <option value="2860">~2,86 м (2860)</option>
+          <option value="3110">~3,11 м (3110)</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="calc()">Рассчитать разбивку</button>
+    <div class="ladder">Линейка пролётов кладки: 2610 · 2730 · 2860 · 2980 · 3110 мм (столб 380). Фундамент = +30 (тумба 350).</div>
+  </div>
+
+  <div class="card result" id="res"></div>
+
+  <p class="note">Модель: пролёт кладки = просвет между столбами 380 мм; модуль 24×125−20 = 2980 (−20 = запил столба по 1 см с двух сторон). Шаг осей 3360 мм постоянный. Пролёты внутри участка приблизительно равны — линейка даёт шаг ~125 мм, поэтому берётся смесь двух соседних значений, чтобы попасть в длину. Остаток показывается: его подгоняют лёгким сдвигом длины или положения ворот/калитки.</p>
+</div>
+
+<script>
+var LADDER=[2610,2730,2860,2980,3110]; // кладка, мм
+var POST=380;                          // столб, мм
+var FOUND_OFFSET=30;                    // фундамент = кладка + 30
+
+function splitRun(R, prefer){
+  var best=null;
+  for(var n=1;n<=40;n++){
+    var avail=R-(n-1)*POST;            // длина под пролёты (между n+1 столбами n пролётов, n-1 внутренних)
+    if(avail < n*LADDER[0]) break;
+    var target=avail/n;
+    if(target < LADDER[0]-60 || target > LADDER[LADDER.length-1]+60) continue;
+    // соседние значения линейки вокруг target
+    var lo=LADDER[0], hi=LADDER[LADDER.length-1];
+    if(target<=LADDER[0]){lo=hi=LADDER[0];}
+    else if(target>=LADDER[LADDER.length-1]){lo=hi=LADDER[LADDER.length-1];}
+    else{ for(var i=0;i<LADDER.length-1;i++){ if(target>=LADDER[i] && target<=LADDER[i+1]){lo=LADDER[i];hi=LADDER[i+1];break;} } }
+    var spans;
+    if(lo===hi){ spans=[]; for(var k=0;k<n;k++) spans.push(lo); }
+    else{
+      var b=Math.round((avail-n*lo)/(hi-lo)); b=Math.max(0,Math.min(n,b));
+      var a=n-b; spans=[];
+      for(var k=0;k<a;k++) spans.push(lo);
+      for(var k=0;k<b;k++) spans.push(hi);
+    }
+    var sum=spans.reduce(function(x,y){return x+y;},0);
+    var residual=avail-sum;
+    var score=Math.abs(residual)+Math.abs(target-prefer)*0.15;
+    if(!best||score<best.score) best={n:n,spans:spans,residual:residual,avail:avail,target:target,score:score};
+  }
+  return best;
+}
+
+// расставить пролёты симметрично: большие к центру
+function symmetrize(spans){
+  var s=spans.slice().sort(function(a,b){return a-b;}); // возр.
+  var out=new Array(s.length); var l=0, r=s.length-1, i=s.length-1;
+  while(i>=0){ out[l++]=s[i--]; if(i>=0) out[r--]=s[i--]; }
+  return out;
+}
+
+function calc(){
+  var R=Math.round(parseFloat(document.getElementById('run').value)*1000);
+  var prefer=parseInt(document.getElementById('target').value,10);
+  var res=document.getElementById('res');
+  res.className='card result on';
+  if(!R||R<LADDER[0]+2*POST){ res.innerHTML='<b>Слишком короткий участок</b> — минимум ~'+((LADDER[0]+0)/1000).toFixed(2)+' м на один пролёт.'; return; }
+  var b=splitRun(R, prefer);
+  if(!b){ res.innerHTML='<b>Не удалось подобрать</b> пролёты в диапазоне 2,61–3,11 м. Проверьте длину.'; return; }
+  var spans=symmetrize(b.spans);
+  var posts=b.n+1;
+  // сводка по размерам
+  var counts={}; spans.forEach(function(v){counts[v]=(counts[v]||0)+1;});
+  var pills=Object.keys(counts).sort().map(function(v){return '<span class="pill">'+counts[v]+' × '+v+' мм</span>';}).join('');
+  var resid=b.residual;
+  var residHtml = Math.abs(resid)<=5
+    ? '<div class="ok">Сходится точно (остаток '+resid+' мм).</div>'
+    : '<div class="warn">Остаток <b>'+resid+' мм</b> — подгоните длину участка или положение ворот/калитки на эту величину, чтобы кладка села ровно.</div>';
+
+  var html='<div class="summary"><b>'+b.n+' пролётов</b> и <b>'+posts+' столбов</b> на участке '+(R/1000).toFixed(2)+' м.<br>'+pills+'</div>'+residHtml;
+
+  // таблица фундамент/кладка
+  html+='<table><tr><th>Пролёт</th><th>Кладка (между столбами 380)</th><th>Фундамент (между тумбами 350)</th></tr>';
+  spans.forEach(function(v,i){ html+='<tr><td>'+(i+1)+'</td><td>'+v+' мм</td><td>'+(v+FOUND_OFFSET)+' мм</td></tr>'; });
+  html+='</table>';
+
+  html+=drawPlan(spans);
+  res.innerHTML=html;
+}
+
+function drawPlan(spans){
+  var W=860, padL=20, padR=20, y=70, wall=22, postW=14, postH=40;
+  var total=spans.reduce(function(a,b){return a+b;},0)+ (spans.length+1)*POST;
+  var scale=(W-padL-padR)/total;
+  var x=padL, svg='<svg viewBox="0 0 '+W+' 150" xmlns="http://www.w3.org/2000/svg">';
+  // первый столб
+  function post(px){ return '<rect x="'+px+'" y="'+(y-9)+'" width="'+(POST*scale)+'" height="'+postH+'" rx="2" fill="#1a1a1a"/>'; }
+  function span(px,w,label){ var pw=w*scale; var s='<rect x="'+px+'" y="'+y+'" width="'+pw+'" height="'+wall+'" fill="#f4f0eb" stroke="#c9bfae"/>';
+    s+='<text x="'+(px+pw/2)+'" y="'+(y+wall+16)+'" font-size="11" text-anchor="middle" fill="#6b6b6b" font-family="Inter,sans-serif">'+label+'</text>'; return s; }
+  svg+=post(x); x+=POST*scale;
+  for(var i=0;i<spans.length;i++){ svg+=span(x,spans[i],spans[i]); x+=spans[i]*scale; svg+=post(x); x+=POST*scale; }
+  // подпись столба
+  svg+='<text x="'+padL+'" y="'+(y-16)+'" font-size="11" fill="#1a1a1a" font-family="Inter,sans-serif">▪ столб 380×380</text>';
+  svg+='</svg>';
+  return svg;
+}
+calc();
+</script>
+</body>
+</html>

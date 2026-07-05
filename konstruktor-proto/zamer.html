@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Шаблон замера забора — прототип | Dianast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#E8600A;--dark:#1a1a1a;--mid:#6b6b6b;--light:#f4f0eb;--line:#d9d2c7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#faf8f4;padding:24px 16px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px}
+.sub{color:var(--mid);font-size:14px;margin-bottom:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+.step{font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;color:var(--orange);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.grp{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.tg{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;color:#444}
+.tg.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.lbl{font-size:12px;font-weight:600;color:#888;margin:14px 0 6px}
+.schemes{display:flex;flex-wrap:wrap;gap:10px}
+.scheme{border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;flex:1;min-width:210px}
+.scheme.on{border-color:var(--orange);background:#fff7f1}
+.scheme .nm{font-weight:700;font-size:13px;margin-bottom:8px}
+.scheme .seq{display:flex;gap:3px;align-items:stretch;height:26px}
+.seq span{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;border-radius:3px;padding:0 2px;color:#fff}
+.seg-p{background:#cbb89a;flex:1}
+.seg-g{background:var(--orange);flex:0 0 34px}
+.seg-w{background:#c2762e;flex:0 0 22px}
+.hidden{display:none}
+
+/* fence render */
+.fence{display:flex;align-items:stretch;gap:4px;margin:6px 0 2px}
+.cap{flex:0 0 128px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;text-align:center;gap:5px}
+.cap .cbtn{border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:5px 4px;font-size:10.5px;font-weight:600;color:#555;cursor:pointer;line-height:1.15}
+.cap .cbtn.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.cap .crow{display:flex;gap:4px}
+.cap .crow .cbtn{flex:1}
+.cap .cnote{font-size:9.5px;color:var(--mid);line-height:1.2}
+/* annotation row (до центра): гараж/дверь над проёмами */
+.anno{display:flex;align-items:flex-end;gap:4px;margin-bottom:2px}
+.aslot{display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.aic{border:1.5px solid;border-radius:6px;padding:4px 6px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.aic.g{border-color:var(--orange);color:var(--orange);background:#fff7f1}
+.aic.w{border-color:#c2762e;color:#c2762e;background:#fdf3ea}
+.aline{width:0;border-left:2px dashed #bbb;height:14px;margin-top:2px}
+.elem{display:flex;align-items:center;justify-content:center;height:52px;border-radius:6px;font-size:12px;font-weight:600;text-align:center}
+.e-p{background:var(--light);border:1px solid #c9bfae;color:#7a6a4e;flex:1;min-width:60px}
+.e-g{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange);flex:0 0 120px}
+.e-w{background:#fdf0e4;border:1.5px solid #c2762e;color:#c2762e;flex:0 0 84px}
+.fields{display:flex;gap:4px;margin-top:0}
+.fslot{display:flex;flex-direction:column;align-items:center}
+.fslot input{width:100%;border:1.5px solid var(--line);border-radius:7px;padding:9px 6px;font-size:14px;text-align:center;font-family:Inter,sans-serif;outline:none}
+.fslot input:focus{border-color:var(--orange)}
+.fslot .fh{font-size:10px;color:var(--mid);margin-top:4px;text-align:center;line-height:1.2}
+.note{font-size:12px;color:var(--mid);margin-top:8px;line-height:1.6}
+.slopewrap{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Шаблон замера забора</h1>
+  <p class="sub">Прототип. Клиент выбирает схему и вписывает размеры. Проём меряется между столбами (от края до края).</p>
+
+  <div class="card">
+    <div class="step">Шаг 1 · Лицевая сторона</div>
+    <div class="grp" id="side"></div>
+    <div class="note" id="sideNote"></div>
+  </div>
+
+  <div class="card">
+    <div class="step">Шаг 2 · Проёмы</div>
+    <div class="lbl">Сколько ворот</div>
+    <div class="grp" id="gates"></div>
+    <div class="lbl">Схема расположения</div>
+    <div class="schemes" id="schemeList"></div>
+    <div id="pairWrap" class="hidden">
+      <div class="lbl">Что идёт первым в паре «ворота+калитка»</div>
+      <div class="grp" id="pairOrder"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step">Шаг 3 · Как меряете</div>
+    <div class="lbl">Расстояние до проёма меряете</div>
+    <div class="grp" id="refMode"></div>
+    <div class="lbl">Участок</div>
+    <div class="grp" id="slope"></div>
+    <div class="slopewrap hidden" id="slopeField">
+      <div class="lbl">Перепад высоты по участку, см</div>
+      <input type="number" style="max-width:180px;border:1.5px solid var(--line);border-radius:7px;padding:9px 10px;font-size:14px" placeholder="напр. 40">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step">Шаг 4 · Размеры (заполните поля)</div>
+    <div id="render"></div>
+    <div class="note">Проём — <b>от края столба до края столба</b>. Части забора — <span id="refHint">до центра проёма</span>. Ворота обычно ~4 м, калитка ~1 м.</div>
+  </div>
+</div>
+
+<script>
+var S={ side:'straight', gates:'one', scheme:'A', pairOrder:'gate', ref:'center', slope:'flat' };
+
+// схемы: P=часть, G=ворота, W=калитка, PAIR=ворота+калитка через столб
+var SCHEMES={
+  one:[
+    {id:'A', nm:'Ворота и калитка порознь', seq:['P','G','P','W','P']},
+    {id:'B', nm:'Калитка, потом ворота',     seq:['P','W','P','G','P']},
+    {id:'C', nm:'Ворота+калитка рядом',       seq:['P','PAIR','P']}
+  ],
+  two:[
+    {id:'D', nm:'Двое ворот, калитка между',  seq:['P','G','P','W','P','G','P']},
+    {id:'E', nm:'Пара + вторые ворота',       seq:['P','PAIR','P','G','P']}
+  ]
+};
+
+function expand(seq){
+  var out=[];
+  seq.forEach(function(t){
+    if(t==='PAIR'){
+      if(S.pairOrder==='gate'){ out.push({t:'G',pair:true}); out.push({t:'W',pair:true}); }
+      else { out.push({t:'W',pair:true}); out.push({t:'G',pair:true}); }
+    } else out.push({t:t});
+  });
+  return out;
+}
+
+function btnGroup(el, opts, cur, cb){
+  el.innerHTML='';
+  opts.forEach(function(o){
+    var b=document.createElement('div'); b.className='tg'+(o.v===cur?' on':''); b.textContent=o.t;
+    b.onclick=function(){ cb(o.v); };
+    el.appendChild(b);
+  });
+}
+
+function renderControls(){
+  btnGroup(document.getElementById('side'),[{v:'straight',t:'Прямая'},{v:'corner',t:'Угловая (Г-образная)'}],S.side,function(v){S.side=v;renderAll();});
+  document.getElementById('sideNote').textContent = S.side==='corner'
+    ? 'Угловая сторона = две прямые. Пока заполните одну сторону; переключение сторон добавим следующим шагом.' : '';
+  btnGroup(document.getElementById('gates'),[{v:'one',t:'Одни ворота'},{v:'two',t:'Двое ворот'}],S.gates,function(v){S.gates=v;S.scheme=SCHEMES[v][0].id;renderAll();});
+  btnGroup(document.getElementById('refMode'),[{v:'center',t:'До центра проёма'},{v:'start',t:'До начала проёма'}],S.ref,function(v){S.ref=v;renderAll();});
+  btnGroup(document.getElementById('slope'),[{v:'flat',t:'Ровный'},{v:'slope',t:'С уклоном'}],S.slope,function(v){S.slope=v;renderAll();});
+  document.getElementById('slopeField').className='slopewrap'+(S.slope==='slope'?'':' hidden');
+
+  // схемы-карточки
+  var list=document.getElementById('schemeList'); list.innerHTML='';
+  SCHEMES[S.gates].forEach(function(sc){
+    var d=document.createElement('div'); d.className='scheme'+(sc.id===S.scheme?' on':'');
+    var seq='<div class="seq">'+sc.seq.map(function(t){
+      if(t==='P')return '<span class="seg-p">Забор</span>';
+      if(t==='G')return '<span class="seg-g">Вор</span>';
+      if(t==='W')return '<span class="seg-w">Кал</span>';
+      if(t==='PAIR')return '<span class="seg-g">Вор</span><span class="seg-w">Кал</span>';
+    }).join('')+'</div>';
+    d.innerHTML='<div class="nm">'+sc.nm+'</div>'+seq;
+    d.onclick=function(){ S.scheme=sc.id; renderAll(); };
+    list.appendChild(d);
+  });
+
+  // пара-порядок виден только для схем с PAIR
+  var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});
+  var hasPair=scObj.seq.indexOf('PAIR')>=0;
+  document.getElementById('pairWrap').className=hasPair?'':'hidden';
+  if(hasPair) btnGroup(document.getElementById('pairOrder'),[{v:'gate',t:'Сначала ворота'},{v:'wicket',t:'Сначала калитка'}],S.pairOrder,function(v){S.pairOrder=v;renderAll();});
+  document.getElementById('refHint').textContent = S.ref==='center'?'до центра проёма':'до края проёма';
+}
+
+function capHtml(side){
+  var c = side==='L'? S.capL : S.capR;
+  var h='<div class="cap">';
+  h+='<div class="crow"><div class="cbtn'+(c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',true)">Соседский столб</div>'
+    +'<div class="cbtn'+(!c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',false)">Голая земля</div></div>';
+  if(c.neighbor){
+    h+='<div class="crow"><div class="cbtn'+(c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',true)">+ свой столб</div>'
+      +'<div class="cbtn'+(!c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',false)">К соседскому</div></div>';
+  } else {
+    h+='<div class="cnote">свой крайний столб (считаем автоматически)</div>';
+  }
+  return h+'</div>';
+}
+function setNb(side,v){ (side==='L'?S.capL:S.capR).neighbor=v; renderFence(); }
+function setOwn(side,v){ (side==='L'?S.capL:S.capR).ownPost=v; renderFence(); }
+
+function renderFence(){
+  var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});
+  var els=expand(scObj.seq);
+  var host=document.getElementById('render');
+  var two=S.gates==='two';
+
+  // Строка-подсказка (до центра): гараж над воротами, дверь над калиткой + осевая линия
+  var anno='';
+  if(S.ref==='center'){
+    anno='<div class="anno"><div style="flex:0 0 128px"></div>';
+    els.forEach(function(e){
+      if(e.t==='P'){ anno+='<div class="aslot" style="flex:1;min-width:60px"></div>'; }
+      else if(e.t==='G'){ anno+='<div class="aslot" style="flex:0 0 120px"><div class="aic g">🚗 центр гаража</div><div class="aline"></div></div>'; }
+      else if(e.t==='W'){ anno+='<div class="aslot" style="flex:0 0 84px"><div class="aic w">🚪 центр двери</div><div class="aline"></div></div>'; }
+    });
+    anno+='<div style="flex:0 0 128px"></div></div>';
+  }
+
+  var fence='<div class="fence">'+capHtml('L');
+  var fields='<div class="fields"><div style="flex:0 0 128px"></div>';
+  var pIdx=0,gIdx=0,wIdx=0;
+  els.forEach(function(e){
+    if(e.t==='P'){ pIdx++;
+      fence+='<div class="elem e-p">Забор '+pIdx+'</div>';
+      var hint = S.ref==='center'?'длина, м (до центра проёма)':'длина, м (до края проёма)';
+      fields+='<div class="fslot" style="flex:1;min-width:60px"><input type="number" step="0.01" placeholder="_ _, _ _"><div class="fh">Забор '+pIdx+' · '+hint+'</div></div>';
+    } else if(e.t==='G'){ gIdx++;
+      fence+='<div class="elem e-g">Ворота'+(two?' '+gIdx:'')+'</div>';
+      fields+='<div class="fslot" style="flex:0 0 120px"><input type="number" step="0.01" placeholder="4,00"><div class="fh">Ворота'+(two?' '+gIdx:'')+' · ширина, м</div></div>';
+    } else if(e.t==='W'){ wIdx++;
+      fence+='<div class="elem e-w">Калитка</div>';
+      fields+='<div class="fslot" style="flex:0 0 84px"><input type="number" step="0.01" placeholder="1,00"><div class="fh">Калитка · ширина, м</div></div>';
+    }
+  });
+  fence+=capHtml('R')+'</div>';
+  fields+='<div style="flex:0 0 128px"></div></div>';
+  host.innerHTML=anno+fence+fields;
+}
+S.capL={neighbor:true,ownPost:false}; S.capR={neighbor:true,ownPost:false};
+
+function renderAll(){ renderControls(); renderFence(); }
+renderAll();
+</script>
+</body>
+</html>

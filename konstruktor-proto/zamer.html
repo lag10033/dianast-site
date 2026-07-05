@@ -46,6 +46,17 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 .aic.g{border-color:var(--orange);color:var(--orange);background:#fff7f1}
 .aic.w{border-color:#c2762e;color:#c2762e;background:#fdf3ea}
 .aline{width:0;border-left:2px dashed #bbb;height:14px;margin-top:2px}
+.print-only{display:none}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff;padding:0}
+  .card{display:none !important}
+  #step4card{display:block !important;border:none;padding:0}
+  #step4card .step{display:none}
+  .print-only{display:block}
+  .noprint{display:none !important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 .elem{display:flex;align-items:center;justify-content:center;height:52px;border-radius:6px;font-size:12px;font-weight:600;text-align:center}
 .e-p{background:var(--light);border:1px solid #c9bfae;color:#7a6a4e;flex:1;min-width:60px}
 .e-g{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange);flex:0 0 120px}
@@ -90,14 +101,17 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     <div class="grp" id="slope"></div>
     <div class="slopewrap hidden" id="slopeField">
       <div class="lbl">Перепад высоты по участку, см</div>
-      <input type="number" style="max-width:180px;border:1.5px solid var(--line);border-radius:7px;padding:9px 10px;font-size:14px" placeholder="напр. 40">
+      <input type="number" style="max-width:180px;border:1.5px solid var(--line);border-radius:7px;padding:9px 10px;font-size:14px" placeholder="напр. 40 см">
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="step4card">
     <div class="step">Шаг 4 · Размеры (заполните поля)</div>
+    <div id="printHead" class="print-only"></div>
     <div id="render"></div>
     <div class="note">Проём — <b>от края столба до края столба</b>. Части забора — <span id="refHint">до центра проёма</span>. Ворота обычно ~4 м, калитка ~1 м.</div>
+    <button class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
+    <span class="note noprint" style="margin-left:12px">Удобнее заполнить размеры от руки на участке.</span>
   </div>
 </div>
 
@@ -171,12 +185,17 @@ function renderControls(){
 
 function capHtml(side){
   var c = side==='L'? S.capL : S.capR;
-  var h='<div class="cap">';
-  h+='<div class="crow"><div class="cbtn'+(c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',true)">Соседский столб</div>'
-    +'<div class="cbtn'+(!c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',false)">Голая земля</div></div>';
+  var bNb='<div class="cbtn'+(c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',true)">Соседский столб</div>';
+  var bGr='<div class="cbtn'+(!c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',false)">Голая земля</div>';
+  // левый торец: [Соседский][Голая]; правый: [Голая][Соседский]
+  var mainRow = side==='L' ? bNb+bGr : bGr+bNb;
+  var h='<div class="cap"><div class="crow">'+mainRow+'</div>';
   if(c.neighbor){
-    h+='<div class="crow"><div class="cbtn'+(c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',true)">+ свой столб</div>'
-      +'<div class="cbtn'+(!c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',false)">К соседскому</div></div>';
+    var bOwn='<div class="cbtn'+(c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',true)">+ свой столб</div>';
+    var bJoin='<div class="cbtn'+(!c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',false)">К соседскому</div>';
+    // левый: [К соседскому][+ свой столб]; правый: [+ свой столб][К соседскому]
+    var subRow = side==='L' ? bJoin+bOwn : bOwn+bJoin;
+    h+='<div class="crow">'+subRow+'</div>';
   } else {
     h+='<div class="cnote">свой крайний столб (считаем автоматически)</div>';
   }
@@ -223,9 +242,15 @@ function renderFence(){
   fields+='<div style="flex:0 0 128px"></div></div>';
   host.innerHTML=anno+fence+fields;
 }
-S.capL={neighbor:true,ownPost:false}; S.capR={neighbor:true,ownPost:false};
+S.capL={neighbor:false,ownPost:true}; S.capR={neighbor:false,ownPost:true};
 
-function renderAll(){ renderControls(); renderFence(); }
+function updatePrintHead(){
+  var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});
+  var el=document.getElementById('printHead'); if(!el) return;
+  el.innerHTML='<div style="font-family:Montserrat,sans-serif;font-weight:800;font-size:19px;margin-bottom:4px">Шаблон замера забора — заполните от руки</div>'
+    +'<div style="font-size:13px;color:#555;margin-bottom:16px">Схема: '+scObj.nm+' · Проём меряется от края столба до края столба · Ворота ~4 м, калитка ~1 м · Части забора — '+(S.ref==='center'?'до центра проёма':'до края проёма')+(S.slope==='slope'?' · участок с уклоном':'')+'</div>';
+}
+function renderAll(){ renderControls(); renderFence(); updatePrintHead(); }
 renderAll();
 </script>
 </body>

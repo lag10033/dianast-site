@@ -47,6 +47,18 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 .aic.w{border-color:#c2762e;color:#c2762e;background:#fdf3ea}
 .aline{width:0;border-left:2px dashed #bbb;height:14px;margin-top:2px}
 .print-only{display:none}
+#printHead .pTop{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+#printHead .pLogo{height:48px;width:auto}
+#printHead .pFirm{font-family:Montserrat,sans-serif;font-weight:800;font-size:16px;color:#1a1a1a}
+#printHead .pPhone{font-size:12px;color:#555;margin-top:2px}
+#printHead .pCtas{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px;padding-bottom:12px;border-bottom:2px solid var(--orange)}
+#printHead .pCtas span{font-size:12px;color:#333;position:relative;padding-left:16px}
+#printHead .pCtas span::before{content:'✓';position:absolute;left:0;color:var(--orange);font-weight:800}
+#printHead .pTitle{font-family:Montserrat,sans-serif;font-weight:800;font-size:19px;margin:0 0 3px}
+#printHead .pInstr{font-size:12px;color:#555;margin-bottom:16px}
+#printNotes{margin-top:22px}
+#printNotes .pnTitle{font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;margin-bottom:12px}
+#printNotes .pline{border-bottom:1px solid #b8b8b8;height:28px}
 @media print{
   @page{size:A4 landscape;margin:12mm}
   body{background:#fff;padding:0}
@@ -109,7 +121,11 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     <div class="step">Шаг 4 · Размеры (заполните поля)</div>
     <div id="printHead" class="print-only"></div>
     <div id="render"></div>
-    <div class="note">Проём — <b>от края столба до края столба</b>. Части забора — <span id="refHint">до центра проёма</span>. Ворота обычно ~4 м, калитка ~1 м.</div>
+    <div class="note noprint">Проём — <b>от края столба до края столба</b>. Расстояния — <span id="refHint">до центра проёма</span>. Ворота обычно ~4 м, калитка ~1 м.</div>
+    <div id="printNotes" class="print-only">
+      <div class="pnTitle">Примечания (заполните при замере):</div>
+      <div class="pline"></div><div class="pline"></div><div class="pline"></div>
+    </div>
     <button class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
     <span class="note noprint" style="margin-left:12px">Удобнее заполнить размеры от руки на участке.</span>
   </div>
@@ -227,9 +243,9 @@ function renderFence(){
   var pIdx=0,gIdx=0,wIdx=0;
   els.forEach(function(e){
     if(e.t==='P'){ pIdx++;
-      fence+='<div class="elem e-p">Забор '+pIdx+'</div>';
+      fence+='<div class="elem e-p">Расстояние '+pIdx+'</div>';
       var hint = S.ref==='center'?'длина, м (до центра проёма)':'длина, м (до края проёма)';
-      fields+='<div class="fslot" style="flex:1;min-width:60px"><input type="number" step="0.01" placeholder="_ _, _ _"><div class="fh">Забор '+pIdx+' · '+hint+'</div></div>';
+      fields+='<div class="fslot" style="flex:1;min-width:60px"><input type="number" step="0.01" placeholder="_ _, _ _"><div class="fh">Расстояние '+pIdx+' · '+hint+'</div></div>';
     } else if(e.t==='G'){ gIdx++;
       fence+='<div class="elem e-g">Ворота'+(two?' '+gIdx:'')+'</div>';
       fields+='<div class="fslot" style="flex:0 0 120px"><input type="number" step="0.01" placeholder="4,00"><div class="fh">Ворота'+(two?' '+gIdx:'')+' · ширина, м</div></div>';
@@ -247,8 +263,21 @@ S.capL={neighbor:false,ownPost:true}; S.capR={neighbor:false,ownPost:true};
 function updatePrintHead(){
   var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});
   var el=document.getElementById('printHead'); if(!el) return;
-  el.innerHTML='<div style="font-family:Montserrat,sans-serif;font-weight:800;font-size:19px;margin-bottom:4px">Шаблон замера забора — заполните от руки</div>'
-    +'<div style="font-size:13px;color:#555;margin-bottom:16px">Схема: '+scObj.nm+' · Проём меряется от края столба до края столба · Ворота ~4 м, калитка ~1 м · Части забора — '+(S.ref==='center'?'до центра проёма':'до края проёма')+(S.slope==='slope'?' · участок с уклоном':'')+'</div>';
+  el.innerHTML=
+    '<div class="pTop">'
+      +'<img src="/logo.png" alt="Dianast" class="pLogo">'
+      +'<div>'
+        +'<div class="pFirm">Dianast — колотый кирпич и заборы под ключ</div>'
+        +'<div class="pPhone">+375 29 797-43-62 · dianast.by · Кобрин</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="pCtas">'
+      +'<span>Ригельный фундамент под ключ — быстро, закажите у нас</span>'
+      +'<span>Колотый кирпич Dianast — цена от производителя</span>'
+      +'<span>Забор под ключ — замер и смета бесплатно</span>'
+    +'</div>'
+    +'<div class="pTitle">Шаблон замера забора — заполните от руки</div>'
+    +'<div class="pInstr">Схема: '+scObj.nm+' · Проём меряется от края столба до края столба · Ворота ~4 м, калитка ~1 м · Расстояния — '+(S.ref==='center'?'до центра проёма':'до края проёма')+(S.slope==='slope'?' · участок с уклоном':'')+'</div>';
 }
 function renderAll(){ renderControls(); renderFence(); updatePrintHead(); }
 renderAll();

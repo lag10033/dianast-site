@@ -178,6 +178,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .nav-phone:hover{color:var(--orange)}
 .nav-cta{background:var(--orange);color:white;padding:10px 22px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.04em;text-transform:uppercase;transition:background 0.2s}
 .nav-cta:hover{background:var(--orange-light)}
+.nav-links{display:flex;align-items:center;gap:22px}
+.nav-link{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;color:var(--dark);text-decoration:none;letter-spacing:0.02em;transition:color 0.2s;white-space:nowrap}
+.nav-link:hover{color:var(--orange)}
 
 /* HERO */
 .hero{padding-top:68px;min-height:100vh;display:flex;align-items:center;background:url("assets/img/hero-bg.webp") center/cover no-repeat;position:relative;overflow:hidden}
@@ -320,7 +323,8 @@ footer{position:relative;background:#111;padding:25px 5%}
 .testi-stars{color:var(--orange);font-size:16px;margin-bottom:12px;letter-spacing:2px}
 .testi-text{font-size:15px;color:var(--mid);line-height:1.7;margin-bottom:20px;font-style:italic}
 .testi-author{display:flex;align-items:center;gap:12px}
-.testi-avatar{width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:white}
+.testi-avatar{width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:800;color:white;overflow:hidden;flex-shrink:0}
+.testi-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .testi-name{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:var(--dark)}
 .testi-city{font-size:12px;color:var(--mid)}
 
@@ -417,7 +421,11 @@ function submitLead(e){
       <span id="nav-tagline" style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.03em;text-align:center"><span style="color:var(--dark)">Кирпич </span><span style="color:var(--orange)">Dianast</span><span style="color:var(--dark)"> — соберёт даже ребёнок!</span></span>
       <a href="tel:+375297974362" class="nav-phone">+375 29 797-43-62</a>
     </div>
-    <a href="#calculator" class="nav-cta" id="nav-cta">Рассчитать стоимость</a>
+    <div class="nav-links">
+      <a href="#portfolio" class="nav-link">Примеры работ</a>
+      <a href="#reviews" class="nav-link">Отзывы</a>
+      <a href="#calculator" class="nav-cta" id="nav-cta">Рассчитать стоимость</a>
+    </div>
   </div>
 </nav>
 
@@ -970,6 +978,7 @@ function submitLead(e){
   }
   #nav-tagline{display:none}
   .nav-phone{display:none}
+  .nav-link{display:none}
   #nav-cta{padding:10px 16px;font-size:12px;white-space:nowrap}
   #leadBar span{font-size:11px}
   #leadBar button:first-of-type{padding:6px 12px;font-size:11px}
@@ -1149,97 +1158,83 @@ calcFence();
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section>
+<!-- Отзывы -->
+<section id="reviews">
   <div class="container">
     <div class="section-label">Отзывы</div>
     <h2 class="section-title">Что говорят клиенты</h2>
     <div class="testimonials-grid">
+
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">Брали угловой и рядовой коричневый на забор 40 метров. Качество отличное, размеры точные. Расчёт количества кирпича сделали сразу, привезли в срок. Буду рекомендовать.</p>
+        <p class="testi-text">Заказывали кирпич горчичного цвета для забора в Кобрине. Привезли быстро, выгрузили прямо на участке. Кирпич ровный, цвет один в один как на фото. Уже второй год стоит — никаких нареканий.</p>
         <div class="testi-author">
-          <div class="testi-avatar">АК</div>
+          <div class="testi-avatar">АВ</div>
           <div>
-            <div class="testi-name">Александр К.</div>
-            <div class="testi-city">Брест, забор 40 м</div>
+            <div class="testi-name">Александр В.</div>
+            <div class="testi-city">Кобрин</div>
           </div>
         </div>
       </div>
+
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">Искала серый кирпич под цвет крыши. Андрей помог подобрать цвет и красиво разбить по пролётам. Забор получился шикарный. Соседи уже спрашивают где заказывали.</p>
+        <p class="testi-text">Брали угловой и рядовой кирпич в коричневом цвете для дома в Бресте. Менеджер помог рассчитать точное количество, не пришлось переплачивать за лишний. Очень доволен результатом — забор получился красивый.</p>
         <div class="testi-author">
-          <div class="testi-avatar">НМ</div>
+          <div class="testi-avatar">ИМ</div>
           <div>
-            <div class="testi-name">Наталья М.</div>
-            <div class="testi-city">Пинск, забор 25 м</div>
+            <div class="testi-name">Игорь М.</div>
+            <div class="testi-city">Брест</div>
           </div>
         </div>
       </div>
+
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">Заказывали второй раз уже на забор — первый брали 3 года назад на колонны террасы. Качество стало ещё лучше. Пазогребневая система реально классная штука, ощутимая экономия на монтаже.</p>
+        <p class="testi-text">Делали забор с графитовым кирпичом — смотрится очень стильно, соседи уже спрашивают где брали. Цена у производителя намного ниже чем в магазинах. Доставка в Барановичи прошла без проблем.</p>
         <div class="testi-author">
-          <div class="testi-avatar">СВ</div>
+          <div class="testi-avatar">НК</div>
           <div>
-            <div class="testi-name">Сергей В.</div>
-            <div class="testi-city">Брестская область, 2 заказа</div>
+            <div class="testi-name">Наталья К.</div>
+            <div class="testi-city">Барановичи</div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-
-<!-- Отзывы -->
-<section id="reviews" style="background:#fff;padding:80px 5%">
-  <div style="max-width:1200px;margin:0 auto">
-    <div class="section-label">Отзывы</div>
-    <h2 class="section-title">Что говорят клиенты</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:40px">
-
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Заказывали кирпич горчичного цвета для забора в Кобрине. Привезли быстро, выгрузили прямо на участке. Кирпич ровный, цвет один в один как на фото. Уже второй год стоит — никаких нареканий.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Александр В.</div>
-        <div style="font-size:13px;color:#888">Кобрин</div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Покупали красный колотый кирпич для дачного забора в Пинском районе. Качество отличное — ровный скол, хороший цвет. Калькулятор на сайте реально помог не ошибиться с количеством.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">ВЛ</div>
+          <div>
+            <div class="testi-name">Виктор Л.</div>
+            <div class="testi-city">Пинск</div>
+          </div>
+        </div>
       </div>
 
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Брали угловой и рядовой кирпич в коричневом цвете для дома в Бресте. Менеджер помог рассчитать точное количество, не пришлось переплачивать за лишний. Очень доволен результатом — забор получился красивый.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Игорь М.</div>
-        <div style="font-size:13px;color:#888">Брест</div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Уже третий раз берём кирпич у Dianast — сначала для своего участка, потом рекомендовал соседям. Стабильное качество и нормальные люди. Всё как договорились — приехали вовремя, разгрузили аккуратно.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">СД</div>
+          <div>
+            <div class="testi-name">Сергей Д.</div>
+            <div class="testi-city">Дрогичин</div>
+          </div>
+        </div>
       </div>
 
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Делали забор с графитовым кирпичом — смотрится очень стильно, соседи уже спрашивают где брали. Цена у производителя намного ниже чем в магазинах. Доставка в Барановичи прошла без проблем.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Наталья К.</div>
-        <div style="font-size:13px;color:#888">Барановичи</div>
-      </div>
-
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Покупали красный колотый кирпич для дачного забора в Пинском районе. Качество отличное — ровный скол, хороший цвет. Калькулятор на сайте реально помог не ошибиться с количеством.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Виктор Л.</div>
-        <div style="font-size:13px;color:#888">Пинск</div>
-      </div>
-
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Уже третий раз берём кирпич у Dianast — сначала для своего участка, потом рекомендовал соседям. Стабильное качество и нормальные люди. Всё как договорились — приехали вовремя, разгрузили аккуратно.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Сергей Д.</div>
-        <div style="font-size:13px;color:#888">Дрогичин</div>
-      </div>
-
-      <div style="background:#f8f5f0;border-radius:12px;padding:28px">
-        <div style="display:flex;gap:4px;margin-bottom:12px">★★★★★</div>
-        <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:16px">Строили забор с воротами, использовали горчичный угловой для столбов и рядовой для пролётов. Кирпич ложится хорошо, геометрия правильная. Забор стоит уже три года — никаких трещин и выцветания.</p>
-        <div style="font-weight:700;color:#1a1a1a;font-size:14px">Андрей Р.</div>
-        <div style="font-size:13px;color:#888">Столин</div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Строили забор с воротами, использовали горчичный угловой для столбов и рядовой для пролётов. Кирпич ложится хорошо, геометрия правильная. Забор стоит уже три года — никаких трещин и выцветания.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">АР</div>
+          <div>
+            <div class="testi-name">Андрей Р.</div>
+            <div class="testi-city">Столин</div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1255,21 +1250,21 @@ calcFence();
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">Демлер и колотый кирпич — это одно и то же?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Да. Демлер — народное название колотого кирпича (рваного камня), закрепившееся в Беларуси. Это один и тот же материал: бетонный блок с колотой лицевой гранью под натуральный камень. Подробнее — на странице <a href="/demler" style="color:#E8600A">блок демлер от производителя</a>.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Нет, это не одно и то же. Демлер и колотый кирпич Dianast схожи лишь колотой лицевой текстурой и составом сырья. Демлер — крупноформатный блок: из-за больших размеров в заборе он смотрится грубовато. Кирпич Dianast заметно меньше, поэтому забор из него выглядит аккуратно и стильно. Подробнее о демлере — на <a href="/demler" style="color:#E8600A">отдельной странице</a>.</p>
         </div>
       </div>
 
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">Сколько кирпичей нужно на один столб забора?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Стандартный столб высотой 2 метра из углового кирпича требует около 84 штук (21 ряд по 4 кирпича). Точное количество зависит от высоты столба и способа кладки. Воспользуйтесь нашим калькулятором — он рассчитает всё автоматически.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Стандартный столб высотой 2 метра из углового кирпича требует около 84 штук (21 ряд по 4 кирпича). Точное количество зависит от высоты столба и способа кладки. Воспользуйтесь нашим <a href="#calculator" style="color:#E8600A">калькулятором</a> — он рассчитает всё автоматически.</p>
         </div>
       </div>
 
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">В чём разница между угловым и рядовым кирпичом?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Угловой кирпич имеет две колотые поверхности под прямым углом — он используется для кладки столбов, создавая красивый угол. Рядовой кирпич имеет одну широкую колотую грань и используется для заполнения пролётов между столбами.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Угловой кирпич имеет две колотые поверхности, расположенные перпендикулярно друг другу под прямым углом, — он используется для кладки столбов и создаёт красивый угол. Рядовой кирпич имеет две широкие колотые грани (с лицевой и с обратной стороны) и используется для заполнения пролётов между столбами.</p>
         </div>
       </div>
 
@@ -1290,21 +1285,21 @@ calcFence();
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">Можно ли совместить несколько цветов в одном заборе?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Да, это популярное решение — например, графитовые столбы с горчичными пролётами или коричневые столбы с красными пролётами. Все наши цвета производятся из одного сырья и хорошо сочетаются между собой.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Да, совместить несколько цветов можно, но люди делают это крайне редко. Как говорится, классика есть классика — мода то приходит, то уходит. А на вкус и цвет товарищей нет: захотите комбинацию — подскажем, как сочетать красиво.</p>
         </div>
       </div>
 
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">Сколько служит кирпичный забор?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">Кирпичный забор при правильной кладке служит десятилетиями: заявленный срок — 20 лет, на практике стоит поколениями. Колотый кирпич устойчив к морозу, влаге и ультрафиолету — он не выгорает, не ржавеет и не требует покраски или обработки на протяжении всего срока службы.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">При правильной кладке кирпичный забор служит десятилетиями. Гарантийный срок — 5 лет, заявленный — 20 лет, а на практике такой забор, скорее всего, простоит несколько поколений. Колотый кирпич устойчив к морозу, влаге и ультрафиолету — он не разрушается и не выгорает. При желании через 7–10 лет цвет можно обновить, если вам покажется, что он немного потускнел.</p>
         </div>
       </div>
 
       <div style="background:#fff;border-radius:12px;padding:24px 28px" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name" style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 12px 0">Как быстро привезёте после заказа?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">По Брестской области — обычно 1-2 рабочих дня. В другие регионы — зависит от загрузки и маршрута, в среднем 2-5 дней. Точную дату согласуем при оформлении заказа.</p>
+          <p itemprop="text" style="font-size:15px;line-height:1.7;color:#555;margin:0">По Брестской области — обычно около 5 рабочих дней. В другие регионы срок зависит от загрузки и маршрута, в среднем 5–10 дней. Точную дату согласуем при оформлении заказа. Учитывайте, что в сезон бывают пики загрузки, поэтому кирпич лучше заказывать заранее.</p>
         </div>
       </div>
 

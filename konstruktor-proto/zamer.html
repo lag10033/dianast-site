@@ -46,6 +46,23 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 .aic.g{border-color:var(--orange);color:var(--orange);background:#fff7f1}
 .aic.w{border-color:#c2762e;color:#c2762e;background:#fdf3ea}
 .aline{width:0;border-left:2px dashed #bbb;height:14px;margin-top:2px}
+.zgrid{display:grid;gap:6px 4px;align-items:stretch}
+.cap-wrap{align-self:center}
+.cap{width:100%}
+.oblk{display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:600;text-align:center;min-height:50px}
+.oblk.e-g{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange)}
+.oblk.e-w{background:#fdf0e4;border:1.5px solid #c2762e;color:#c2762e}
+.cline{border-right:2px dashed #b9b9b9;pointer-events:none}
+.aic{align-self:end;justify-self:center;border:1.5px solid;border-radius:6px;padding:3px 6px;font-size:10.5px;font-weight:600;white-space:nowrap;margin-bottom:4px}
+.aic.g{border-color:var(--orange);color:var(--orange);background:#fff7f1}
+.aic.w{border-color:#c2762e;color:#c2762e;background:#fdf3ea}
+.rbar{display:flex;align-items:center;justify-content:center;min-height:32px;background:var(--light);border:1px solid #c9bfae;border-radius:6px;color:#7a6a4e;font-size:12px;font-weight:600}
+.bound{position:relative;border-left:2px dashed #999}
+.bound.r{border-left:none;border-right:2px dashed #999}
+.ofield input{background:#fff}
+.cstack{display:flex;flex-direction:column;gap:5px}
+.chint{font-size:9.5px;color:#8a6d4e;line-height:1.25;font-style:italic;margin-top:3px}
+.cbound-l{font-size:10px;color:#888;margin:2px 0}
 .print-only{display:none}
 #printHead .pTop{display:flex;align-items:center;gap:14px;margin-bottom:10px}
 #printHead .pLogo{height:48px;width:auto}
@@ -203,62 +220,73 @@ function capHtml(side){
   var c = side==='L'? S.capL : S.capR;
   var bNb='<div class="cbtn'+(c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',true)">Соседский столб</div>';
   var bGr='<div class="cbtn'+(!c.neighbor?' on':'')+'" onclick="setNb(\''+side+'\',false)">Голая земля</div>';
-  // левый торец: [Соседский][Голая]; правый: [Голая][Соседский]
-  var mainRow = side==='L' ? bNb+bGr : bGr+bNb;
+  var mainRow = side==='L' ? bNb+bGr : bGr+bNb;   // слева [Соседский][Голая], справа наоборот
   var h='<div class="cap"><div class="crow">'+mainRow+'</div>';
   if(c.neighbor){
     var bOwn='<div class="cbtn'+(c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',true)">+ свой столб</div>';
     var bJoin='<div class="cbtn'+(!c.ownPost?' on':'')+'" onclick="setOwn(\''+side+'\',false)">К соседскому</div>';
-    // левый: [К соседскому][+ свой столб]; правый: [+ свой столб][К соседскому]
     var subRow = side==='L' ? bJoin+bOwn : bOwn+bJoin;
     h+='<div class="crow">'+subRow+'</div>';
+    h+='<div class="chint">Обычно ставят свой отдельный столб рядом — так забор выглядит красивее. Но можно и без него, присоединиться к соседскому.</div>';
   } else {
-    h+='<div class="cnote">свой крайний столб (считаем автоматически)</div>';
+    h+='<div class="cbound-l">╎ граница участка</div>';
+    var bC='<div class="cbtn'+(c.edgePos==='center'?' on':'')+'" onclick="setEdge(\''+side+'\',\'center\')">Столб по центру границы</div>';
+    var bI='<div class="cbtn'+(c.edgePos!=='center'?' on':'')+'" onclick="setEdge(\''+side+'\',\'inside\')">Внутрь от границы</div>';
+    h+='<div class="cstack">'+bC+bI+'</div>';
+    if(c.edgePos==='center') h+='<div class="chint">Рекомендуем, если строите первым: столб по центру границы участка. Иначе боковой забор у межи потом не сойдётся.</div>';
   }
   return h+'</div>';
 }
 function setNb(side,v){ (side==='L'?S.capL:S.capR).neighbor=v; renderFence(); }
 function setOwn(side,v){ (side==='L'?S.capL:S.capR).ownPost=v; renderFence(); }
+function setEdge(side,v){ (side==='L'?S.capL:S.capR).edgePos=v; renderFence(); }
 
 function renderFence(){
   var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});
   var els=expand(scObj.seq);
-  var host=document.getElementById('render');
-  var two=S.gates==='two';
+  var two=S.gates==='two', center=(S.ref==='center');
 
-  // Строка-подсказка (до центра): гараж над воротами, дверь над калиткой + осевая линия
-  var anno='';
-  if(S.ref==='center'){
-    anno='<div class="anno"><div style="flex:0 0 128px"></div>';
-    els.forEach(function(e){
-      if(e.t==='P'){ anno+='<div class="aslot" style="flex:1;min-width:60px"></div>'; }
-      else if(e.t==='G'){ anno+='<div class="aslot" style="flex:0 0 120px"><div class="aic g">🚗 центр гаража</div><div class="aline"></div></div>'; }
-      else if(e.t==='W'){ anno+='<div class="aslot" style="flex:0 0 84px"><div class="aic w">🚪 центр двери</div><div class="aline"></div></div>'; }
-    });
-    anno+='<div style="flex:0 0 128px"></div></div>';
-  }
-
-  var fence='<div class="fence">'+capHtml('L');
-  var fields='<div class="fields"><div style="flex:0 0 128px"></div>';
-  var pIdx=0,gIdx=0,wIdx=0;
+  // колонки: капы по 128px, часть = 1fr, проём = 2 половинки (для оси по центру)
+  var cols=['128px'], meta=[], line=2, pIdx=0,gIdx=0,wIdx=0;
   els.forEach(function(e){
-    if(e.t==='P'){ pIdx++;
-      fence+='<div class="elem e-p">Расстояние '+pIdx+'</div>';
-      var hint = S.ref==='center'?'длина, м (до центра проёма)':'длина, м (до края проёма)';
-      fields+='<div class="fslot" style="flex:1;min-width:60px"><input type="number" step="0.01" placeholder="_ _, _ _"><div class="fh">Расстояние '+pIdx+' · '+hint+'</div></div>';
-    } else if(e.t==='G'){ gIdx++;
-      fence+='<div class="elem e-g">Ворота'+(two?' '+gIdx:'')+'</div>';
-      fields+='<div class="fslot" style="flex:0 0 120px"><input type="number" step="0.01" placeholder="4,00"><div class="fh">Ворота'+(two?' '+gIdx:'')+' · ширина, м</div></div>';
-    } else if(e.t==='W'){ wIdx++;
-      fence+='<div class="elem e-w">Калитка</div>';
-      fields+='<div class="fslot" style="flex:0 0 84px"><input type="number" step="0.01" placeholder="1,00"><div class="fh">Калитка · ширина, м</div></div>';
-    }
+    if(e.t==='P'){ pIdx++; cols.push('minmax(54px,1fr)'); meta.push({t:'P',idx:pIdx,s:line,e:line+1}); line+=1; }
+    else if(e.t==='G'){ gIdx++; cols.push('58px','58px'); meta.push({t:'G',idx:gIdx,s:line,m:line+1,e:line+2}); line+=2; }
+    else { wIdx++; cols.push('40px','40px'); meta.push({t:'W',s:line,m:line+1,e:line+2}); line+=2; }
   });
-  fence+=capHtml('R')+'</div>';
-  fields+='<div style="flex:0 0 128px"></div></div>';
-  host.innerHTML=anno+fence+fields;
+  cols.push('128px');
+  var cStart=2, cEnd=line;
+  var cells=[];
+  // капы (торцы)
+  cells.push('<div class="cap-wrap" style="grid-column:1/2;grid-row:2/6">'+capHtml('L')+'</div>');
+  cells.push('<div class="cap-wrap" style="grid-column:'+cEnd+'/'+(cEnd+1)+';grid-row:2/6">'+capHtml('R')+'</div>');
+  // граница участка (голая земля) — штрих-пунктир у края
+  if(!S.capL.neighbor) cells.push('<div class="bound" style="grid-column:'+cStart+'/'+(cStart+1)+';grid-row:2/6"></div>');
+  if(!S.capR.neighbor) cells.push('<div class="bound r" style="grid-column:'+(cEnd-1)+'/'+cEnd+';grid-row:2/6"></div>');
+  // проёмы: блок + осевой штрих-пунктир + поле ширины + иконка (до центра)
+  meta.forEach(function(m){
+    if(m.t==='P') return;
+    var isG=m.t==='G', cls=isG?'e-g':'e-w';
+    var label=isG?('Ворота'+(two?' '+m.idx:'')):'Калитка';
+    cells.push('<div class="oblk '+cls+'" style="grid-column:'+m.s+'/'+m.e+';grid-row:2/3">'+label+'</div>');
+    cells.push('<div class="cline" style="grid-column:'+m.s+'/'+m.m+';grid-row:'+(center?1:2)+'/5"></div>');
+    var ph=isG?'4,00':'1,00';
+    var fl=isG?('Ворота'+(two?' '+m.idx:'')+' · ширина, м'):'Калитка · ширина, м';
+    cells.push('<div class="fslot ofield" style="grid-column:'+m.s+'/'+m.e+';grid-row:3/4"><input type="number" step="0.01" placeholder="'+ph+'"><div class="fh">'+fl+'</div></div>');
+    if(center){ var ic=isG?'🚗 центр гаража':'🚪 центр двери'; cells.push('<div class="aic '+(isG?'g':'w')+'" style="grid-column:'+m.s+'/'+m.e+';grid-row:1/2">'+ic+'</div>'); }
+  });
+  // Расстояния: бар + поле (по одному на каждую часть, до оси/края проёма)
+  meta.forEach(function(m,k){
+    if(m.t!=='P') return;
+    var L=meta[k-1], R=meta[k+1];
+    var lref = L ? (center?L.m:L.e) : cStart;
+    var rref = R ? (center?R.m:R.s) : cEnd;
+    var hint = center?'до центра проёма':'до края проёма';
+    cells.push('<div class="rbar" style="grid-column:'+lref+'/'+rref+';grid-row:4/5">Расстояние '+m.idx+'</div>');
+    cells.push('<div class="fslot" style="grid-column:'+lref+'/'+rref+';grid-row:5/6"><input type="number" step="0.01" placeholder="_ _, _ _"><div class="fh">Расстояние '+m.idx+' · '+hint+'</div></div>');
+  });
+  document.getElementById('render').innerHTML='<div class="zgrid" style="grid-template-columns:'+cols.join(' ')+'">'+cells.join('')+'</div>';
 }
-S.capL={neighbor:false,ownPost:true}; S.capR={neighbor:false,ownPost:true};
+S.capL={neighbor:false,ownPost:true,edgePos:'center'}; S.capR={neighbor:false,ownPost:true,edgePos:'center'};
 
 function updatePrintHead(){
   var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;});

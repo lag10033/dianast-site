@@ -2,11 +2,469 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="robots" content="noindex, follow">
-<meta http-equiv="refresh" content="0;url=/#calculator">
-<title>Dianast</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор кирпичного забора онлайн — расчёт кирпича и стоимости | Dianast</title>
+<meta name="description" content="Бесплатный калькулятор кирпичного забора: введите длину, количество столбов и высоту — мгновенно рассчитаем количество углового и рядового кирпича, поддоны, доставку и стоимость. Кирпич Dianast, производство с 2014 года, Кобрин.">
+<link rel="canonical" href="https://dianast.by/calculator">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="калькулятор забора, рассчитать кирпичный забор, калькулятор кирпича на забор, сколько кирпича на забор, расчёт забора онлайн, калькулятор столбов забора, стоимость кирпичного забора">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png?v=2">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Калькулятор кирпичного забора онлайн — расчёт за 30 секунд">
+<meta property="og:description" content="Введите длину забора, столбы и высоту — калькулятор рассчитает количество кирпича, поддоны, доставку и стоимость. Бесплатно.">
+<meta property="og:url" content="https://dianast.by/calculator">
+<meta property="og:locale" content="ru_BY">
+<meta property="og:site_name" content="Dianast">
+
+<!-- JSON-LD: калькулятор как веб-приложение -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Калькулятор кирпичного забора Dianast",
+  "url": "https://dianast.by/calculator",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BYN"},
+  "description": "Онлайн-калькулятор для расчёта количества колотого кирпича на забор: угловой кирпич для столбов, рядовой для пролётов, поддоны, доставка и итоговая стоимость.",
+  "provider": {
+    "@type": "Organization",
+    "name": "Dianast",
+    "url": "https://dianast.by",
+    "foundingDate": "2014",
+    "telephone": "+375297974362",
+    "address": {"@type": "PostalAddress", "addressLocality": "Кобрин", "addressRegion": "Брестская область", "addressCountry": "BY"}
+  }
+}
+</script>
+
+<!-- JSON-LD: хлебные крошки -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Главная", "item": "https://dianast.by/"},
+    {"@type": "ListItem", "position": 2, "name": "Калькулятор кирпичного забора", "item": "https://dianast.by/calculator"}
+  ]
+}
+</script>
+
+<!-- JSON-LD: вопросы-ответы (для поиска и ответов ИИ) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "author": {"@type": "Person", "name": "Андрей", "jobTitle": "Собственник производства Dianast, инженер-строитель (ПГС), 25+ лет в строительстве"},
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Сколько кирпича нужно на один столб забора?",
+      "acceptedAnswer": {"@type": "Answer", "text": "На стандартный столб высотой 2 метра из углового колотого кирпича уходит около 84 штук — это 21 ряд по 4 кирпича. Один ряд кладки в высоту — примерно 9,6 см. Точное количество зависит от высоты столба; калькулятор считает его автоматически по числу рядов."}
+    },
+    {
+      "@type": "Question",
+      "name": "Как рассчитать количество кирпича на забор?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Нужно знать длину забора, количество столбов, высоту столбов и пролётов (продлёнки), ширину ворот и калитки. Угловой кирпич считается для столбов (4 штуки в ряду × число рядов × число столбов), рядовой — для заполнения пролётов между столбами. Калькулятор Dianast делает этот расчёт мгновенно и добавляет поддоны и доставку."}
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько стоит кирпичный забор в Беларуси?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Стоимость складывается из углового кирпича (3,40 руб/шт), рядового кирпича (3,60 руб/шт), поддонов (10 руб/шт) и доставки от Кобрина. Для забора длиной 30–40 метров бюджет по материалу обычно составляет от 2000 руб. Точную сумму под ваш участок покажет калькулятор."}
+    },
+    {
+      "@type": "Question",
+      "name": "Делаете ли вы чертёж фундамента с разбивкой пролётов?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Да. По запросу готовим чертёж фундамента забора с симметричной разбивкой пролётов относительно ворот и калитки и привязкой по осям столбов — чтобы заливка и кладка были ровными, а пролёты одинаковыми. Оставьте заявку в калькуляторе, и менеджер подготовит план под ваш участок."}
+    }
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#E8600A;--dark:#1a1a1a;--mid:#6b6b6b;--light:#f4f0eb;--border:#E8E3DC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff}
+a{color:var(--orange);text-decoration:none}
+header{background:var(--dark);padding:16px 5%;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Montserrat',sans-serif;font-weight:800;font-size:22px;color:#fff}
+.header-phone{color:#fff;font-size:15px;font-weight:600}
+.hero-art{background:var(--light);padding:48px 5%}
+.inner{max-width:820px;margin:0 auto}
+.breadcrumb{font-size:13px;color:var(--mid);margin-bottom:18px}
+.breadcrumb a{color:var(--mid)}
+h1{font-family:'Montserrat',sans-serif;font-size:clamp(24px,3.4vw,38px);font-weight:800;line-height:1.2;margin-bottom:14px}
+.lead{font-size:17px;line-height:1.7;color:#333;max-width:760px}
+.wrap{max-width:820px;margin:0 auto;padding:44px 5%}
+h2{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;margin:8px 0 16px}
+p{font-size:16px;line-height:1.8;color:#333;margin-bottom:14px}
+.card{background:#fff;border-radius:16px;padding:28px;border:1px solid var(--border)}
+.label{display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.field input{flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0}
+.field .unit{padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);font-weight:500;border-left:1px solid var(--border);white-space:nowrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.big-btn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:background 0.2s}
+.big-btn:hover{background:#b83d10}
+.result{background:var(--dark);border-radius:16px;padding:36px;color:#fff;margin-top:20px;user-select:none;-webkit-user-select:none;display:none}
+.result .rr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.result .rlab{font-size:14px;color:rgba(255,255,255,0.6)}
+.result .rval{font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#fff}
+.rsect{border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:20px;margin-bottom:20px}
+.rhead{font-size:12px;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.disc{background:#fff;border-radius:12px;padding:18px 22px;border:1px solid var(--border);font-size:13px;color:var(--mid);line-height:1.6;margin-top:16px;display:none}
+h3{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;margin:28px 0 10px}
+.faq-q{font-weight:600;color:var(--dark);margin:22px 0 6px;font-size:16px}
+.box{background:var(--light);border-left:4px solid var(--orange);border-radius:0 8px 8px 0;padding:20px 24px;margin:26px 0}
+.box p{margin:0}
+select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:#fff;outline:none;cursor:pointer}
+footer{background:var(--dark);color:rgba(255,255,255,0.6);padding:30px 5%;text-align:center;font-size:14px}
+footer a{color:rgba(255,255,255,0.6)}
+@media(max-width:600px){.row2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<script>window.location.href = '/#calculator';</script>
+<header><a href="/" class="logo">Dianast</a><a href="tel:+375297974362" class="header-phone">+375 29 797-43-62</a></header>
+
+<div class="hero-art"><div class="inner">
+  <div class="breadcrumb"><a href="/">Главная</a> → Калькулятор кирпичного забора</div>
+  <h1>Калькулятор кирпичного забора</h1>
+  <p class="lead">Введите длину забора, количество столбов и высоту — калькулятор мгновенно рассчитает, сколько нужно углового кирпича на столбы и рядового на пролёты, сколько поддонов, стоимость доставки от Кобрина и итоговую сумму. Расчёт бесплатный и без обязательств, по колотому кирпичу Dianast.</p>
+</div></div>
+
+<div class="wrap">
+
+  <!-- КАЛЬКУЛЯТОР -->
+  <div class="card" id="calc-card">
+    <div style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:700;margin-bottom:20px;color:var(--dark)">Параметры забора</div>
+
+    <div class="row2">
+      <div>
+        <label for="c-len" class="label">Длина забора</label>
+        <div class="field"><input type="number" id="c-len" aria-label="Длина забора в метрах" value="30" min="1" step="1" oninput="calcFence()"><span class="unit">м</span></div>
+      </div>
+      <div>
+        <label for="c-cols" class="label">Кол-во столбов</label>
+        <div class="field"><input type="number" id="c-cols" aria-label="Количество столбов" value="11" min="1" step="1" oninput="calcFence()"><span class="unit">шт</span></div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="c-hpil-rows" class="label">Высота столбов</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="field" style="flex:1"><input type="number" id="c-hpil-rows" aria-label="Рядов в столбе" value="19" min="1" step="1" oninput="syncPilRows()"><span class="unit">ряд.</span></div>
+          <span style="font-size:12px;color:var(--mid);white-space:nowrap"><span id="c-hpil-m" style="font-weight:700;color:var(--dark)">1.82</span>м</span>
+        </div>
+      </div>
+      <div>
+        <label for="c-hrow-rows" class="label">Высота продлёнки</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="field" style="flex:1"><input type="number" id="c-hrow-rows" aria-label="Рядов в пролёте" value="3" min="0" step="1" oninput="syncRowRows()"><span class="unit">ряд.</span></div>
+          <span style="font-size:12px;color:var(--mid);white-space:nowrap"><span id="c-hrow-m" style="font-weight:700;color:var(--dark)">0.29</span>м</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label for="c-gate" class="label">Ширина ворот</label>
+        <div class="field"><input type="number" id="c-gate" aria-label="Ширина ворот в метрах" value="4" min="0" step="0.5" oninput="calcFence()"><span class="unit">м</span></div>
+      </div>
+      <div>
+        <label for="c-wicket" class="label">Ширина калитки</label>
+        <div class="field"><input type="number" id="c-wicket" aria-label="Ширина калитки в метрах" value="1" min="0" step="0.5" oninput="calcFence()"><span class="unit">м</span></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:4px">
+      <label for="c-city" class="label">Город доставки</label>
+      <select id="c-city" aria-label="Выберите город доставки" onchange="calcFence()">
+        <option value="kobrin">Кобрин</option>
+        <option value="50">Брест (~50 км)</option>
+        <option value="50">Дрогичин (~50 км)</option>
+        <option value="55">Береза (~55 км)</option>
+        <option value="80">Столин (~80 км)</option>
+        <option value="90">Пинск (~90 км)</option>
+        <option value="115">Ивацевичи (~115 км)</option>
+        <option value="150">Барановичи (~150 км)</option>
+        <option value="165">Слоним (~165 км)</option>
+        <option value="190">Волковыск (~190 км)</option>
+        <option value="210">Новогрудок (~210 км)</option>
+        <option value="220">Гродно (~220 км)</option>
+        <option value="260">Лида (~260 км)</option>
+        <option value="280">Несвиж (~280 км)</option>
+        <option value="290">Столбцы (~290 км)</option>
+        <option value="310">Солигорск (~310 км)</option>
+        <option value="310">Слуцк (~310 км)</option>
+        <option value="310">Сморгонь (~310 км)</option>
+        <option value="350">Минск (~350 км)</option>
+        <option value="360">Мозырь (~360 км)</option>
+        <option value="370">Вилейка (~370 км)</option>
+        <option value="380">Молодечно (~380 км)</option>
+        <option value="380">Жодино (~380 км)</option>
+        <option value="380">Осиповичи (~380 км)</option>
+        <option value="390">Борисов (~390 км)</option>
+        <option value="390">Жлобин (~390 км)</option>
+        <option value="420">Бобруйск (~420 км)</option>
+        <option value="430">Гомель (~430 км)</option>
+        <option value="470">Орша (~470 км)</option>
+        <option value="490">Могилёв (~490 км)</option>
+        <option value="520">Полоцк (~520 км)</option>
+        <option value="560">Витебск (~560 км)</option>
+        <option value="other">Другой город</option>
+      </select>
+      <div id="c-city-manual-wrap" style="display:none;margin-top:8px">
+        <div class="field"><input type="number" id="c-city-km" aria-label="Расстояние от Кобрина в км" placeholder="Расстояние от Кобрина" min="1" step="1" oninput="calcFence()"><span class="unit">км</span></div>
+      </div>
+    </div>
+
+    <!-- Имя и телефон -->
+    <div class="row2" style="margin-top:14px;margin-bottom:0">
+      <div>
+        <label for="c-name" class="label">Имя</label>
+        <div class="field"><input type="text" id="c-name" aria-label="Ваше имя" placeholder="Ваше имя"></div>
+      </div>
+      <div>
+        <label class="label">Телефон</label>
+        <div class="field"><input type="tel" id="c-phone" aria-label="Номер телефона" value="+375 " oninput="(function(el){var v=el.value;var prefix='+375 ';if(!v.startsWith(prefix)){el.value=prefix;return;}var d=v.slice(prefix.length).replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=prefix+f;})(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)"></div>
+      </div>
+    </div>
+
+    <button onclick="showCalcResult()" class="big-btn">Получить мгновенный расчёт →</button>
+
+    <!-- Результат -->
+    <div id="calc-result-block" class="result" oncontextmenu="return false">
+      <div style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:700;margin-bottom:24px;color:rgba(255,255,255,0.9)">Результат расчёта</div>
+
+      <div class="rsect">
+        <div class="rhead">Угловой кирпич (столбы)</div>
+        <div class="rr"><span class="rlab">Количество</span><span id="r-ang-pcs" class="rval" style="font-size:18px">—</span></div>
+        <div class="rr"><span class="rlab">Поддонов (по 288 шт)</span><span id="r-ang-pal" class="rval" style="color:rgba(255,255,255,0.8)">—</span></div>
+        <div class="rr" style="margin-bottom:0"><span class="rlab">Стоимость (3,40 руб/шт)</span><span id="r-ang-sum" class="rval" style="color:#FF6B35">—</span></div>
+      </div>
+
+      <div class="rsect">
+        <div class="rhead">Рядовой кирпич (продлёнка)</div>
+        <div class="rr"><span class="rlab">Количество</span><span id="r-row-pcs" class="rval" style="font-size:18px">—</span></div>
+        <div class="rr"><span class="rlab">Поддонов (по 210 шт)</span><span id="r-row-pal" class="rval" style="color:rgba(255,255,255,0.8)">—</span></div>
+        <div class="rr" style="margin-bottom:0"><span class="rlab">Стоимость (3,60 руб/шт)</span><span id="r-row-sum" class="rval" style="color:#FF6B35">—</span></div>
+      </div>
+
+      <div class="rr" style="margin-bottom:0"><span class="rval" style="color:rgba(255,255,255,0.7)">Итого кирпича</span><span id="r-total-pcs" class="rval" style="font-weight:800;font-size:20px">—</span></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:16px;padding-top:16px">
+        <div class="rr"><span class="rlab">Поддоны (<span id="r-pal-count">—</span> шт × 10 руб)</span><span id="r-pal-sum" class="rval" style="color:rgba(255,255,255,0.8)">—</span></div>
+        <div class="rr" id="r-delivery-wrap"><span id="r-delivery-label" class="rlab">Доставка</span><span id="r-delivery-sum" class="rval" style="color:rgba(255,255,255,0.8)">—</span></div>
+      </div>
+      <div class="rr" style="margin-top:8px;margin-bottom:0"><span class="rval" style="color:rgba(255,255,255,0.7)">Итого с доставкой</span><span id="r-total-sum" class="rval" style="font-weight:800;font-size:28px;color:#FF6B35">—</span></div>
+    </div>
+
+    <div id="calc-disclaimer" class="disc">Расчёт приблизительный. Точную стоимость с учётом доставки и, при необходимости, чертёж фундамента с симметричной разбивкой пролётов подготовит менеджер.</div>
+  </div>
+
+  <!-- КАК СЧИТАЕТСЯ -->
+  <h2 style="margin-top:44px">Как калькулятор считает кирпич</h2>
+  <p>Расчёт строится на реальной геометрии кладки колотого кирпича Dianast, а не на усреднённых коэффициентах:</p>
+  <h3>Столбы — угловой кирпич</h3>
+  <p>В одном ряду столба — 4 угловых кирпича. Один ряд в высоту даёт примерно 9,6 см. Столб высотой 2 метра — это 21 ряд, то есть около 84 угловых кирпича. Калькулятор умножает 4 × число рядов × число столбов и добавляет 5% на подрезку и бой.</p>
+  <h3>Пролёты — рядовой кирпич</h3>
+  <p>Рядовой кирпич заполняет пролёты между столбами (продлёнку). Калькулятор вычитает из длины забора ворота, калитку и ширину самих столбов, а на оставшуюся длину пролётов считает рядовой кирпич по числу рядов продлёнки.</p>
+  <h3>Поддоны и доставка</h3>
+  <p>Угловой кирпич отгружается поддонами по 288 штук, рядовой — по 210. Машина везёт до 3 поддонов за рейс. Доставка считается от Кобрина по километражу выбранного города.</p>
+
+  <div class="box"><p>Нужен не только расчёт материала, но и <strong>чертёж фундамента с симметричной разбивкой пролётов</strong> относительно ворот и калитки? Оставьте заявку в калькуляторе — подготовим план под ваш участок, чтобы пролёты получились одинаковыми, а заливка ровной.</p></div>
+
+  <!-- FAQ -->
+  <h2 style="margin-top:40px">Частые вопросы</h2>
+  <div class="faq-q">Сколько кирпича нужно на один столб?</div>
+  <p>Около 84 штук углового кирпича на столб высотой 2 метра — это 21 ряд по 4 кирпича. Для другой высоты калькулятор пересчитает автоматически.</p>
+  <div class="faq-q">Как рассчитать количество кирпича на весь забор?</div>
+  <p>Укажите длину забора, число столбов, высоту столбов и пролётов, ширину ворот и калитки — калькулятор посчитает угловой кирпич на столбы и рядовой на пролёты, добавит поддоны и доставку.</p>
+  <div class="faq-q">Сколько стоит кирпичный забор в Беларуси?</div>
+  <p>Угловой кирпич — 3,40 руб/шт, рядовой — 3,60 руб/шт, поддоны — 10 руб/шт, плюс доставка от Кобрина. Итоговую сумму под ваш участок покажет калькулятор выше.</p>
+  <div class="faq-q">Делаете ли чертёж фундамента с разбивкой пролётов?</div>
+  <p>Да, по запросу. Готовим план с симметричной разбивкой пролётов относительно ворот и калитки и привязкой по осям столбов. Оставьте заявку — менеджер подготовит чертёж.</p>
+
+</div>
+
+<footer>
+  <div>© Dianast — производство колотого кирпича, Кобрин, Беларусь. Опыт в строительстве с 2001 года, производство с 2014.</div>
+  <div style="margin-top:8px"><a href="/">Главная</a> · <a href="/kirpich-vs-profnastil">Кирпич или профнастил</a> · <a href="tel:+375297974362">+375 29 797-43-62</a></div>
+</footer>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110181067', 'ym');
+    ym(110181067, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!-- Телефонная цель -->
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+});
+</script>
+
+<!-- Логика калькулятора -->
+<script>
+var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
+var TG_CHAT  = '335993206';
+function tgSend(text){
+  var url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT) + '&text=' + encodeURIComponent(text);
+  fetch(url).catch(function(){});
+}
+
+// Цель calc_used — один раз при первом взаимодействии с калькулятором
+var calcUsedFired = false;
+function fireCalcUsed(){
+  if(calcUsedFired) return;
+  calcUsedFired = true;
+  if(typeof ym==='function'){ym(110181067,'reachGoal','calc_used');}
+}
+document.getElementById('calc-card').addEventListener('input', fireCalcUsed);
+document.getElementById('c-city').addEventListener('change', fireCalcUsed);
+
+function syncPilRows(){
+  var r = parseInt(document.getElementById('c-hpil-rows').value) || 0;
+  document.getElementById('c-hpil-m').textContent = (r * 0.096).toFixed(2);
+  calcFence();
+}
+function syncRowRows(){
+  var r = parseInt(document.getElementById('c-hrow-rows').value) || 0;
+  document.getElementById('c-hrow-m').textContent = (r * 0.096).toFixed(2);
+  calcFence();
+}
+function calcFence(){
+  var len    = parseFloat(document.getElementById('c-len').value)       || 0;
+  var pilRows= parseInt(document.getElementById('c-hpil-rows').value)   || 0;
+  var rowRows= parseInt(document.getElementById('c-hrow-rows').value)   || 0;
+  var cols   = parseInt(document.getElementById('c-cols').value)        || 0;
+  var gate   = parseFloat(document.getElementById('c-gate').value)      || 0;
+  var wicket = parseFloat(document.getElementById('c-wicket').value)    || 0;
+
+  var angRaw = cols * pilRows * 4;
+  var ang = Math.ceil(angRaw * 1.05);
+
+  var spanLen = Math.max(0, len - gate - wicket - 0.38 * cols);
+  var bricksPerMeter = 4;
+  var rowRaw = rowRows * Math.ceil(spanLen * bricksPerMeter);
+  var row = Math.ceil(rowRaw * 1.05);
+
+  var angFull = Math.floor(ang / 288);
+  var angRem  = ang % 288;
+  var angPal  = angRem > 0 && angRem >= 288 * 0.3 ? angFull + 1 : angFull;
+  if(angPal === 0 && ang > 0) angPal = 1;
+
+  var rowFull = Math.floor(row / 210);
+  var rowRem  = row % 210;
+  var rowPal  = rowRem > 0 && rowRem >= 210 * 0.3 ? rowFull + 1 : rowFull;
+  if(rowPal === 0 && row > 0) rowPal = 1;
+  var angSum = (ang * 3.40).toFixed(2);
+  var rowSum = (row * 3.60).toFixed(2);
+
+  var cityEl = document.getElementById('c-city');
+  var cityVal = cityEl.value;
+  var km = 0;
+  var deliveryCost = 0;
+  var kobrinFixed = false;
+  if(cityVal === 'other'){
+    document.getElementById('c-city-manual-wrap').style.display='block';
+    km = parseFloat(document.getElementById('c-city-km').value) || 0;
+  } else if(cityVal === 'kobrin'){
+    document.getElementById('c-city-manual-wrap').style.display='none';
+    kobrinFixed = true;
+  } else {
+    document.getElementById('c-city-manual-wrap').style.display='none';
+    km = parseFloat(cityVal) || 0;
+  }
+
+  var totalPal = angPal + rowPal;
+  var trips = totalPal > 0 ? Math.ceil(totalPal / 3) : 0;
+  var palCost = totalPal * 10;
+  if(kobrinFixed){
+    deliveryCost = totalPal > 0 ? 40 * trips : 0;
+  } else {
+    var ratePerKm = km <= 160 ? 1.00 : 0.70;
+    deliveryCost = km > 0 ? Math.round(km * ratePerKm * trips * 100) / 100 : 0;
+  }
+  var grandTotal = (ang * 3.40 + row * 3.60 + palCost + deliveryCost).toFixed(2);
+
+  document.getElementById('r-ang-pcs').textContent = ang ? ang + ' шт' : '—';
+  document.getElementById('r-ang-pal').textContent = ang ? angPal + ' шт' : '—';
+  document.getElementById('r-ang-sum').textContent = ang ? angSum + ' руб' : '—';
+  document.getElementById('r-row-pcs').textContent = row ? row + ' шт' : '—';
+  document.getElementById('r-row-pal').textContent = row ? rowPal + ' шт' : '—';
+  document.getElementById('r-row-sum').textContent = row ? rowSum + ' руб' : '—';
+  document.getElementById('r-total-pcs').textContent = (ang + row) ? (ang + row) + ' шт' : '—';
+
+  document.getElementById('r-pal-count').textContent = totalPal || '—';
+  document.getElementById('r-pal-sum').textContent = totalPal ? palCost.toFixed(2) + ' руб' : '—';
+
+  var delivWrap = document.getElementById('r-delivery-wrap');
+  if(kobrinFixed && totalPal > 0){
+    delivWrap.style.display = 'flex';
+    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.75)">(Кобрин)</span>';
+    document.getElementById('r-delivery-sum').textContent = deliveryCost.toFixed(2) + ' руб';
+  } else if(km > 0){
+    delivWrap.style.display = 'flex';
+    var tripsWord = trips === 1 ? ' рейс' : trips < 5 ? ' рейса' : ' рейсов';
+    document.getElementById('r-delivery-label').innerHTML = 'Доставка <span style="color:rgba(255,255,255,0.75)">(' + trips + tripsWord + ', ' + km + ' км)</span>';
+    document.getElementById('r-delivery-sum').textContent = deliveryCost.toFixed(2) + ' руб';
+  } else {
+    delivWrap.style.display = 'none';
+  }
+
+  document.getElementById('r-total-sum').textContent = parseFloat(grandTotal) > 0 ? grandTotal + ' руб' : '—';
+}
+function showCalcResult(){
+  var name  = document.getElementById('c-name').value.trim();
+  var phone = document.getElementById('c-phone').value.trim();
+  if(!name){alert('Введите ваше имя');document.getElementById('c-name').focus();return;}
+  if(phone === '+375' || phone === '+375 ' || phone.length < 10){alert('Введите номер телефона');document.getElementById('c-phone').focus();return;}
+  calcFence();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','calc_lead');}
+  document.getElementById('calc-result-block').style.display = 'block';
+  document.getElementById('calc-disclaimer').style.display = 'block';
+  setTimeout(function(){ document.getElementById('calc-result-block').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+  var len = document.getElementById('c-len').value;
+  var cols = document.getElementById('c-cols').value;
+  var hpilRows = document.getElementById('c-hpil-rows').value;
+  var hrowRows = document.getElementById('c-hrow-rows').value;
+  var gate = document.getElementById('c-gate').value;
+  var wicket = document.getElementById('c-wicket').value;
+  var cityEl = document.getElementById('c-city');
+  var cityText = cityEl.options[cityEl.selectedIndex].text;
+  var angPcs = document.getElementById('r-ang-pcs').textContent;
+  var rowPcs = document.getElementById('r-row-pcs').textContent;
+  var total = document.getElementById('r-total-sum').textContent;
+  var text = '\u{1F9F1} Заявка с калькулятора (/calculator)\n\nИмя: ' + name + '\nТелефон: ' + phone +
+    '\n\nПараметры забора:' +
+    '\n— Длина: ' + len + ' м' +
+    '\n— Столбов: ' + cols +
+    '\n— Рядов столба: ' + hpilRows +
+    '\n— Рядов пролёта: ' + hrowRows +
+    '\n— Ширина ворот: ' + gate + ' м' +
+    '\n— Ширина калитки: ' + wicket + ' м' +
+    '\n— Доставка: ' + cityText +
+    '\n\nРасчёт:' +
+    '\n— Угловой: ' + angPcs +
+    '\n— Рядовой: ' + rowPcs +
+    '\n— Итого: ' + total;
+  tgSend(text);
+}
+calcFence();
+</script>
 </body>
 </html>

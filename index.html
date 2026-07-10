@@ -1100,6 +1100,13 @@ function calcFence(){
 }
 document.getElementById('c-city').addEventListener('change', calcFence);
 calcFence();
+// Цель calc_used — один раз при первом взаимодействии с калькулятором
+(function(){
+  var calcUsedFired=false;
+  function fireCalcUsed(){ if(calcUsedFired) return; calcUsedFired=true; if(typeof ym==='function'){ym(110181067,'reachGoal','calc_used');} }
+  var sec=document.getElementById('calculator');
+  if(sec){ sec.addEventListener('input',fireCalcUsed); sec.addEventListener('change',fireCalcUsed); }
+})();
 </script>
 
 <!-- MASTER -->
@@ -1440,6 +1447,7 @@ function showCalcResult(){
   if(!name){alert('Введите ваше имя');document.getElementById('c-name').focus();return;}
   if(phone === '+375' || phone === '+375 ' || phone.length < 10){alert('Введите номер телефона');document.getElementById('c-phone').focus();return;}
   calcFence();
+  if(typeof ym==='function'){ym(110181067,'reachGoal','calc_lead');}
   document.getElementById('calc-result-block').style.display = 'block';
   document.getElementById('calc-disclaimer').style.display = 'block';
   setTimeout(function(){ document.getElementById('calc-result-block').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);

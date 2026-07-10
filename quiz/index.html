@@ -3,8 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Расчёт забора бесплатно | DIANAST</title>
-<meta name="description" content="Получите точный расчёт забора из колотого кирпича за 2 минуты. Работаем по всей Беларуси.">
+<title>Расчёт забора онлайн за 2 минуты — все виды заборов под ключ | Dianast</title>
+<meta name="description" content="Онлайн-расчёт забора под ключ: кирпич, профнастил, штакетник, 3D, ранчо, жалюзи, блоки. Смета материалов и монтажа сразу на экране, с воротами, калиткой и фундаментом. Работаем по всей Беларуси.">
+<link rel="canonical" href="https://dianast.by/quiz">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dianast.by/quiz">
+<meta property="og:title" content="Расчёт забора онлайн — смета под ключ за 2 минуты">
+<meta property="og:description" content="Выберите тип забора, укажите размеры — получите смету материалов и монтажа сразу на экране. 7 видов заборов, ворота, калитка, фундамент.">
+<meta property="og:locale" content="ru_BY">
+<meta property="og:site_name" content="Dianast">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Онлайн-расчёт забора Dianast",
+  "url": "https://dianast.by/quiz",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BYN"},
+  "description": "Пошаговый расчёт забора под ключ: кирпич Dianast, блоки, профнастил, металлоштакетник, 3D-сетка, ранчо, жалюзи. Смета материалов и монтажа с воротами, калиткой и фундаментом.",
+  "provider": {"@type": "Organization", "name": "Dianast", "url": "https://dianast.by", "foundingDate": "2014", "telephone": "+375297974362",
+    "address": {"@type": "PostalAddress", "addressLocality": "Кобрин", "addressRegion": "Брестская область", "addressCountry": "BY"}}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Главная", "item": "https://dianast.by/"},
+    {"@type": "ListItem", "position": 2, "name": "Расчёт забора онлайн", "item": "https://dianast.by/quiz"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "author": {"@type": "Person", "name": "Андрей", "jobTitle": "Собственник производства Dianast, инженер-строитель (ПГС), 25+ лет в строительстве"},
+  "mainEntity": [
+    {"@type": "Question", "name": "Сколько стоит забор под ключ в Беларуси?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Зависит от типа: 3D-сетка и профнастил — самые доступные, металлоштакетник и ранчо — средний сегмент, жалюзи и заборы с кирпичными или блочными столбами — премиум. Онлайн-расчёт на этой странице покажет смету материалов и монтажа для вашего размера за 2 минуты — с воротами, калиткой и фундаментом."}},
+    {"@type": "Question", "name": "Какой забор дешевле: профнастил, штакетник или 3D-сетка?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Самый экономичный — 3D-сетка, затем профнастил. Металлоштакетник дороже за счёт количества планок и крепежа, особенно в шахматном исполнении. Для боковых и задней стороны участка обычно выбирают профнастил или 3D, для лицевой — кирпич, штакетник или жалюзи."}},
+    {"@type": "Question", "name": "Что входит в смету расчёта забора?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Полная спецификация материалов: столбы, прожилины, крепёж, заполнение, парапет, бетон, фундамент (ригельный или ленточный), ворота с автоматикой, калитка с видеодомофоном — плюс стоимость монтажа каждого этапа и демонтаж старого забора, если нужен."}},
+    {"@type": "Question", "name": "Можно ли посчитать лицевую и боковые стороны разными материалами?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Да. В расчёте можно добавить несколько сторон: например, лицевую — кирпич Dianast с заполнением штакетником, а боковые — профнастил или 3D-сетку. Смета покажет каждую сторону отдельно и общий итог."}}
+  ]
+}
+</script>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=2">
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png?v=2">
@@ -39,9 +88,10 @@ body {
   font-family: Inter, sans-serif;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
 }
+body > section { width: 100%; }
 
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
@@ -1158,9 +1208,26 @@ button { font-family: inherit; cursor: pointer; }
       </div>
       <p class="inp-hint" id="foundationOffNote">Фундамент не обязателен, но с ним удобнее: вдоль забора проще окашивать траву, соседские и бродячие животные не подлезают под низ, а линия забора остаётся ровной.</p>
       <div class="conditional" id="foundationDetails">
+        <label class="field-label">Тип фундамента</label>
+        <div class="cards">
+          <div class="card selected" data-group="foundationType" data-val="rigel" onclick="selectCard(this)">
+            <div style="flex:1">
+              <div class="card-label">Сборный ригель</div>
+              <div class="card-sub">Заводские панели между столбами, быстрый монтаж</div>
+            </div>
+            <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+          </div>
+          <div class="card" data-group="foundationType" data-val="lenta" onclick="selectCard(this)">
+            <div style="flex:1">
+              <div class="card-label">Ленточный (монолит)</div>
+              <div class="card-sub">Заливка по месту, для сложного рельефа и тяжёлых заборов</div>
+            </div>
+            <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+          </div>
+        </div>
         <div class="info-note">
           <span>💡</span>
-          <span>Мы используем <b>сборный ригель</b> — заводские бетонные панели между столбами. Подходит для ровных и слегка неровных участков; на перепадах высоты делаем <b>ступени фундамента</b>, чтобы низ забора шёл аккуратно. Учтите: фундамент — отдельная статья расходов, <b>до 30% от стоимости забора</b>. Точную сумму посчитает менеджер.</span>
+          <span><b>Ригель</b> — заводские бетонные панели между столбами, быстрее и дешевле; на перепадах высоты делаем <b>ступени</b>. <b>Ленточный</b> — монолитная заливка по всей длине, прочнее под кирпич и блоки и лучше на сложном рельефе, но дороже. Фундамент — отдельная статья, <b>до 30% от стоимости забора</b>. Точную сумму посчитает менеджер.</span>
         </div>
       </div>
     </div>
@@ -1222,10 +1289,34 @@ button { font-family: inherit; cursor: pointer; }
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
+        <div class="card has-img" data-group="fenceStyle" data-val="block" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="/assets/photos/pf-graf-2.webp" alt="Блоки + металл" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Блоки + заполнение металлом</div>
+            <div class="card-sub">Столбы из блоков, секции из металла</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card has-img" data-group="fenceStyle" data-val="rancho" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="/assets/photos/pf-korch-1.webp" alt="Ранчо" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Ранчо</div>
+            <div class="card-sub">Горизонтальные металлические планки</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card has-img" data-group="fenceStyle" data-val="jaluzi" onclick="selectCard(this);updateFillStep()">
+          <img class="card-img" src="/assets/photos/pf-gorch-1.webp" alt="Жалюзи" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Жалюзи</div>
+            <div class="card-sub">Ламели под углом, премиум-вид</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
       </div>
     </div>
 
-    <!-- STEP 8: Тип заполнения (только для кирпича) -->
+    <!-- STEP 8: Тип заполнения (для кирпича и блоков) -->
     <div class="step" id="step-7">
       <h2 class="step-title">Тип заполнения</h2>
       <p class="step-sub">Из чего будут секции между кирпичными столбами?</p>
@@ -1326,6 +1417,22 @@ button { font-family: inherit; cursor: pointer; }
           </div>
           <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
+        <div class="card has-img" data-group="sideStyle" data-val="rancho" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-korch-1.webp" alt="Ранчо" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Ранчо</div>
+            <div class="card-sub">Горизонтальные планки с просветом</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
+        <div class="card has-img" data-group="sideStyle" data-val="jaluzi" onclick="selectCard(this)">
+          <img class="card-img" src="/assets/photos/pf-gorch-1.webp" alt="Жалюзи" loading="eager">
+          <div style="padding:0 4px 8px; width:100%">
+            <div class="card-label">Жалюзи</div>
+            <div class="card-sub">Ламели под углом, не видно участок</div>
+          </div>
+          <div class="card-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        </div>
       </div>
     </div>
 
@@ -1356,6 +1463,67 @@ button { font-family: inherit; cursor: pointer; }
       </div>
     </div>
 
+    <!-- STEP 14: Смета-калькулятор (после контактов) -->
+    <div class="step" id="step-14">
+      <h2 class="step-title">Ваша смета готова</h2>
+      <p class="step-sub">Заявка уже у менеджера. Покрутите параметры — цена пересчитается сразу.</p>
+      <div class="ck-hero">
+        <div class="ck-hero-lbl">Под ключ: материалы + монтаж</div>
+        <div class="ck-hero-val" id="ckPrice">—</div>
+        <div class="ck-hero-sub" id="ckRange"></div>
+      </div>
+      <div id="ckSides"></div>
+      <button type="button" class="ck-add" onclick="ckAddSide()">+ Добавить сторону (боковая / задняя)</button>
+      <div class="ck-block">
+        <div class="ck-ctrl">
+          <div class="ck-lab"><span>Ворота, ширина (0 — без ворот)</span><b><span id="ckGateW">4</span> м</b></div>
+          <input type="range" id="ckGate" min="0" max="6" step="0.5" value="4" oninput="ckCompute()">
+        </div>
+        <div class="ck-ctrl" id="ckGateTypeWrap">
+          <div class="ck-pills">
+            <div class="ck-pill sel" id="ckGtSwing" onclick="ckSetGateType('swing')">Распашные</div>
+            <div class="ck-pill" id="ckGtSliding" onclick="ckSetGateType('sliding')">Откатные</div>
+            <div class="ck-pill" id="ckAuto" onclick="ckToggleAuto()">+ Автоматика</div>
+          </div>
+        </div>
+        <div class="ck-ctrl">
+          <div class="ck-lab"><span>Калитка, ширина (0 — без)</span><b><span id="ckWickW">1</span> м</b></div>
+          <input type="range" id="ckWick" min="0" max="2" step="0.5" value="1" oninput="ckCompute()">
+        </div>
+      </div>
+      <div class="ck-spec">
+        <div class="ck-spec-title">Спецификация материалов</div>
+        <div id="ckSpec"></div>
+      </div>
+      <p class="inp-hint" id="ckNote"></p>
+    </div>
+    <style>
+    .ck-hero{background:#1a1a1a;border-radius:14px;padding:18px 20px;color:#fff;margin-bottom:14px;position:sticky;top:6px;z-index:5}
+    .ck-hero-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6)}
+    .ck-hero-val{font-family:Montserrat,sans-serif;font-weight:800;font-size:28px;color:#FF6B35;margin-top:2px}
+    .ck-hero-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+    .ck-side{border:1.5px solid var(--border,#E8E3DC);border-radius:12px;padding:14px;margin-bottom:12px;background:#fff}
+    .ck-side-head{display:flex;justify-content:space-between;align-items:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;margin-bottom:10px}
+    .ck-side-head .ck-del{border:none;background:none;color:#c0392b;font-size:16px;cursor:pointer;padding:0 4px}
+    .ck-block{border:1.5px solid var(--border,#E8E3DC);border-radius:12px;padding:14px;margin-bottom:12px;background:#fff}
+    .ck-ctrl{margin-bottom:10px}
+    .ck-ctrl:last-child{margin-bottom:0}
+    .ck-lab{display:flex;justify-content:space-between;font-size:12px;color:#6b6b6b;margin-bottom:4px}
+    .ck-lab b{color:#1a1a1a;font-family:Montserrat,sans-serif}
+    .ck-ctrl input[type=range]{width:100%;accent-color:#E8600A;margin:0}
+    .ck-pills{display:flex;flex-wrap:wrap;gap:6px}
+    .ck-pill{border:1.5px solid var(--border,#E8E3DC);border-radius:16px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;background:#fff;user-select:none}
+    .ck-pill.sel{border-color:#E8600A;background:#E8600A;color:#fff}
+    .ck-add{width:100%;border:1.5px dashed #E8600A;background:#fff6f0;color:#E8600A;border-radius:12px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:12px}
+    .ck-spec{background:#f4f0eb;border-radius:12px;padding:14px 16px}
+    .ck-spec-title{font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;margin-bottom:8px}
+    .ck-sh{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#E8600A;margin:10px 0 3px;font-weight:600}
+    .ck-sr{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+    .ck-sr .n{color:#6b6b6b;padding-right:8px}
+    .ck-sr .v{font-weight:600;white-space:nowrap}
+    .ck-sr .p{color:#9b9b9b;font-size:11px;margin-left:6px}
+    #step-14 .step-title{margin-bottom:4px}
+    </style>
   </div><!-- /quiz-content -->
 
   <!-- ── NAV ── -->
@@ -1369,6 +1537,29 @@ button { font-family: inherit; cursor: pointer; }
 
 </div><!-- /quiz-wrap -->
 
+<!-- SEO-блок: контент для поиска и ИИ, живёт под квизом -->
+<section style="background:#fff;padding:56px 5%;font-family:Inter,sans-serif;color:#1a1a1a">
+  <div style="max-width:800px;margin:0 auto">
+    <h1 style="font-family:Montserrat,sans-serif;font-size:clamp(22px,3vw,32px);font-weight:800;line-height:1.25;margin-bottom:14px">Онлайн-расчёт забора под ключ в Беларуси</h1>
+    <p style="font-size:16px;line-height:1.8;color:#333;margin-bottom:12px">Пройдите короткий опрос выше — и получите смету забора прямо на экране: материалы по позициям, работа по этапам, ворота, калитка и фундамент. Считаем 7 видов заборов: <strong>кирпич Dianast, блоки, профнастил, металлоштакетник, 3D-сетку, ранчо и жалюзи</strong>. Можно комбинировать: лицевая сторона — кирпич, боковые — профнастил, смета покажет каждую сторону отдельно.</p>
+    <p style="font-size:16px;line-height:1.8;color:#333;margin-bottom:24px">Расчёт строится на реальных нормативах производства Dianast (Кобрин, работаем с 2014 года): шаг столбов, ряды прожилин, расход крепежа и бетона — те же цифры, по которым мы строим заборы каждый день. Это ориентировочная смета, точную сумму менеджер подтверждает после бесплатного замера.</p>
+
+    <h2 style="font-family:Montserrat,sans-serif;font-size:20px;font-weight:700;margin:28px 0 10px">Частые вопросы</h2>
+    <p style="font-weight:600;margin:16px 0 4px;font-size:16px">Сколько стоит забор под ключ?</p>
+    <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:10px">Зависит от типа: 3D-сетка и профнастил — самые доступные, штакетник и ранчо — средний сегмент, жалюзи и заборы на кирпичных или блочных столбах — премиум. Расчёт выше покажет вашу цифру за 2 минуты.</p>
+    <p style="font-weight:600;margin:16px 0 4px;font-size:16px">Что входит в смету?</p>
+    <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:10px">Столбы, прожилины, крепёж, заполнение, парапет, бетон, фундамент (ригельный или ленточный), ворота с автоматикой, калитка с видеодомофоном — и стоимость монтажа каждого этапа, включая демонтаж старого забора.</p>
+    <p style="font-weight:600;margin:16px 0 4px;font-size:16px">Какой забор выбрать для боковой стороны участка?</p>
+    <p style="font-size:15px;line-height:1.7;color:#444;margin-bottom:22px">Чаще берут профнастил или 3D-сетку — это экономично и практично. Лицевую сторону делают из кирпича, штакетника или жалюзи. В расчёте это учтено: первый вопрос — какая сторона.</p>
+
+    <div style="text-align:center;margin:30px 0 8px">
+      <a href="#quizWrap" onclick="window.scrollTo({top:0,behavior:'smooth'});return false" style="display:inline-block;background:#D4521E;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;padding:15px 36px;border-radius:10px;text-decoration:none">Начать расчёт забора →</a>
+    </div>
+
+    <p style="font-size:13px;color:#888;margin-top:26px;line-height:1.7">Полезное: <a href="/calculator" style="color:#D4521E">калькулятор кирпича Dianast</a> · <a href="/kirpich-vs-profnastil" style="color:#D4521E">кирпич или профнастил</a> · <a href="/stoimost-zabora" style="color:#D4521E">сколько стоит кирпичный забор</a> · <a href="/foto-zaborov" style="color:#D4521E">фото наших заборов</a> · <a href="/zabor-pod-klyuch" style="color:#D4521E">забор под ключ</a></p>
+  </div>
+</section>
+
 <script>
 // ── State ──────────────────────────────────────────────
 const state = {
@@ -1378,7 +1569,7 @@ const state = {
   ground: null,
   gatePlanned: false, gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
   wicketPlanned: false, wicketOn: false, wicketWidth: '', wicketIntercom: false,
-  foundationOn: false,
+  foundationOn: false, foundationType: 'rigel',
   fenceStyle: null, fillType: null, sideStyle: null,
   city: '', name: '', phone: '',
 };
@@ -1439,12 +1630,12 @@ function formatPhone() {
 function getSteps() {
   // Боковая ветка: сторона, длина, высота(м), участок, тип(бюджет), ворота, калитка, фундамент, город, контакты
   if (state.fenceSide === 'side') {
-    return [0, 1, 10, 12, 11, 4, 5, 13, 8, 9];
+    return [0, 1, 10, 12, 11, 4, 5, 13, 8, 9, 14];
   }
   // Лицевая ветка (основной сценарий)
   const s = [0,1,2,3,4,5,13,6];
-  if (state.fenceStyle === 'brick') s.push(7);
-  s.push(8,9);
+  if (state.fenceStyle === 'brick' || state.fenceStyle === 'block') s.push(7);
+  s.push(8,9,14);
   return s;
 }
 
@@ -1508,7 +1699,7 @@ function updateNav() {
   const num   = stepIdx + 1;
   const pct   = total > 1 ? (stepIdx / (total - 1)) * 100 : 100;
 
-  document.getElementById('stepLabel').textContent = `Шаг ${num} из ${total}`;
+  document.getElementById('stepLabel').textContent = steps[stepIdx] === 14 ? 'Ваша смета' : `Шаг ${num} из ${total}`;
   document.getElementById('progressFill').style.width = pct + '%';
 
   const btnBack = document.getElementById('btnBack');
@@ -1523,11 +1714,15 @@ function updateNav() {
   btnNext.disabled = false;
   btnNext.style.cursor = ok ? 'pointer' : 'not-allowed';
 
-  const isLast = stepIdx === total - 1;
-  if (isLast) {
+  const curStep = steps[stepIdx];
+  if (curStep === 9) {
     btnText.textContent = 'Получить расчёт';
     btnArrow.textContent = '🎉';
     btnNext.style.fontSize = '14px';
+  } else if (curStep === 14) {
+    btnText.textContent = 'Отправить смету менеджеру';
+    btnArrow.textContent = '📩';
+    btnNext.style.fontSize = '13px';
   } else {
     btnText.textContent = 'Далее';
     btnArrow.textContent = '→';
@@ -1557,6 +1752,7 @@ function showStep(idx) {
     if (content) content.scrollTop = 0;
     // Wheel needs layout to set scrollTop — do it when the step is visible
     if (steps[idx] === 2) positionWheel();
+    if (steps[idx] === 14) initCalc();
   }
 
   updateNav();
@@ -1565,10 +1761,12 @@ function showStep(idx) {
 function goNext() {
   if (!canGo()) return;
   const steps = getSteps();
+  const cur = steps[stepIdx];
+  if (cur === 9) { submitQuiz(true); return; }
   if (stepIdx < steps.length - 1) {
     showStep(stepIdx + 1);
   } else {
-    submitQuiz();
+    submitFinalSmeta();
   }
 }
 
@@ -1580,7 +1778,7 @@ function goBack() {
 var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
 var TG_CHAT  = '335993206';
 
-function submitQuiz() {
+function submitQuiz(advance) {
   if(typeof ym==='function'){ym(110181067,'reachGoal','quiz_submit');}
   var btn = document.getElementById('btnNext');
   btn.disabled = true;
@@ -1589,9 +1787,10 @@ function submitQuiz() {
 
   var sideMap     = {face:'Лицевая', side:'Боковая'};
   var groundMap   = {old:'Старый забор', open:'Голая земля', foundation:'Залит фундамент'};
-  var styleMap    = {brick:'Кирпич + металл', stake:'Штакетник', profile:'Профнастил'};
-  var sideStyleMap= {profile:'Профнастил', stake:'Металлический штакетник', '3d':'3D забор'};
+  var styleMap    = {brick:'Кирпич + металл', block:'Блоки + металл', stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи'};
+  var sideStyleMap= {profile:'Профнастил', stake:'Металлический штакетник', '3d':'3D забор', rancho:'Ранчо', jaluzi:'Жалюзи'};
   var fillMap     = {stake:'Штакетник', profile:'Профнастил', rancho:'Ранчо', jaluzi:'Жалюзи', brickfill:'Кирпич'};
+  var foundMap    = {rigel:'сборный ригель', lenta:'ленточный'};
   var gateTypeMap = {sliding:'Откатные', swing:'Распашные'};
   var isSide      = state.fenceSide === 'side';
 
@@ -1602,7 +1801,7 @@ function submitQuiz() {
   var styleLine = isSide
     ? '▪ Тип забора: ' + (sideStyleMap[state.sideStyle]||'—') + '\n'
     : '▪ Тип забора: ' + (styleMap[state.fenceStyle]||'—') + '\n'
-      + (state.fenceStyle==='brick' ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '');
+      + ((state.fenceStyle==='brick'||state.fenceStyle==='block') ? '▪ Заполнение: ' + (fillMap[state.fillType]||'—') + '\n' : '');
 
   var gateInfo;
   if (!state.gatePlanned) {
@@ -1633,7 +1832,7 @@ function submitQuiz() {
     + '▪ Участок: '    + (groundMap[state.ground]||'—') + '\n'
     + styleLine
     + '▪ Ворота: '     + gateInfo + '\n'
-    + '▪ Фундамент: '  + (state.foundationOn ? 'Да' : 'Нет') + '\n'
+    + '▪ Фундамент: '  + (state.foundationOn ? ('Да — ' + (foundMap[state.foundationType]||'ригель')) : 'Нет') + '\n'
     + '▪ Калитка: '    + wicketInfo + '\n';
 
   var tgUrl = 'https://api.telegram.org/bot' + TG_TOKEN
@@ -1653,9 +1852,14 @@ function submitQuiz() {
     })
   }).catch(function(){});
 
-  fetch(tgUrl)
-    .then(function(){ showThankyou(); })
-    .catch(function(){ showThankyou(); });
+  if (advance) {
+    fetch(tgUrl).catch(function(){});
+    showStep(stepIdx + 1);
+  } else {
+    fetch(tgUrl)
+      .then(function(){ showThankyou(); })
+      .catch(function(){ showThankyou(); });
+  }
 
   var mailLink = document.createElement('a');
   mailLink.href = 'mailto:lag10033@gmail.com'
@@ -1825,7 +2029,7 @@ function toggleCheckbox(id) {
 
 // ── Fence style → fill step ────────────────────────────
 function updateFillStep() {
-  if (state.fenceStyle !== 'brick') {
+  if (state.fenceStyle !== 'brick' && state.fenceStyle !== 'block') {
     state.fillType = null;
     document.querySelectorAll('.card-grid[data-group="fillType"]').forEach(c => c.classList.remove('selected'));
   }
@@ -1835,6 +2039,292 @@ function updateFillStep() {
 // ── Init ───────────────────────────────────────────────
 buildWheel();
 updateNav();
+</script>
+<script>
+// ══ Шаг 14: смета-калькулятор ══════════════════════════
+var CK_T = {
+  profnastil:{n:'Профнастил', sp:2.7, dep:1.1, frame:true},
+  shtaketnik:{n:'Штакетник', sp:2.7, dep:1.1, frame:true},
+  '3d':{n:'3D-сетка', sp:2.53, dep:1.0, frame:true},
+  rancho:{n:'Ранчо', sp:2.0, dep:1.1, frame:true},
+  zhaluzi:{n:'Жалюзи', sp:2.0, dep:1.1, frame:true},
+  brick:{n:'Кирпич + металл', sp:3.0, mason:true},
+  block:{n:'Блоки + металл', sp:3.0, mason:true}
+};
+var CK_FILLS = {shtaketnik:'Штакетник', profnastil:'Профнастил', rancho:'Ранчо', zhaluzi:'Жалюзи', brickfill:'Кирпич'};
+var CK_P = {postM:14, post60:10, lagM:9.5, prof:25, shtak:5, rancho:15, zhal:10, guide:12,
+  screw:0.09, brk:5, homut:3.7, cap:3, concrete:200, parapetM:14, pshka:4,
+  rigMount:5, rigCover:5, rigelPc:85, tumbaPc:35,
+  brickAng:3.40, brickRow:3.60, blockPc:16, capBrick:55, capBlock:10,
+  glue:19.5, armM:1.5, herm:15, consM:7,
+  gateSwing:2200, gateSliding:3200, auto:1600, wicket:900, intercom:1200,
+  mProf:35, mShtak:54, m3d:35, mRancho:70, mZhal:70,
+  mPost:65, mFill:32, mRigel:25, mLenta:60, mGate:800, mWicket:300, mDem:40};
+var CK_3DH = [1.53, 1.73, 2.03];
+var CK_3DP = [80, 90, 100];
+var CK_MRATE = {profnastil:'mProf', shtaketnik:'mShtak', '3d':'m3d', rancho:'mRancho', zhaluzi:'mZhal'};
+function ckFAdd(){ return state.foundationOn ? (state.foundationType==='lenta' ? 0.5 : 0.2) : 0; }
+var ckSides = [], ckGT = 'swing', ckAutoOn = false, ckShownOnce = false;
+
+function ckCe(x){ return Math.ceil(x - 1e-9); }
+function ckRu(x){ return Math.round(x).toLocaleString('ru-RU'); }
+
+function initCalc(){
+  var faceMap = {brick:'brick', block:'block', stake:'shtaketnik', profile:'profnastil', rancho:'rancho', jaluzi:'zhaluzi'};
+  var sideMap = {profile:'profnastil', stake:'shtaketnik', '3d':'3d', rancho:'rancho', jaluzi:'zhaluzi'};
+  var fillM   = {stake:'shtaketnik', profile:'profnastil', rancho:'rancho', jaluzi:'zhaluzi', brickfill:'brickfill'};
+  var isSide = state.fenceSide === 'side';
+  ckSides = [{
+    role: isSide ? 'Боковая' : 'Лицевая',
+    type: isSide ? (sideMap[state.sideStyle]||'profnastil') : (faceMap[state.fenceStyle]||'profnastil'),
+    fill: fillM[state.fillType] || 'profnastil',
+    shah: 0,
+    len: parseFloat(state.length)||30,
+    h: isSide ? (parseFloat(state.heightSide)||1.7) : (parseFloat(state.height)||1.9)
+  }];
+  var gw = state.gatePlanned ? (parseFloat(state.gateWidth)||4) : 0;
+  var ww = state.wicketPlanned ? (parseFloat(state.wicketWidth)||1) : 0;
+  document.getElementById('ckGate').value = gw;
+  document.getElementById('ckWick').value = ww;
+  ckGT = state.gateType || 'swing';
+  ckAutoOn = !!state.gateAuto;
+  ckSyncGatePills();
+  ckRenderSides();
+  ckCompute();
+  if (!ckShownOnce) { ckShownOnce = true; if(typeof ym==='function'){ym(110181067,'reachGoal','calc_shown');} }
+}
+function ckSyncGatePills(){
+  document.getElementById('ckGtSwing').classList.toggle('sel', ckGT==='swing');
+  document.getElementById('ckGtSliding').classList.toggle('sel', ckGT==='sliding');
+  document.getElementById('ckAuto').classList.toggle('sel', ckAutoOn);
+}
+function ckSetGateType(t){ ckGT=t; ckSyncGatePills(); ckCompute(); }
+function ckToggleAuto(){ ckAutoOn=!ckAutoOn; ckSyncGatePills(); ckCompute(); }
+function ckAddSide(){
+  ckSides.push({role:'Боковая/задняя', type:'profnastil', fill:'profnastil', shah:0, len:20, h:1.7});
+  ckRenderSides(); ckCompute();
+}
+function ckDelSide(i){ ckSides.splice(i,1); ckRenderSides(); ckCompute(); }
+function ckSet(i,k,v){ ckSides[i][k] = (k==='type'||k==='fill') ? v : parseFloat(v); if(k==='type'||k==='fill'||k==='shah') ckRenderSides(); ckCompute(); }
+function ckRenderSides(){
+  var html='';
+  ckSides.forEach(function(s,i){
+    var t=CK_T[s.type];
+    html+='<div class="ck-side"><div class="ck-side-head"><span>Сторона '+(i+1)+' · '+s.role+'</span>'+(i>0?'<button class="ck-del" onclick="ckDelSide('+i+')" aria-label="Удалить">✕</button>':'')+'</div>';
+    html+='<div class="ck-pills" style="margin-bottom:10px">';
+    var keys = i===0 && ckSides[0].role==='Лицевая' ? ['brick','block','shtaketnik','profnastil','rancho','zhaluzi'] : ['profnastil','shtaketnik','3d','rancho','zhaluzi'];
+    keys.forEach(function(k){ html+='<div class="ck-pill'+(s.type===k?' sel':'')+'" onclick="ckSet('+i+',\'type\',\''+k+'\')">'+CK_T[k].n+'</div>'; });
+    html+='</div>';
+    if(t.mason){
+      html+='<div class="ck-lab" style="margin-bottom:4px"><span>Заполнение секций</span></div><div class="ck-pills" style="margin-bottom:10px">';
+      for(var f in CK_FILLS){ html+='<div class="ck-pill'+(s.fill===f?' sel':'')+'" onclick="ckSet('+i+',\'fill\',\''+f+'\')">'+CK_FILLS[f]+'</div>'; }
+      html+='</div>';
+    }
+    var shahKind = t.mason ? s.fill : s.type;
+    if(shahKind==='shtaketnik'||shahKind==='rancho'){
+      html+='<div class="ck-pills" style="margin-bottom:10px"><div class="ck-pill'+(!s.shah?' sel':'')+'" onclick="ckSet('+i+',\'shah\',0)">С зазором</div><div class="ck-pill'+(s.shah?' sel':'')+'" onclick="ckSet('+i+',\'shah\',1)">Шахматка</div></div>';
+    }
+    html+='<div class="ck-ctrl"><div class="ck-lab"><span>Длина</span><b>'+s.len+' м</b></div><input type="range" min="5" max="100" step="1" value="'+s.len+'" oninput="ckSet('+i+',\'len\',this.value)"></div>';
+    html+='<div class="ck-ctrl"><div class="ck-lab"><span>Высота</span><b>'+s.h.toFixed(1)+' м</b></div><input type="range" min="1" max="2.5" step="0.1" value="'+s.h+'" oninput="ckSet('+i+',\'h\',this.value)"></div>';
+    html+='</div>';
+  });
+  document.getElementById('ckSides').innerHTML=html;
+}
+function ckNear3D(h){ return CK_3DH.reduce(function(a,b){return Math.abs(b-h)<Math.abs(a-h)?b:a}); }
+function ckParapet(fillLen, spansFill, add){
+  if(!state.foundationOn) return;
+  var m=fillLen+0.06*spansFill;
+  add('Парапет на фундамент', spansFill+' шт (пролёт+6 см, ~'+m.toFixed(1)+' м)', m*CK_P.parapetM);
+}
+function ckLagi(fillLen, posts, add){
+  add('Прожилина 31×31 (2 ряда)', (2*fillLen).toFixed(1)+' м', 2*fillLen*CK_P.lagM);
+  add('Кронштейны', 2*posts*2+' шт', 2*posts*2*CK_P.brk);
+}
+function ckProf(fillLen, h, add){
+  var sh=ckCe(fillLen/1.05);
+  add('Профлист С20', sh+' шт ('+(sh*1.05*h).toFixed(1)+' м²)', sh*1.05*h*CK_P.prof);
+  add('Саморезы', sh*20+' шт', sh*20*CK_P.screw);
+  add('Планка Пшка', ckCe(fillLen/2)+' шт', ckCe(fillLen/2)*CK_P.pshka);
+}
+function ckShtak(fillLen, h, shah, add){
+  var st=ckCe(fillLen*1000/(115+55))*(shah?2:1);
+  add('Штакетины 115/55'+(shah?' (шахматка)':''), st+' шт', st*h*CK_P.shtak);
+  add('Саморезы', st*4+' шт', st*4*CK_P.screw);
+}
+function ckGuides(spans, h, add){
+  var g=2*spans;
+  add('Направляющие', g+' шт × '+h.toFixed(1)+' м = '+(g*h).toFixed(1)+' м', g*h*CK_P.guide);
+  return g;
+}
+function ckRancho(fillLen, h, shah, guides, posts, add){
+  var rows=ckCe(h*1000/240), pm=rows*fillLen*(shah?2:1);
+  add('Планка ранчо ('+rows+' ряд.'+(shah?', шахматка':'')+')', pm.toFixed(1)+' м', pm*CK_P.rancho);
+  var scr=rows*(shah?2:1)*(guides+posts)*2;
+  add('Саморезы', scr+' шт', scr*CK_P.screw);
+}
+function ckZhal(fillLen, h, guides, posts, add){
+  var lam=ckCe(h*1000/155), lm=lam*fillLen;
+  add('Ламели жалюзи ('+lam+' по высоте)', lm.toFixed(1)+' м', lm*CK_P.zhal);
+  var scr=lam*(guides+posts)*2;
+  add('Саморезы', scr+' шт', scr*CK_P.screw);
+}
+function ckFrameFound(len, posts, spansFill, add){
+  if(!state.foundationOn) return;
+  if(state.foundationType==='lenta'){
+    var v=len*0.2*0.5;
+    add('Лента 0,2×0,5 (бетон)', v.toFixed(2)+' м³', v*CK_P.concrete);
+    add('Работа: фундамент (лента)', len+' м.п. × '+CK_P.mLenta+' р', len*CK_P.mLenta);
+  } else {
+    add('Крепления фундамента', 2*posts+' шт', 2*posts*CK_P.rigMount);
+    add('Накладки ригеля', 2*posts+' шт', 2*posts*CK_P.rigCover);
+    add('Ригели', spansFill+' шт', spansFill*CK_P.rigelPc);
+    add('Работа: фундамент (ригель)', len+' м.п. × '+CK_P.mRigel+' р', len*CK_P.mRigel);
+  }
+}
+function ckSideSpec(s, gw, ww, add){
+  var t=CK_T[s.type];
+  var fillLen=Math.max(0, s.len-gw-ww);
+  if(t.frame){
+    var spans=ckCe(s.len/t.sp), posts=spans+1, spansFill=ckCe(fillLen/t.sp);
+    var h = s.type==='3d' ? ckNear3D(s.h) : s.h;
+    var postLen=h+t.dep+ckFAdd(), postM=posts*postLen;
+    add('Столбы металл 61×35', posts+' шт × '+postLen.toFixed(1)+' м = '+postM.toFixed(1)+' м', postM*CK_P.postM);
+    add('Заглушки', posts+' шт', posts*CK_P.cap);
+    if(s.type==='profnastil'){
+      ckLagi(fillLen, posts, add);
+      ckParapet(fillLen, spansFill, add);
+      ckProf(fillLen, h, add);
+    } else if(s.type==='shtaketnik'){
+      ckLagi(fillLen, posts, add);
+      ckParapet(fillLen, spansFill, add);
+      ckShtak(fillLen, h, s.shah, add);
+    } else if(s.type==='3d'){
+      add('Крепления', posts*2+' шт', posts*2*CK_P.homut);
+      ckParapet(fillLen, spansFill, add);
+      add('Панели 3D (h '+h.toFixed(2).replace('.',',')+')', ckCe(fillLen/2.5)+' шт', ckCe(fillLen/2.5)*CK_3DP[CK_3DH.indexOf(h)]);
+    } else if(s.type==='rancho'){
+      ckParapet(fillLen, spansFill, add);
+      var g1=ckGuides(spansFill, h, add);
+      ckRancho(fillLen, h, s.shah, g1, posts, add);
+    } else {
+      ckParapet(fillLen, spansFill, add);
+      var g2=ckGuides(spansFill, h, add);
+      ckZhal(fillLen, h, g2, posts, add);
+    }
+    add('Бетон лунок', (posts*0.08).toFixed(2)+' м³', posts*0.08*CK_P.concrete);
+    ckFrameFound(s.len, posts, spansFill, add);
+    var mr=CK_P[CK_MRATE[s.type]];
+    add('Работа: монтаж забора', fillLen.toFixed(0)+' м.п. × '+mr+' р', fillLen*mr);
+  } else {
+    var posts2=ckCe(s.len/t.sp)+1, spans2=ckCe(fillLen/t.sp), rows=Math.round(s.h/ROW_M);
+    var isBrick = s.type==='brick';
+    if(isBrick){
+      var ang=ckCe(posts2*rows*4*1.03);
+      add('Кирпич угловой Dianast', posts2+' столбов × '+rows+' ряд. = '+ang+' шт', ang*CK_P.brickAng);
+      var rowsFill = s.fill==='brickfill' ? rows : 3;
+      var rowBr=ckCe(fillLen*4*rowsFill*1.03);
+      add('Кирпич рядовой ('+(s.fill==='brickfill'?'весь пролёт':'продлёнка 3 ряда')+')', rowBr+' шт', rowBr*CK_P.brickRow);
+      add('Крышка столба метал.', posts2+' шт', posts2*CK_P.capBrick);
+    } else {
+      var rb=ckCe(s.h/0.19), bl=posts2*rb*2;
+      add('Блок colorMix', posts2+' столбов × '+rb+' ряд. = '+bl+' шт', bl*CK_P.blockPc);
+      add('Крышка colorMix', posts2+' шт', posts2*CK_P.capBlock);
+      add('Герметик', posts2+' шт', posts2*CK_P.herm);
+      add('Арматура Ø10 (4×3 м)', posts2*12+' м', posts2*12*CK_P.armM);
+    }
+    var m2=fillLen+0.06*spans2;
+    add('Парапет металлический', spans2+' шт (~'+m2.toFixed(1)+' м)', m2*CK_P.parapetM);
+    if(isBrick && state.foundationType!=='lenta'){
+      add('Тумбы ригеля', posts2+' шт', posts2*CK_P.tumbaPc);
+      add('Ригели', spans2+' шт', spans2*CK_P.rigelPc);
+      add('Работа: фундамент (ригель)', s.len+' м.п. × '+CK_P.mRigel+' р', s.len*CK_P.mRigel);
+    } else {
+      var vw=isBrick?0.3:0.2, vм=s.len*vw*0.5;
+      add('Монолитный фундамент '+vw.toFixed(1).replace('.',',')+'×0,5', vм.toFixed(2)+' м³ бетона', vм*CK_P.concrete);
+      add('Работа: фундамент (монолит)', s.len+' м.п. × '+CK_P.mLenta+' р', s.len*CK_P.mLenta);
+    }
+    if(s.fill && s.fill!=='brickfill'){
+      add('Прожилина 31×31 (2 ряда)', (2*fillLen).toFixed(1)+' м', 2*fillLen*CK_P.lagM);
+      if(s.fill==='profnastil') ckProf(fillLen, s.h, add);
+      else if(s.fill==='shtaketnik') ckShtak(fillLen, s.h, s.shah, add);
+      else if(s.fill==='rancho'){ var g3=ckGuides(spans2, s.h, add); ckRancho(fillLen, s.h, s.shah, g3, posts2, add); }
+      else if(s.fill==='zhaluzi'){ var g4=ckGuides(spans2, s.h, add); ckZhal(fillLen, s.h, g4, posts2, add); }
+    }
+    add('Бетон столбов', (posts2*(isBrick?0.15:0.12)).toFixed(2)+' м³', posts2*(isBrick?0.15:0.12)*CK_P.concrete);
+    if(isBrick){
+      var core=posts2*(s.h+1);
+      add('Столб метал. 60×40 (сердечник)', posts2+' шт × '+(s.h+1).toFixed(1)+' м = '+core.toFixed(1)+' м', core*CK_P.post60);
+      var totBr=ckCe(posts2*rows*4*1.03)+ckCe(fillLen*4*(s.fill==='brickfill'?rows:3)*1.03);
+      add('Клей-пена (1 балл./288 кирп.)', ckCe(totBr/288)+' балл.', ckCe(totBr/288)*CK_P.glue);
+      add('Расходники', '~'+ckRu(s.len*CK_P.consM)+' р', s.len*CK_P.consM);
+    }
+    add('Работа: кладка столбов', posts2+' шт × '+CK_P.mPost+' р', posts2*CK_P.mPost);
+    add('Работа: монтаж заполнения', fillLen.toFixed(0)+' м.п. × '+CK_P.mFill+' р', fillLen*CK_P.mFill);
+  }
+}
+function ckCompute(){
+  var gw=parseFloat(document.getElementById('ckGate').value)||0;
+  var ww=parseFloat(document.getElementById('ckWick').value)||0;
+  document.getElementById('ckGateW').textContent=gw;
+  document.getElementById('ckWickW').textContent=ww;
+  document.getElementById('ckGateTypeWrap').style.display = gw>0 ? 'block':'none';
+  var html='', total=0;
+  ckSides.forEach(function(s,i){
+    var items=[];
+    function add(n,q,p){ items.push({n:n,q:q,p:p}); total+=p; }
+    ckSideSpec(s, i===0?gw:0, i===0?ww:0, add);
+    var sub=items.reduce(function(a,b){return a+b.p},0);
+    html+='<div class="ck-sh">Сторона '+(i+1)+' — '+CK_T[s.type].n+(CK_T[s.type].mason?' / '+CK_FILLS[s.fill]:'')+', '+s.len+'×'+s.h.toFixed(1)+' м — '+ckRu(sub)+' р</div>';
+    items.forEach(function(it){ html+='<div class="ck-sr"><span class="n">'+it.n+'</span><span class="v">'+it.q+(it.p>0?'<span class="p">'+ckRu(it.p)+' р</span>':'')+'</span></div>'; });
+  });
+  if(gw>0 || ww>0){ html+='<div class="ck-sh">Ворота и калитка</div>'; }
+  if(gw>0){
+    var gp=(ckGT==='sliding'?CK_P.gateSliding:CK_P.gateSwing)+(ckAutoOn?CK_P.auto:0);
+    total+=gp;
+    html+='<div class="ck-sr"><span class="n">Ворота '+(ckGT==='sliding'?'откатные':'распашные')+' '+gw+' м'+(ckAutoOn?' + автоматика':'')+'</span><span class="v">'+ckRu(gp)+' р</span></div>';
+    if(ckGT==='sliding'){
+      total+=1.2*CK_P.concrete;
+      html+='<div class="ck-sr"><span class="n">Тумба под откатные (бетон)</span><span class="v">1,2 м³<span class="p">'+ckRu(1.2*CK_P.concrete)+' р</span></span></div>';
+    }
+    total+=CK_P.mGate;
+    html+='<div class="ck-sr"><span class="n">Работа: установка ворот</span><span class="v">'+ckRu(CK_P.mGate)+' р</span></div>';
+  }
+  if(ww>0){
+    var wp=CK_P.wicket+(state.wicketIntercom?CK_P.intercom:0);
+    total+=wp+CK_P.mWicket;
+    html+='<div class="ck-sr"><span class="n">Калитка '+ww+' м'+(state.wicketIntercom?' + видеодомофон':'')+'</span><span class="v">'+ckRu(wp)+' р</span></div>';
+    html+='<div class="ck-sr"><span class="n">Работа: установка калитки</span><span class="v">'+ckRu(CK_P.mWicket)+' р</span></div>';
+  }
+  if(state.ground==='old'){
+    var totLen=ckSides.reduce(function(a,s){return a+s.len},0);
+    total+=totLen*CK_P.mDem;
+    html+='<div class="ck-sr"><span class="n">Демонтаж старого забора</span><span class="v">'+totLen+' м.п. × '+CK_P.mDem+' р<span class="p">'+ckRu(totLen*CK_P.mDem)+' р</span></span></div>';
+  }
+  document.getElementById('ckSpec').innerHTML=html;
+  document.getElementById('ckPrice').textContent=ckRu(total)+' руб';
+  document.getElementById('ckRange').textContent='вилка: '+ckRu(total*0.95)+' – '+ckRu(total*1.05)+' руб · материалы + монтаж';
+  document.getElementById('ckNote').textContent='Расчёт по прайсу и нормативам Dianast от 08.07: материалы + работа (под ключ). Точную смету подтвердит менеджер после замера. Ворота и калитку детально посчитаем отдельным калькулятором. Угловые столбы на стыках сторон уточним на замере.';
+}
+function submitFinalSmeta(){
+  if(typeof ym==='function'){ym(110181067,'reachGoal','smeta_send');}
+  var btn=document.getElementById('btnNext');
+  btn.disabled=true;
+  document.getElementById('btnText').textContent='Отправляем...';
+  var gw=parseFloat(document.getElementById('ckGate').value)||0;
+  var ww=parseFloat(document.getElementById('ckWick').value)||0;
+  var lines=ckSides.map(function(s,i){
+    return (i+1)+') '+s.role+' — '+CK_T[s.type].n+(CK_T[s.type].mason?' / заполнение: '+CK_FILLS[s.fill]:'')+', '+s.len+' м × '+s.h.toFixed(1)+' м';
+  });
+  var text='🧮 Финальная смета из калькулятора\n\n'
+    +'👤 '+state.name+' · '+state.phone+' · '+state.city+'\n\n'
+    +'Стороны:\n'+lines.join('\n')+'\n'
+    +'Ворота: '+(gw>0?(ckGT==='sliding'?'откатные':'распашные')+' '+gw+' м'+(ckAutoOn?' + автоматика':''):'нет')+'\n'
+    +'Калитка: '+(ww>0?ww+' м':'нет')+'\n'
+    +'Фундамент: '+(state.foundationOn?(state.foundationType==='lenta'?'ленточный':'ригель'):'нет')+'\n'
+    +'Итог по калькулятору: '+document.getElementById('ckPrice').textContent;
+  var url='https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage?chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text);
+  fetch(url).then(function(){showThankyou();}).catch(function(){showThankyou();});
+}
 </script>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">

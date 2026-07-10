@@ -6,8 +6,23 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/quiz</loc>
+    <priority>1.0</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/calculator</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/demler</loc>
     <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/rigelnyj-fundament</loc>
+    <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>

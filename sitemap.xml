@@ -16,6 +16,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://dianast.by/zabor-iz-profnastila</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://dianast.by/demler</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>

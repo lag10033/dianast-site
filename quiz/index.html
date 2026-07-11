@@ -1088,6 +1088,7 @@ button { font-family: inherit; cursor: pointer; }
       <div class="height-result">
         <div class="hr-meters"><span id="hrMeters">1,83 м</span></div>
         <div class="hr-rows"><span id="hrRows">18</span> рядов кирпича</div>
+        <div id="hrBreak" style="font-size:12px;color:#9CA3AF;margin-top:3px">кладка 1,73 м + фундамент 0,10 м</div>
       </div>
 
       <div class="seg" id="heightFrom">
@@ -1951,6 +1952,10 @@ function renderHeight() {
   const rEl = document.getElementById('hrRows');
   if (mEl) mEl.textContent = meters.toFixed(2).replace('.', ',') + ' м';
   if (rEl) rEl.textContent = rows;
+  const bEl = document.getElementById('hrBreak');
+  if (bEl) bEl.textContent = state.heightFrom === 'ground'
+    ? 'кладка ' + brick.toFixed(2).replace('.', ',') + ' м + фундамент 0,10 м'
+    : 'чистая кладка, без фундамента';
 
   document.querySelectorAll('#wheelScroll .wheel-item').forEach(function (it) {
     it.classList.toggle('active', parseInt(it.dataset.rows, 10) === rows);

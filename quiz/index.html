@@ -1086,13 +1086,8 @@ button { font-family: inherit; cursor: pointer; }
       <p class="step-sub">Крутите колесо — выберите количество рядов кирпича</p>
 
       <div class="height-result">
-        <div class="hr-meters"><span id="hrMeters">1,83 м</span></div>
-        <div class="hr-rows"><span id="hrRows">18</span> рядов кирпича</div>
-      </div>
-
-      <div class="seg" id="heightFrom">
-        <button type="button" class="seg-btn active" data-from="ground" onclick="setHeightFrom('ground',this)">От земли</button>
-        <button type="button" class="seg-btn" data-from="foundation" onclick="setHeightFrom('foundation',this)">От фундамента</button>
+        <div class="hr-meters"><span id="hrMeters">1,82 м</span></div>
+        <div class="hr-rows"><span id="hrRows">19</span> рядов кирпича</div>
       </div>
 
       <div class="wheel">
@@ -1103,7 +1098,7 @@ button { font-family: inherit; cursor: pointer; }
 
       <div class="info-note">
         <span>💡</span>
-        <span>1 ряд кладки ≈ 9,6 см. Например, <b>18 рядов = 1,73 м</b> кирпича. Фундамент добавляет ~10 см, поэтому «от земли» выходит <b>1,83 м</b>.</span>
+        <span>1 ряд кладки = 9,6 см. Например, <b>19 рядов = 1,82 м</b> кирпича. Это высота кладки столба; фундамент и его высота считаются отдельным шагом.</span>
       </div>
     </div>
 
@@ -1564,7 +1559,7 @@ button { font-family: inherit; cursor: pointer; }
 // ── State ──────────────────────────────────────────────
 const state = {
   fenceSide: null,
-  length: '', height: '', heightFrom: 'ground', heightRows: 18,
+  length: '', height: '', heightRows: 19,
   heightSide: '',
   ground: null,
   gatePlanned: false, gateOn: false, gateWidth: '', gateType: null, gateAuto: false,
@@ -1796,7 +1791,7 @@ function submitQuiz(advance) {
 
   var heightLine = isSide
     ? '▪ Высота: ' + (state.heightSide||'—') + ' м\n'
-    : '▪ Высота: ' + (state.height||'—') + ' м (' + state.heightRows + ' рядов, ' + (state.heightFrom==='foundation'?'от фундамента':'от земли') + ')\n';
+    : '▪ Высота: ' + (state.height||'—') + ' м (' + state.heightRows + ' рядов)\n';
 
   var styleLine = isSide
     ? '▪ Тип забора: ' + (sideStyleMap[state.sideStyle]||'—') + '\n'
@@ -1899,8 +1894,7 @@ function selectGridCard(el) {
 }
 
 // ── Height wheel (rows of brick) ───────────────────────
-const ROW_M        = 1.73 / 18;   // ≈ 0.0961 м на 1 ряд кладки
-const FOUNDATION_M = 0.10;        // фундамент выступает над землёй
+const ROW_M = 0.096;   // 1 ряд кладки = 9,6 см (норматив Dianast)
 const MIN_ROWS = 10, MAX_ROWS = 30, ITEM_H = 40;
 
 function buildWheel() {
@@ -1943,8 +1937,7 @@ function snapToRows(rows) {
 
 function renderHeight() {
   const rows  = state.heightRows;
-  const brick = rows * ROW_M;
-  const meters = state.heightFrom === 'ground' ? brick + FOUNDATION_M : brick;
+  const meters = rows * ROW_M;
   state.height = meters.toFixed(2);
 
   const mEl = document.getElementById('hrMeters');
@@ -1956,13 +1949,6 @@ function renderHeight() {
     it.classList.toggle('active', parseInt(it.dataset.rows, 10) === rows);
   });
   updateNav();
-}
-
-function setHeightFrom(val, el) {
-  state.heightFrom = val;
-  document.querySelectorAll('#heightFrom .seg-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderHeight();
 }
 
 // ── Height in meters (боковая ветка) ───────────────────

@@ -80,9 +80,9 @@ footer a{color:rgba(255,255,255,0.75)}
 
 <header>
   <a href="/" class="logo" aria-label="Dianast — главная страница">
-    <img width="400" height="400" src="/assets/img/portfolio-1.webp" alt="Dianast — колотый кирпич" style="height:52px;width:52px">
+    <img src="/assets/img/logo-header.png" alt="Dianast" width="40" height="40" style="display:block;border-radius:8px">
   </a>
-  <a href="tel:+375297974362" class="header-phone">+375 29 797-43-62</a>
+  <a href="/quiz" class="hdr-cta">Рассчитать забор</a><a href="tel:+375297974362" class="header-phone">+375 29 797-43-62</a>
 </header>
 
 <div class="hero">
@@ -162,5 +162,44 @@ document.addEventListener('click',function(e){
 });
 </script>
 
+<!-- Стандарт Dianast: фикс-шапка + CTA, кнопки Viber/звонок, стрелка наверх -->
+<style>
+header{position:fixed;top:0;left:0;right:0;z-index:1000}
+body{padding-top:72px}
+.hdr-cta{background:#E8600A;color:#fff !important;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;padding:10px 18px;border-radius:8px;white-space:nowrap;text-decoration:none !important;margin-left:auto;margin-right:14px}
+.hdr-cta:hover{background:#c94f06;text-decoration:none}
+@media(max-width:620px){.header-phone{display:none}.hdr-cta{margin-right:0}}
+.viber-float{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;align-items:center;gap:8px}
+.viber-wrap,.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.viber-label,.phone-label{background:rgba(0,0,0,0.75);color:#fff;font-family:Montserrat,sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all .2s}
+.viber-wrap:hover .viber-label,.phone-wrap:hover .phone-label{opacity:1;transform:translateY(0)}
+.viber-btn{width:60px;height:60px;border-radius:50%;background:#1A1A1A;box-shadow:0 4px 20px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.viber-btn:hover{transform:scale(1.1)}
+.viber-btn svg{width:32px;height:32px;fill:#F5C400}
+.phone-float{width:60px;height:60px;border-radius:50%;background:#E8600A;box-shadow:0 4px 20px rgba(232,96,10,.45);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.phone-float:hover{transform:scale(1.1)}
+.phone-float svg{width:26px;height:26px;fill:#fff}
+</style>
+<div class="viber-float">
+  <div class="viber-wrap">
+    <div class="viber-label">Написать в Viber</div>
+    <a href="viber://chat?number=%2B375297974362" class="viber-btn" aria-label="Написать в Viber" onclick="if(typeof ym==='function')ym(110181067,'reachGoal','viber_click')">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.82 2 3 7.37 3 14c0 3.54 1.55 6.73 4.04 9.01L6 28l5.23-1.37C12.7 27.17 14.32 27.5 16 27.5c7.18 0 13-5.37 13-12S23.18 2 16 2zm5.5 16.5c-.28.78-1.64 1.5-2.28 1.56-.58.05-1.14.23-3.83-.8-3.24-1.25-5.32-4.55-5.48-4.76-.16-.21-1.3-1.73-1.3-3.3s.82-2.34 1.12-2.66c.28-.3.62-.38.83-.38.2 0 .41 0 .58.01.2.01.46-.07.72.55.27.64.93 2.27.1 2.46.09.19-.06.41-.19.58-.13.17-.27.38-.39.5-.13.13-.26.28-.11.54.15.26.66 1.09 1.42 1.76.98.87 1.8 1.14 2.06 1.27.26.13.41.11.57-.07.16-.18.67-.78.85-1.05.18-.27.36-.22.6-.13.25.09 1.56.74 1.83.87.26.13.44.2.5.31.07.11.07.64-.21 1.42z"/></svg>
+  </a>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-label">Позвонить</div>
+    <a href="tel:+375297974362" class="phone-float" aria-label="Позвонить">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+  </a>
+  </div>
+</div>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:196px;right:36px;width:44px;height:44px;border-radius:50%;background:#1a1a1a;color:white;border:none;cursor:pointer;z-index:900;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-size:20px" aria-label="Наверх">↑</button>
+<script>
+(function(){
+  function upd(){var b=document.getElementById('back-to-top');if(!b)return;var s=window.pageYOffset||document.documentElement.scrollTop||0;b.style.display=s>400?'flex':'none';}
+  window.addEventListener('scroll',upd,{passive:true});window.addEventListener('touchmove',upd,{passive:true});
+})();
+</script>
 </body>
 </html>

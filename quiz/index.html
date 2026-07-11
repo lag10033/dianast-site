@@ -1104,7 +1104,7 @@ button { font-family: inherit; cursor: pointer; }
 
       <div class="info-note">
         <span>💡</span>
-        <span>1 ряд кладки ≈ 9,6 см. Например, <b>18 рядов = 1,73 м</b> кирпича. Фундамент добавляет ~10 см, поэтому «от земли» выходит <b>1,83 м</b>.</span>
+        <span id="hrHint">1 ряд кладки = 9,6 см. Ваш выбор: <b>18 рядов = 1,73 м</b> кирпича. Фундамент не учитываем (+0 см).</span>
       </div>
     </div>
 
@@ -1956,6 +1956,14 @@ function renderHeight() {
   if (bEl) bEl.textContent = state.heightFrom === 'ground'
     ? 'кладка ' + brick.toFixed(2).replace('.', ',') + ' м + фундамент 0,10 м'
     : 'чистая кладка, без фундамента';
+  const hEl = document.getElementById('hrHint');
+  if (hEl) {
+    const bM = brick.toFixed(2).replace('.', ',');
+    const gM = (brick + FOUNDATION_M).toFixed(2).replace('.', ',');
+    hEl.innerHTML = state.heightFrom === 'ground'
+      ? '1 ряд кладки = 9,6 см. Ваш выбор: <b>' + rows + ' рядов = ' + bM + ' м</b> кирпича + фундамент ~10 см — высота столба «от земли» <b>' + gM + ' м</b>.'
+      : '1 ряд кладки = 9,6 см. Ваш выбор: <b>' + rows + ' рядов = ' + bM + ' м</b> кирпича. Фундамент не учитываем (+0 см).';
+  }
 
   document.querySelectorAll('#wheelScroll .wheel-item').forEach(function (it) {
     it.classList.toggle('active', parseInt(it.dataset.rows, 10) === rows);

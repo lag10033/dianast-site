@@ -2232,10 +2232,10 @@ function ckSideSpec(s, gw, ww, add){
     var posts2=ckCe(s.len/t.sp)+1, spans2=ckCe(fillLen/t.sp), rows=Math.round(s.h/ROW_M);
     var isBrick = s.type==='brick';
     if(isBrick){
-      var ang=ckCe(posts2*rows*4*1.03);
+      var ang=ckCe(posts2*rows*4)+posts2*3;           // запас углового — 3 шт на столб (Андрей 20.07), не процент
       add('Кирпич угловой Dianast', posts2+' столбов × '+rows+' ряд. = '+ang+' шт', ang*CK_P.brickAng);
       var rowsFill = s.fill==='brickfill' ? rows : 3;
-      var rowBr=ckCe(fillLen*4*rowsFill*1.03);
+      var rowBr=ckCe(fillLen*4*rowsFill)+20;           // запас рядового — +20 шт на весь забор (Андрей 20.07)
       add('Кирпич рядовой ('+(s.fill==='brickfill'?'весь пролёт':'продлёнка 3 ряда')+')', rowBr+' шт', rowBr*CK_P.brickRow);
       add('Крышка столба метал.', posts2+' шт', posts2*CK_P.capBrick);
     } else {
@@ -2267,7 +2267,7 @@ function ckSideSpec(s, gw, ww, add){
     if(isBrick){
       var core=posts2*(s.h+1);
       add('Столб метал. 60×40 (сердечник)', posts2+' шт × '+(s.h+1).toFixed(1)+' м = '+core.toFixed(1)+' м', core*CK_P.post60);
-      var totBr=ckCe(posts2*rows*4*1.03)+ckCe(fillLen*4*(s.fill==='brickfill'?rows:3)*1.03);
+      var totBr=(ckCe(posts2*rows*4)+posts2*3)+(ckCe(fillLen*4*(s.fill==='brickfill'?rows:3))+20);   // тот же штучный запас, что и выше
       add('Клей-пена (1 балл./288 кирп.)', ckCe(totBr/288)+' балл.', ckCe(totBr/288)*CK_P.glue);
       add('Расходники', '~'+ckRu(s.len*CK_P.consM)+' р', s.len*CK_P.consM);
     }

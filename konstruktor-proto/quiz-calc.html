@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Прототип — квиз + калькулятор с живой ценой</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#E8600A;--dark:#1a1a1a;--mid:#6b6b6b;--light:#f4f0eb;--border:#E8E3DC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#faf8f5}
+.app{max-width:640px;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+.top{background:var(--dark);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between}
+.top .logo{font-family:Montserrat,sans-serif;font-weight:800;font-size:18px}
+.top .badge{font-size:12px;color:rgba(255,255,255,.7)}
+.pbar{height:4px;background:var(--light)}
+.pfill{height:100%;background:var(--orange);width:0;transition:width .3s}
+.body{flex:1;padding:28px 22px}
+.step{display:none}
+.step.active{display:block;animation:in .28s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.q{font-family:Montserrat,sans-serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.qs{color:var(--mid);font-size:14px;margin-bottom:22px}
+.cards{display:grid;gap:12px}
+.cards.two{grid-template-columns:1fr 1fr}
+.card{border:2px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;font-size:15px;font-weight:600;transition:.15s;background:#fff;text-align:left}
+.card:hover{border-color:var(--orange)}
+.card.sel{border-color:var(--orange);background:#fff6f0}
+.card small{display:block;font-weight:400;color:var(--mid);font-size:12px;margin-top:4px}
+.field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.field input{flex:1;border:none;outline:none;padding:14px 16px;font-size:16px;background:transparent;width:0}
+.field .u{padding:14px;background:var(--light);font-size:13px;color:var(--mid)}
+.toggle{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;cursor:pointer}
+.toggle.on{border-color:var(--orange);background:#fff6f0}
+.sw{width:44px;height:26px;border-radius:20px;background:#ccc;position:relative;transition:.2s;flex:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on .sw{background:var(--orange)}
+.toggle.on .sw::after{left:21px}
+.nav{display:flex;gap:12px;padding:18px 22px;border-top:1px solid var(--border)}
+.btn{flex:1;padding:15px;border-radius:10px;border:none;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer}
+.btn-back{background:var(--light);color:var(--dark);flex:0 0 90px}
+.btn-next{background:var(--orange);color:#fff}
+.btn-next:disabled{opacity:.4;cursor:not-allowed}
+/* Calculator */
+#calc{display:none}
+#calc.active{display:block}
+.price-hero{background:var(--dark);color:#fff;border-radius:16px;padding:24px;margin-bottom:20px;position:sticky;top:10px;z-index:5}
+.price-hero .lbl{font-size:13px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em}
+.price-hero .val{font-family:Montserrat,sans-serif;font-weight:800;font-size:34px;color:#FF6B35;margin-top:4px;transition:color .15s}
+.price-hero .val.flash{color:#fff}
+.price-hero .range{font-size:13px;color:rgba(255,255,255,.55);margin-top:2px}
+.ctrl{margin-bottom:18px}
+.ctrl .clab{display:flex;justify-content:space-between;font-size:13px;color:var(--mid);margin-bottom:8px}
+.ctrl .clab b{color:var(--dark);font-family:Montserrat,sans-serif}
+input[type=range]{width:100%;accent-color:var(--orange)}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1.5px solid var(--border);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;background:#fff}
+.pill.sel{border-color:var(--orange);background:var(--orange);color:#fff}
+.spec{background:var(--light);border-radius:14px;padding:20px;margin:20px 0}
+.spec h3{font-family:Montserrat,sans-serif;font-size:14px;margin-bottom:14px}
+.sr{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.sr .n{color:var(--mid)}
+.sr .v{font-weight:600;font-family:Montserrat,sans-serif}
+.sr .p{color:var(--mid);font-size:12px;margin-left:8px;min-width:70px;text-align:right;display:inline-block}
+.note{font-size:12px;color:var(--mid);line-height:1.6;margin-top:10px}
+.lead{border-top:1px solid var(--border);margin-top:20px;padding-top:20px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><span class="logo">Dianast</span><span class="badge" id="badge">Шаг 1 из 6</span></div>
+  <div class="pbar"><div class="pfill" id="pfill"></div></div>
+
+  <div class="body" id="quizBody">
+    <div class="step active" data-step="side">
+      <div class="q">Какая сторона забора?</div>
+      <div class="qs">Подберём материал под задачу</div>
+      <div class="cards two">
+        <div class="card" onclick="pick('side','face',this)">Лицевая<small>на улицу, престиж</small></div>
+        <div class="card" onclick="pick('side','side',this)">Боковая / задняя<small>эконом</small></div>
+      </div>
+    </div>
+
+    <div class="step" data-step="type">
+      <div class="q">Тип забора</div>
+      <div class="qs" id="typeHint">Можно поменять потом в калькуляторе</div>
+      <div class="cards">
+        <div class="card" onclick="pick('type','profnastil',this)">Профнастил<small>эконом, быстро</small></div>
+        <div class="card" onclick="pick('type','shtaketnik',this)">Металлоштакетник<small>продувается, аккуратно</small></div>
+        <div class="card" onclick="pick('type','3d',this)">3D-сетка<small>дёшево, для периметра</small></div>
+        <div class="card" onclick="pick('type','rancho',this)">Ранчо<small>горизонтальные планки</small></div>
+        <div class="card" onclick="pick('type','zhaluzi',this)">Жалюзи<small>премиум-вид</small></div>
+      </div>
+    </div>
+
+    <div class="step" data-step="len">
+      <div class="q">Длина забора</div>
+      <div class="qs">Не знаете точно — примерно, уточним при звонке</div>
+      <div class="field"><input type="number" id="i-len" value="30" min="1" step="1" oninput="sync()"><span class="u">метров</span></div>
+    </div>
+
+    <div class="step" data-step="h">
+      <div class="q">Высота забора</div>
+      <div class="qs">Обычно 1,8–2,0 м</div>
+      <div class="field"><input type="number" id="i-h" value="2.0" min="0.5" max="3" step="0.1" oninput="sync()"><span class="u">метров</span></div>
+    </div>
+
+    <div class="step" data-step="gate">
+      <div class="q">Ворота</div>
+      <div class="qs">Нужны ли распашные ворота</div>
+      <div class="toggle on" id="t-gate" onclick="toggle('gate',this)"><span>Нужны ворота</span><span class="sw"></span></div>
+      <div id="gate-w"><div class="field"><input type="number" id="i-gate" value="4" min="0" step="0.5" oninput="sync()"><span class="u">м ширина</span></div></div>
+    </div>
+
+    <div class="step" data-step="wicket">
+      <div class="q">Калитка</div>
+      <div class="qs">Отдельная калитка для прохода</div>
+      <div class="toggle on" id="t-wicket" onclick="toggle('wicket',this)"><span>Нужна калитка</span><span class="sw"></span></div>
+      <div id="wicket-w"><div class="field"><input type="number" id="i-wicket" value="1" min="0" step="0.5" oninput="sync()"><span class="u">м ширина</span></div></div>
+    </div>
+  </div>
+
+  <div class="body" id="calc">
+    <div class="price-hero">
+      <div class="lbl">Ориентировочная стоимость материалов</div>
+      <div class="val" id="price">—</div>
+      <div class="range" id="prange"></div>
+    </div>
+
+    <div class="ctrl">
+      <div class="pills" id="typePills"></div>
+    </div>
+    <div class="ctrl">
+      <div class="clab"><span>Длина забора</span><b><span id="o-len">30</span> м</b></div>
+      <input type="range" id="r-len" min="5" max="100" step="1" value="30" oninput="fromRange()">
+    </div>
+    <div class="ctrl">
+      <div class="clab"><span>Высота забора</span><b><span id="o-h">2.0</span> м</b></div>
+      <input type="range" id="r-h" min="1" max="2.5" step="0.1" value="2.0" oninput="fromRange()">
+    </div>
+    <div class="ctrl">
+      <div class="clab"><span>Ширина ворот (0 — без ворот)</span><b><span id="o-gate">4</span> м</b></div>
+      <input type="range" id="r-gate" min="0" max="6" step="0.5" value="4" oninput="fromRange()">
+    </div>
+    <div class="ctrl">
+      <div class="clab"><span>Ширина калитки (0 — без)</span><b><span id="o-wicket">1</span> м</b></div>
+      <input type="range" id="r-wicket" min="0" max="2" step="0.5" value="1" oninput="fromRange()">
+    </div>
+    <div class="ctrl" id="brkCtrl">
+      <div class="clab"><span>Кронштейнов на узел</span></div>
+      <div class="pills"><div class="pill sel" data-brk="2" onclick="setBrk(2,this)">2</div><div class="pill" data-brk="1" onclick="setBrk(1,this)">1</div></div>
+    </div>
+    <div class="ctrl" id="shahCtrl" style="display:none">
+      <div class="clab"><span>Штакетник двусторонний (шахматка)</span></div>
+      <div class="pills"><div class="pill" data-shah="1" onclick="setShah(1,this)">Односторонний</div><div class="pill sel" data-shah="0" onclick="setShah(0,this)">Одинарный</div></div>
+    </div>
+
+    <div class="spec">
+      <h3>Спецификация материалов</h3>
+      <div id="specRows"></div>
+    </div>
+    <div class="note" id="calcNote"></div>
+
+    <div class="lead">
+      <div class="q" style="font-size:18px;margin-bottom:6px">Прислать расчёт и точную цену</div>
+      <div class="qs">Менеджер уточнит прайс и при необходимости сделает чертёж фундамента</div>
+      <div class="field"><input type="text" id="i-name" placeholder="Ваше имя"></div>
+      <div class="field"><input type="tel" id="i-phone" placeholder="+375 __ ___-__-__"></div>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <button class="btn btn-back" id="btnBack" onclick="back()" style="display:none">Назад</button>
+    <button class="btn btn-next" id="btnNext" onclick="next()">Далее →</button>
+  </div>
+</div>
+
+<script>
+var STEPS = ['side','type','len','h','gate','wicket'];
+var state = { side:null, type:null, len:30, h:2.0, gateOn:true, gate:4, wicketOn:true, wicket:1, brk:2, shah:0 };
+var idx = 0, inCalc = false;
+
+var TYPES = {
+  profnastil:{name:'Профнастил', spacing:2.7, depth:1.1, post:'61×35×1,2', lag:'31×31×1,0', lags:2, hasLag:true},
+  shtaketnik:{name:'Штакетник', spacing:2.7, depth:1.1, post:'61×35×1,2', lag:'31×31×1,0', lags:2, hasLag:true},
+  '3d':{name:'3D-сетка', spacing:2.53, depth:1.0, post:'60×40×1,5', lags:0, hasLag:false},
+  rancho:{name:'Ранчо', spacing:2.0, depth:1.1, post:'60×40×2', lags:0, hasLag:false},
+  zhaluzi:{name:'Жалюзи', spacing:2.0, depth:1.1, post:'60×40×2', lags:0, hasLag:false}
+};
+var P = { postM:6, lagM:3, proflistM2:13, shtaketM:2.2, panel3d:45, ranchoM:3, zhaluziM:4,
+  screw:0.06, bracket:1.5, homut:2, cap:0.5, concrete:140, gate:3200, wicket:600, guideM:3 };
+
+function ceil(x){ return Math.ceil(x - 1e-9); }
+function ru(x,d){ return Number(x.toFixed(d===undefined?0:d)).toLocaleString('ru-RU'); }
+
+function pick(key,val,el){
+  state[key]=val;
+  el.parentNode.querySelectorAll('.card').forEach(function(c){c.classList.remove('sel')});
+  el.classList.add('sel');
+  updateNav();
+}
+function toggle(key,el){
+  var on = !el.classList.contains('on');
+  el.classList.toggle('on',on);
+  state[key+'On']=on;
+  document.getElementById(key+'-w').style.display = on ? 'block' : 'none';
+  updateNav();
+}
+function sync(){
+  state.len=parseFloat(document.getElementById('i-len').value)||0;
+  state.h=parseFloat(document.getElementById('i-h').value)||0;
+  state.gate=parseFloat(document.getElementById('i-gate').value)||0;
+  state.wicket=parseFloat(document.getElementById('i-wicket').value)||0;
+  updateNav();
+}
+function canGo(){
+  var s=STEPS[idx];
+  if(s==='side') return !!state.side;
+  if(s==='type') return !!state.type;
+  if(s==='len') return state.len>0;
+  if(s==='h') return state.h>0;
+  return true;
+}
+function updateNav(){
+  document.getElementById('btnNext').disabled = !inCalc && !canGo();
+}
+function showStep(){
+  document.querySelectorAll('#quizBody .step').forEach(function(el){el.classList.remove('active')});
+  document.querySelector('[data-step="'+STEPS[idx]+'"]').classList.add('active');
+  document.getElementById('badge').textContent='Шаг '+(idx+1)+' из '+STEPS.length;
+  document.getElementById('pfill').style.width=(idx/(STEPS.length))*100+'%';
+  document.getElementById('btnBack').style.display = idx>0 ? 'block':'none';
+  document.getElementById('btnNext').textContent='Далее →';
+  updateNav();
+}
+function next(){
+  if(inCalc) return;
+  if(!canGo()) return;
+  if(idx < STEPS.length-1){ idx++; showStep(); }
+  else openCalc();
+}
+function back(){
+  if(inCalc){ inCalc=false; document.getElementById('calc').classList.remove('active');
+    document.getElementById('quizBody').style.display='block'; showStep(); return; }
+  if(idx>0){ idx--; showStep(); }
+}
+function openCalc(){
+  inCalc=true;
+  document.getElementById('quizBody').style.display='none';
+  document.getElementById('calc').classList.add('active');
+  document.getElementById('badge').textContent='Калькулятор';
+  document.getElementById('pfill').style.width='100%';
+  document.getElementById('btnNext').style.display='none';
+  document.getElementById('btnBack').style.display='block';
+  // seed controls from quiz
+  document.getElementById('r-len').value=state.len;
+  document.getElementById('r-h').value=state.h;
+  document.getElementById('r-gate').value=state.gateOn?state.gate:0;
+  document.getElementById('r-wicket').value=state.wicketOn?state.wicket:0;
+  renderTypePills();
+  fromRange();
+}
+function renderTypePills(){
+  var html='';
+  for(var k in TYPES){ html+='<div class="pill'+(k===state.type?' sel':'')+'" data-type="'+k+'" onclick="setType(\''+k+'\',this)">'+TYPES[k].name+'</div>'; }
+  document.getElementById('typePills').innerHTML=html;
+}
+function setType(k,el){ state.type=k; el.parentNode.querySelectorAll('.pill').forEach(function(p){p.classList.remove('sel')}); el.classList.add('sel'); compute(); }
+function setBrk(v,el){ state.brk=v; el.parentNode.querySelectorAll('.pill').forEach(function(p){p.classList.remove('sel')}); el.classList.add('sel'); compute(); }
+function setShah(v,el){ state.shah=v; el.parentNode.querySelectorAll('.pill').forEach(function(p){p.classList.remove('sel')}); el.classList.add('sel'); compute(); }
+function fromRange(){
+  state.len=parseFloat(document.getElementById('r-len').value);
+  state.h=parseFloat(document.getElementById('r-h').value);
+  state.gate=parseFloat(document.getElementById('r-gate').value);
+  state.wicket=parseFloat(document.getElementById('r-wicket').value);
+  document.getElementById('o-len').textContent=state.len;
+  document.getElementById('o-h').textContent=state.h.toFixed(1);
+  document.getElementById('o-gate').textContent=state.gate;
+  document.getElementById('o-wicket').textContent=state.wicket;
+  compute();
+}
+function compute(){
+  var t=TYPES[state.type]; if(!t) return;
+  document.getElementById('brkCtrl').style.display = t.hasLag ? 'block':'none';
+  document.getElementById('shahCtrl').style.display = state.type==='shtaketnik' ? 'block':'none';
+
+  var len=state.len, h=state.h, gate=state.gate, wicket=state.wicket;
+  var spans=ceil(len/t.spacing), posts=spans+1;
+  var postLen=h+t.depth, postPipeM=posts*postLen;
+  var fillLen=Math.max(0,len-gate-wicket);
+  var holes=posts, concrete=holes*0.08, caps=posts;
+
+  var items=[]; var total=0;
+  function add(n,q,u,price){ items.push({n:n,q:q,u:u,p:price}); total+=price; }
+
+  add('Столбы ('+t.post+')', posts, 'шт', 0);
+  add('Труба на столбы', ru(postPipeM,1), 'м', postPipeM*P.postM);
+  add('Заглушки', caps, 'шт', caps*P.cap);
+  add('Лунки + бетон', ru(concrete,2)+' м³', '', concrete*P.concrete);
+
+  if(t.hasLag){
+    var lagM=t.lags*fillLen; add('Лаги ('+t.lags+' ряда, '+t.lag+')', ru(lagM,1), 'м', lagM*P.lagM);
+    var brackets=t.lags*posts*state.brk; add('Кронштейны', brackets, 'шт', brackets*P.bracket);
+  }
+
+  if(state.type==='profnastil'){
+    var sheets=ceil(fillLen/1.05); var screws=sheets*20;
+    add('Профлист С20', sheets, 'шт ('+ru(sheets*1.05*h,1)+' м²)', sheets*1.05*h*P.proflistM2);
+    add('Саморезы', screws, 'шт', screws*P.screw);
+  } else if(state.type==='shtaketnik'){
+    var perM=1000/(115+55); var mult=state.shah?2:1;
+    var st=ceil(fillLen*perM*mult); var sc=st*4;
+    add('Штакетины (115, зазор 55'+(state.shah?', шахматка':'')+')', st, 'шт', st*h*P.shtaketM);
+    add('Саморезы', sc, 'шт', sc*P.screw);
+  } else if(state.type==='3d'){
+    var panels=ceil(fillLen/2.5); var hom=posts*4;
+    add('Панель 3D', panels, 'шт', panels*P.panel3d);
+    add('Хомуты', hom, 'шт', hom*P.homut);
+  } else if(state.type==='rancho'){
+    var rows=ceil(h*1000/240); var plankM=rows*fillLen; var cross=rows*posts; var sc2=cross*4;
+    add('Планка ранчо (просвет 120)', ru(plankM,1)+' м', '('+rows+' ряда)', plankM*P.ranchoM);
+    add('Саморезы', sc2, 'шт', sc2*P.screw);
+  } else if(state.type==='zhaluzi'){
+    var lam=ceil(h*1000/155); var lamM=lam*fillLen; var guides=2*spans;
+    add('Ламели (шаг 155)', ru(lamM,1)+' м', '('+lam+' по высоте)', lamM*P.zhaluziM);
+    add('Направляющие', ru(guides*h,1)+' м', '', guides*h*P.guideM);
+    add('Саморезы', lam*2, 'шт', lam*2*P.screw);
+  }
+
+  if(gate>0) add('Ворота распашные', 1, 'компл. ('+gate+' м)', P.gate);
+  if(wicket>0) add('Калитка', 1, 'компл. ('+wicket+' м)', P.wicket);
+
+  var html='';
+  items.forEach(function(it){
+    html+='<div class="sr"><span class="n">'+it.n+'</span><span><span class="v">'+it.q+' '+it.u+'</span><span class="p">'+(it.p>0?ru(it.p)+' р':'')+'</span></span></div>';
+  });
+  document.getElementById('specRows').innerHTML=html;
+
+  var el=document.getElementById('price');
+  el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},120);
+  el.textContent=ru(total)+' руб';
+  document.getElementById('prange').textContent='вилка: '+ru(total*0.92)+' – '+ru(total*1.12)+' руб (цены материалов ориентировочные)';
+  document.getElementById('calcNote').innerHTML='Тип: <b>'+t.name+'</b>. Пролёт ≤ '+t.spacing+' м, столбов '+posts+'. Заполнение по длине без ворот и калитки ('+ru(fillLen,1)+' м). Цены материалов — ориентир по рынку РБ; ворота ≈'+P.gate+' р (подтверждено). Заменим на прайсы Dianast.';
+}
+showStep();
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Прототип — калькулятор профнастила (движок)</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#E8600A;--dark:#1a1a1a;--mid:#6b6b6b;--light:#f4f0eb;--border:#E8E3DC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--dark);background:#fff}
+header{background:var(--dark);padding:14px 5%;color:#fff;font-family:Montserrat,sans-serif;font-weight:800;font-size:18px}
+.wrap{max-width:780px;margin:0 auto;padding:32px 5%}
+h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--mid);font-size:14px;margin-bottom:24px}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.card h2{font-family:Montserrat,sans-serif;font-size:16px;font-weight:700;margin-bottom:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.field input,.field select{flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent;width:0}
+.field .u{padding:10px 12px;background:var(--light);font-size:12px;color:var(--mid);border-left:1px solid var(--border)}
+.result{background:var(--dark);color:#fff;border-radius:14px;padding:28px;margin-bottom:12px}
+.result h2{font-family:Montserrat,sans-serif;font-size:16px;margin-bottom:20px;color:rgba(255,255,255,.9)}
+.spec{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.spec .n{color:rgba(255,255,255,.65)}
+.spec .v{font-family:Montserrat,sans-serif;font-weight:700;color:#fff}
+.spec .u{color:rgba(255,255,255,.45);font-weight:400;font-size:12px;margin-left:5px}
+.grpline{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#FF8A4C;margin:18px 0 4px}
+.grpline:first-child{margin-top:0}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.15)}
+.total .v{font-family:Montserrat,sans-serif;font-weight:800;font-size:24px;color:#FF6B35}
+.note{font-size:12px;color:var(--mid);line-height:1.6;background:var(--light);border-radius:10px;padding:14px 16px}
+@media(max-width:560px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>Dianast — прототип движка (профнастил)</header>
+<div class="wrap">
+  <h1>Калькулятор профнастила — спецификация до самореза</h1>
+  <p class="sub">Тестовая страница для проверки расчёта. Цифры пересчитываются на лету. Нормативы — по данным Андрея от 07.07.</p>
+
+  <div class="card">
+    <h2>Параметры забора</h2>
+    <div class="row2">
+      <div><label>Длина забора</label><div class="field"><input type="number" id="len" value="30" min="1" step="1" oninput="calc()"><span class="u">м</span></div></div>
+      <div><label>Высота забора</label><div class="field"><input type="number" id="h" value="2.0" min="0.5" step="0.1" oninput="calc()"><span class="u">м</span></div></div>
+    </div>
+    <div class="row2">
+      <div><label>Ширина ворот</label><div class="field"><input type="number" id="gate" value="4" min="0" step="0.5" oninput="calc()"><span class="u">м</span></div></div>
+      <div><label>Ширина калитки</label><div class="field"><input type="number" id="wicket" value="1" min="0" step="0.5" oninput="calc()"><span class="u">м</span></div></div>
+    </div>
+    <div class="row2">
+      <div><label>Кронштейнов на узел</label><div class="field"><select id="brk" onchange="calc()"><option value="2">2 (по умолчанию)</option><option value="1">1</option></select></div></div>
+      <div><label>Марка бетона</label><div class="field"><input type="text" id="conc" value="М200" oninput="calc()"></div></div>
+    </div>
+  </div>
+
+  <div class="result" id="res"></div>
+
+  <div class="note" id="assump"></div>
+</div>
+
+<script>
+var C = {
+  spacingMax: 2.7, postDepth: 1.1,
+  postPipe: '61×35×1,2', lagPipe: '31×31×1,0', lagRows: 2,
+  sheetW: 1.05, sheetMark: 'С20', screwsPerSheet: 20,
+  holeD: 300, holeDepth: 1.1, concretePerHole: 0.08,
+  gatePrice: 3200
+};
+function ceil(x){ return Math.ceil(x - 1e-9); }
+function fmt(x, d){ return Number(x.toFixed(d===undefined?2:d)).toLocaleString('ru-RU'); }
+
+function calc(){
+  var len    = parseFloat(document.getElementById('len').value)    || 0;
+  var h      = parseFloat(document.getElementById('h').value)      || 0;
+  var gate   = parseFloat(document.getElementById('gate').value)   || 0;
+  var wicket = parseFloat(document.getElementById('wicket').value) || 0;
+  var brk    = parseInt(document.getElementById('brk').value)      || 2;
+  var conc   = document.getElementById('conc').value || 'М200';
+
+  var spans = ceil(len / C.spacingMax);
+  var posts = spans + 1;
+  var postLen = h + C.postDepth;
+  var postPipeM = posts * postLen;
+
+  var fillLen = Math.max(0, len - gate - wicket);
+  var lagM = C.lagRows * fillLen;
+  var brackets = C.lagRows * posts * brk;
+
+  var sheets = ceil(fillLen / C.sheetW);
+  var sheetArea = sheets * C.sheetW * h;
+  var screws = sheets * C.screwsPerSheet;
+
+  var holes = posts;
+  var concreteM3 = holes * C.concretePerHole;
+  var caps = posts;
+  var gates = gate > 0 ? 1 : 0;
+  var wickets = wicket > 0 ? 1 : 0;
+
+  var rows = '';
+  rows += '<div class="grpline">Столбы</div>';
+  rows += line('Столбов', posts, 'шт (' + C.postPipe + ')');
+  rows += line('Труба на столбы', fmt(postPipeM,1), 'м (по ' + fmt(postLen,1) + ' м)');
+  rows += line('Заглушки на столбы', caps, 'шт');
+  rows += line('Лунки Ø' + C.holeD, holes, 'шт × ' + fmt(C.holeDepth,1) + ' м');
+  rows += line('Бетон ' + conc, fmt(concreteM3,2), 'м³');
+
+  rows += '<div class="grpline">Каркас пролётов</div>';
+  rows += line('Лаги (' + C.lagRows + ' ряда)', fmt(lagM,1), 'м (' + C.lagPipe + ')');
+  rows += line('Кронштейны', brackets, 'шт (' + brk + '/узел)');
+
+  rows += '<div class="grpline">Заполнение</div>';
+  rows += line('Профлист ' + C.sheetMark, sheets, 'шт (' + fmt(sheetArea,1) + ' м²)');
+  rows += line('Саморезы кровельные', screws, 'шт');
+
+  rows += '<div class="grpline">Ворота и калитка</div>';
+  rows += line('Ворота распашные', gates, gates ? 'комплект (' + fmt(gate,1) + ' м)' : '—');
+  rows += line('Калитка', wickets, wickets ? 'шт (' + fmt(wicket,1) + ' м)' : '—');
+
+  var priceKnown = gates * C.gatePrice;
+  var totalHtml = '<div class="total"><span class="v" style="color:rgba(255,255,255,.7);font-size:15px">Известная цена (ворота)</span><span class="v">' + fmt(priceKnown,0) + ' руб</span></div>';
+
+  document.getElementById('res').innerHTML =
+    '<h2>Спецификация материалов</h2>' + rows + totalHtml;
+
+  document.getElementById('assump').innerHTML =
+    'Допущения движка: пролёт ≤ ' + C.spacingMax + ' м, столбов = пролётов + 1 · заглубление ' + C.postDepth + ' м · лаги и профлист считаются по длине заполнения (длина − ворота − калитка) · бетон ' + C.concretePerHole + ' м³/лунку · без покраски (оцинковка/полимер) · запас 0%. Цены материалов (труба, профлист, бетон) — добавим по прайсам; пока показана только известная цена ворот (≈' + C.gatePrice + ' руб).';
+}
+function line(name, val, unit){
+  return '<div class="spec"><span class="n">' + name + '</span><span class="v">' + val + '<span class="u">' + unit + '</span></span></div>';
+}
+calc();
+</script>
+</body>
+</html>

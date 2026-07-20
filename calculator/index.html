@@ -319,11 +319,15 @@ document.addEventListener('click',function(e){
 
 <!-- Логика калькулятора -->
 <script>
-var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
-var TG_CHAT  = '335993206';
-function tgSend(text){
-  var url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT) + '&text=' + encodeURIComponent(text);
-  fetch(url).catch(function(){});
+// Заявка уходит на сервер CRM: он кладёт её в базу и шлёт в Telegram.
+// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
+var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
+function sendLead(text){
+  fetch(LEAD_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text: text, page: location.pathname})
+  }).catch(function(){});
 }
 
 // Цель calc_used — один раз при первом взаимодействии с калькулятором
@@ -462,7 +466,7 @@ function showCalcResult(){
     '\n— Угловой: ' + angPcs +
     '\n— Рядовой: ' + rowPcs +
     '\n— Итого: ' + total;
-  tgSend(text);
+  sendLead(text);
 }
 calcFence();
 </script>

@@ -1776,8 +1776,9 @@ function goBack() {
 }
 
 // ── Submit ─────────────────────────────────────────────
-var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
-var TG_CHAT  = '335993206';
+// Заявки уходят на сервер CRM: он кладёт их в базу и шлёт в Telegram.
+// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
+var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
 
 function submitQuiz(advance) {
   if(typeof ym==='function'){ym(110181067,'reachGoal','quiz_submit');}
@@ -1836,30 +1837,26 @@ function submitQuiz(advance) {
     + '▪ Фундамент: '  + (state.foundationOn ? ('Да — ' + (foundMap[state.foundationType]||'ригель')) : 'Нет') + '\n'
     + '▪ Калитка: '    + wicketInfo + '\n';
 
-  var tgUrl = 'https://api.telegram.org/bot' + TG_TOKEN
-    + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT)
-    + '&text=' + encodeURIComponent(text);
-
-  // Заявка сразу в CRM (клиент + сделка «Новый лид» на экране «Сегодня»).
-  // Ошибки не блокируют клиента: Telegram и почта остаются резервом.
-  fetch('https://dianast-crm.vercel.app/api/lead', {
+  // Заявка сразу в CRM (клиент + сделка «Новый лид» на экране «Сегодня»),
+  // оттуда же сервер шлёт уведомление в Telegram.
+  // Ошибки не блокируют клиента: почта остаётся резервом.
+  var leadReq = fetch(LEAD_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: state.name,
       phone: state.phone,
       city: state.city,
-      note: text.replace('📋 Новая заявка с квиза\n\n', '')
+      note: text.replace('📋 Новая заявка с квиза\n\n', ''),
+      text: text,
+      page: location.pathname
     })
   }).catch(function(){});
 
   if (advance) {
-    fetch(tgUrl).catch(function(){});
     showStep(stepIdx + 1);
   } else {
-    fetch(tgUrl)
-      .then(function(){ showThankyou(); })
-      .catch(function(){ showThankyou(); });
+    leadReq.then(function(){ showThankyou(); });
   }
 
   var mailLink = document.createElement('a');
@@ -2338,8 +2335,14 @@ function submitFinalSmeta(){
     +'Калитка: '+(ww>0?ww+' м':'нет')+'\n'
     +'Фундамент: '+(state.foundationOn?(state.foundationType==='lenta'?'ленточный':'ригель'):'нет')+'\n'
     +'Итог по калькулятору: '+document.getElementById('ckPrice').textContent;
-  var url='https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage?chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text);
-  fetch(url).then(function(){showThankyou();}).catch(function(){showThankyou();});
+  fetch(LEAD_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:state.name, phone:state.phone, city:state.city,
+      note:text, text:text, page:location.pathname
+    })
+  }).then(function(){showThankyou();}).catch(function(){showThankyou();});
 }
 </script>
 <!-- Yandex.Metrika counter -->

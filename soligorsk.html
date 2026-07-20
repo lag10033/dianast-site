@@ -1210,7 +1210,7 @@ function showCalcResult(){
     '\n\u2014 Угловой: ' + angPcs +
     '\n\u2014 Рядовой: ' + rowPcs +
     '\n\u2014 Итого: ' + total;
-  tgSend(text, function(){}, function(){});
+  sendLead(text, function(){}, function(){});
 }
 function scrollToContact(){
   document.getElementById('contact').scrollIntoView({behavior:'smooth'});
@@ -1221,11 +1221,15 @@ calcHero();
 
 
 <script>
-var TG_TOKEN = 'TELEGRAM-TOKEN-REVOKED';
-var TG_CHAT  = '335993206';
-function tgSend(text, onOk, onErr){
-  var url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + encodeURIComponent(TG_CHAT) + '&text=' + encodeURIComponent(text);
-  fetch(url).then(function(r){ if(r.ok) onOk(); else onErr(); }).catch(onErr);
+// Заявка уходит на сервер CRM: он кладёт её в базу и шлёт в Telegram.
+// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
+var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
+function sendLead(text, onOk, onErr){
+  fetch(LEAD_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text: text, page: location.pathname})
+  }).then(function(r){ if(r.ok) onOk(); else onErr(); }).catch(onErr);
 }
 function sendHeroForm(e){
   e.preventDefault();
@@ -1234,7 +1238,7 @@ function sendHeroForm(e){
   if(phone === '+375'){alert('Введите номер телефона');return;}
   var btn = e.target; btn.disabled = true; btn.textContent = 'Отправляем...';
   var text = '\u{1F4CB} Заявка с главной страницы\n\nИмя: ' + (name||'не указано') + '\nТелефон: ' + phone;
-  tgSend(text, function(){
+  sendLead(text, function(){
     var card = document.querySelector('.hero-card');
     card.innerHTML = '<div style="text-align:center;padding:40px 16px"><div style="font-size:56px;margin-bottom:12px">\u2705</div><h3 style="font-family:Montserrat,sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Заявка отправлена!</h3><p style="color:#777;font-size:14px;line-height:1.6">Мы свяжемся с вами<br>в течение 30 минут</p></div>';
   }, function(){
@@ -1249,7 +1253,7 @@ function sendForm(e){
   if(!name || phone === '+375'){alert('Пожалуйста, заполните имя и телефон.');return;}
   var btn = e.target; btn.disabled = true; btn.textContent = 'Отправляем...';
   var text = '\u{1F4DE} Заявка из формы обратной связи\n\nИмя: ' + name + '\nТелефон: ' + phone;
-  tgSend(text, function(){
+  sendLead(text, function(){
     var form = document.querySelector('.contact-form');
     form.innerHTML = '<div style="text-align:center;padding:48px 16px"><div style="font-size:56px;margin-bottom:12px">\u2705</div><h3 style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Заявка отправлена!</h3><p style="font-size:15px;color:#666;line-height:1.6">Мы свяжемся с вами<br>в течение 30 минут</p></div>';
   }, function(){

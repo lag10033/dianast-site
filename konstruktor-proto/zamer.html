@@ -85,6 +85,30 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
   #ebar,#ecanvas,#eexport,#etoast{display:none !important}
   .noprint{display:none !important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* режим редактора: печатаем СВОЮ компоновку вместо авто-схемы */
+  body.printlayout .wrap{max-width:none;margin:0}   /* иначе холст режется об 960px экранной вёрстки */
+  body.printlayout #render{display:none !important}
+  /* клипует РОДИТЕЛЬ: масштабированный холст визуально влезает, но его нескейленная
+     ширина иначе раздувает лист и Chrome ужимает всю страницу целиком */
+  body.printlayout #step4card{overflow:hidden}
+  body.printlayout #ecanvas{display:block !important;position:relative;
+    height:var(--printh,auto) !important;overflow:visible !important;
+    border:none;border-radius:0;background:none;
+    transform:scale(var(--prints,1));transform-origin:top left}
+  body.printlayout #ecanvas .etools,
+  body.printlayout #ecanvas .rz{display:none !important}
+  body.printlayout #ecanvas .eblk input{border:none;background:transparent;
+    -webkit-appearance:none;appearance:none;font-weight:600}
+  body.printlayout #ecanvas .eblk{box-shadow:none}
+  body.printlayout #ecanvas .eblk.sel{outline:none}   /* выделение — экранная вещь, на бумаге мусор */
+  /* на бумаге важна читаемость: подписи не режем, экранную мелочь убираем */
+  body.printlayout #ecanvas .eblk .en{font-size:9px;line-height:1.1;overflow:visible;text-overflow:clip}
+  body.printlayout #ecanvas .eblk.post .en{display:none}      /* «столб» в 11px блок не влезет никогда */
+  body.printlayout #ecanvas .eblk .emod{display:none}         /* подсказка ≈1×2,98 — для экрана */
+  body.printlayout #ecanvas .eblk .em{font-size:11px;width:auto;max-width:100%;text-align:center;padding:0}
+  body.printlayout #ecanvas .eblk .emu{display:none}          /* «м» — в шапке уже сказано, что метры */
+  body.printlayout #ecanvas .eblk.wicket .em{font-size:9px}   /* калитка ≈1 м — самый узкий блок */
+  body.printlayout #ecanvas .eblk.wicket .en{font-size:7px}
 }
 .fslot{display:flex;flex-direction:column;align-items:center}
 .fslot input{width:100%;border:1.5px solid var(--line);border-radius:7px;padding:9px 6px;font-size:14px;text-align:center;font-family:Inter,sans-serif;outline:none}
@@ -227,7 +251,7 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
       <div class="pnTitle">Примечания (заполните при замере):</div>
       <div class="pline"></div><div class="pline"></div><div class="pline"></div>
     </div>
-    <button class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
+    <button id="printBtn" class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
     <span class="note noprint" style="margin-left:12px">Удобнее заполнить размеры от руки на участке.</span>
   </div>
 </div>
@@ -540,7 +564,7 @@ function renderEditor(){
   if(!ecanvas)return;
   var h='<div class="eruler" id="eruler"></div>';
   EB.blocks.forEach(function(b){ h+=blockHTML(b); });
-  ecanvas.innerHTML=h; drawRuler();
+  ecanvas.innerHTML=h; drawRuler(); updatePrintBtn();   // подпись кнопки печати не должна врать после удаления блоков
 }
 function drawRuler(){
   var el=document.getElementById('eruler'); if(!el)return;
@@ -703,6 +727,36 @@ function enterEditor(){ S.editMode=true; renderEl.classList.add('hidden');
   if(fresh||EB.needFit) relayoutFit(); }
 function exitEditor(){ S.editMode=false; renderEl.classList.remove('hidden');
   ebar.classList.add('hidden'); ecanvas.classList.add('hidden'); }
+
+/* --- печать своей компоновки (в режиме редактора вместо авто-схемы) --- */
+var PRINT_W_PX=1030;   // A4 landscape 297мм минус поля 12мм = 273мм ≈ 1030px при 96dpi
+// по высоте: 210мм минус поля = 186мм ≈ 703px, минус шапка печати, заголовок и «Примечания»
+var PRINT_H_PX=355;
+function beforePrintLayout(){
+  if(!S.editMode||!EB.blocks.length) return;         // не в редакторе — печатается авто-шаблон, как раньше
+  var maxX=0,maxY=0;
+  EB.blocks.forEach(function(b){ maxX=Math.max(maxX,b.x+blockW(b)); maxY=Math.max(maxY,b.y+b.h); });
+  var ruler=document.getElementById('eruler');       // линейка шире блоков — до метра лишку
+  if(ruler) maxX=Math.max(maxX,parseFloat(ruler.style.width)||0);
+  var w=maxX+20, h=maxY+20;
+  // растягиваем на всю ширину листа, а не только ужимаем: иначе размер на бумаге
+  // зависит от случайного зума в редакторе и половина A4 пустует
+  var s=Math.min(PRINT_W_PX/Math.max(w,1), PRINT_H_PX/Math.max(h,1));
+  s=Math.max(0.2,Math.min(2.5,s));
+  document.body.classList.add('printlayout');
+  ecanvas.style.setProperty('--prints',s);
+  ecanvas.style.setProperty('--printh',Math.ceil(h*s)+'px');
+}
+function afterPrintLayout(){
+  document.body.classList.remove('printlayout');
+  if(!ecanvas)return;
+  ecanvas.style.removeProperty('--prints'); ecanvas.style.removeProperty('--printh');
+}
+window.addEventListener('beforeprint',beforePrintLayout);
+window.addEventListener('afterprint',afterPrintLayout);
+// кнопка печати честно говорит, что именно уйдёт на бумагу
+function updatePrintBtn(){ var b=document.getElementById('printBtn'); if(!b)return;
+  b.textContent=(S.editMode&&EB.blocks.length)?'🖨 Распечатать мою компоновку':'🖨 Распечатать / скачать шаблон'; }
 function updateHint(){ var el=document.getElementById('ehint'); if(!el)return;
   el.style.display=EB.dirty?'block':'none'; }
 // Автоподстановка: любое изменение размеров/схемы сразу пересобирает раскладку Шага 5
@@ -812,8 +866,9 @@ function initEditor(){
   btnGroup(document.getElementById('editMode'),
     [{v:'auto',t:'Схема (авто)'},{v:'edit',t:'Редактор (двигать блоки)'}],
     (S.editMode?'edit':'auto'),
-    function(v){ if(v==='edit')enterEditor(); else exitEditor();
+    function(v){ if(v==='edit')enterEditor(); else exitEditor(); updatePrintBtn();
       btnGroup(document.getElementById('editMode'),[{v:'auto',t:'Схема (авто)'},{v:'edit',t:'Редактор (двигать блоки)'}],(S.editMode?'edit':'auto'),arguments.callee); });
+  updatePrintBtn();
   buildEbar(); bindCanvas();
 }
 

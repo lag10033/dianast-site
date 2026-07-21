@@ -1145,6 +1145,18 @@ calcFence();
   </div>
 </section>
 
+<!-- CHAT CTA -->
+<section style="background:#fff;padding:60px 5%">
+  <div style="max-width:800px;margin:0 auto;background:#1a1a1a;border-radius:16px;padding:40px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div style="width:64px;height:64px;border-radius:50%;background:#E8600A;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:26px;color:#fff;flex:none">С</div>
+    <div style="flex:1;min-width:220px">
+      <h2 style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:0 0 6px">Спросите строителя</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:0">Степаныч подскажет по кирпичу, расходу и забору — прямо в чате, без звонков.</p>
+    </div>
+    <button onclick="window.dianastChat&&window.dianastChat.open()" style="background:#E8600A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;padding:14px 28px;border-radius:8px;border:none;cursor:pointer">Открыть чат</button>
+  </div>
+</section>
+
 <!-- FAQ -->
 <section id="faq" style="background:var(--light);padding:80px 5%">
   <div style="max-width:800px;margin:0 auto">
@@ -1410,6 +1422,7 @@ calcHero();
 
 
 <script src="/js/lead.js?v=1"></script>
+<script src="/js/chat.js?v=1" defer></script>
 <script>
 function sendHeroForm(e){
   e.preventDefault();

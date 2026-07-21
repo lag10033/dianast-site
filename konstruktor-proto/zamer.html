@@ -161,6 +161,10 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 #ordBox .ordMsg.ok{display:block;color:#2e7d32}
 #ordBox .ordMsg.err{display:block;color:#b3261e}
 .hp-f{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#brickCard .shareRow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
+#brickCard .shareBtn{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:#4a443a;cursor:pointer;font-family:Inter,sans-serif}
+#brickCard .shareBtn:hover{border-color:var(--orange);color:var(--orange)}
+#brickCard .shareHint{font-size:12px;color:#9a8f7a}
 .eblk.sel{outline:2px solid var(--orange);outline-offset:1px;z-index:60}
 .eblk.span{background:#f4f0eb;border:1px solid #c9bfae;color:#7a6a4e}
 .eblk.gate{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange)}
@@ -298,6 +302,11 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     <div class="step">Шаг 6 · Сколько нужно кирпича</div>
     <div id="brickOut"></div>
     <div class="note" id="brickNote"></div>
+
+    <div class="shareRow">
+      <button type="button" class="shareBtn" id="shareBtn">🔗 Скопировать ссылку на этот расчёт</button>
+      <span class="shareHint">Отправьте клиенту — он откроет готовую раскладку и размеры</span>
+    </div>
 
     <div id="ordBox">
       <div class="ordTitle">Узнать цену и заказать</div>
@@ -1072,6 +1081,84 @@ function initEditor(){
 }
 
 function renderAll(){ renderDims(); renderControls(); renderFence(); updatePrintHead(); editorSyncOnSchema(); renderBrick(); updatePrintBtn(); }
+/* --- Расчёт в ссылке: Андрей скидывает клиенту готовую раскладку одним URL --- */
+// Личных данных в ссылке нет — только размеры. Хэш (#) на сервер не уходит.
+var SHARE_MAX=6000;                                  // длиннее браузеры и мессенджеры режут
+function shareState(){
+  var st={ v:1, side:S.side, sl:S.sideLen, g:S.gates, sc:S.scheme, po:S.pairOrder,
+           pl:S.plotLen, gw:S.gateW.slice(0,2), ww:S.wicketW, u:S.unit, rf:S.ref, sp:S.slope,
+           r:S.rows, hf:S.heightFrom, fr:S.fillRows };
+  if(EB.touched && EB.blocks.length){               // ручную раскладку тоже передаём — она ценнее авто
+    st.b=EB.blocks.map(function(b){ return {i:b.id,t:b.type,x:Math.round(b.x),y:Math.round(b.y),
+      m:(b.m!=null?Math.round(b.m*1000)/1000:null),ms:b.measured?1:0,
+      d:(b.type==='corner'?num(b.deg,90):undefined), tn:(b.type==='corner'?b.turn:undefined),
+      tx:(b.type==='label'?String(b.text||'').slice(0,80):undefined)}; });
+    st.sc2=EB.scale;
+  }
+  return st;
+}
+function encodeShare(o){
+  try{ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/,''); }catch(e){ return ''; }
+}
+function decodeShare(s){
+  try{ return JSON.parse(decodeURIComponent(escape(atob(String(s).replace(/[^A-Za-z0-9+/=]/g,''))))); }catch(e){ return null; }
+}
+// ссылка — недоверенный ввод: чужой URL не должен ни сломать расчёт, ни протащить разметку
+function applyShare(o){
+  if(!o||typeof o!=='object') return false;
+  function pick(v,list,def){ return list.indexOf(v)>=0?v:def; }
+  function pos(v,def,max){ var n=Number(v); return (isFinite(n)&&n>0)?Math.min(n,max||MAXM):def; }
+  S.side=pick(o.side,['straight','corner'],'straight');
+  S.sideLen=(o.sl===0?0:pos(o.sl,15));
+  S.gates=pick(o.g,['one','two'],'one');
+  var ids=SCHEMES[S.gates].map(function(x){return x.id;});
+  S.scheme=pick(o.sc,ids,ids[0]);
+  S.pairOrder=pick(o.po,['gate','wicket'],'gate');
+  S.plotLen=(o.pl==null?null:pos(o.pl,30));
+  S.gateW=[pos(o.gw&&o.gw[0],4.0,20), pos(o.gw&&o.gw[1],4.0,20)];
+  S.wicketW=pos(o.ww,1.0,10);
+  S.unit=pick(o.u,['m','mm'],'m');
+  S.ref=pick(o.rf,['start','center'],'center');
+  S.slope=pick(o.sp,['flat','slope'],'flat');
+  S.rows=Math.max(1,Math.min(60,parseInt(o.r,10)||19));
+  S.heightFrom=pick(o.hf,['foundation','ground'],'foundation');
+  S.fillRows=Math.max(1,Math.min(20,parseInt(o.fr,10)||3));
+  EB.blocks=[]; EB.touched=false;
+  if(Array.isArray(o.b)&&o.b.length&&o.b.length<400){
+    var clean=o.b.map(function(x){ return sanitizeBlock({id:x.i,type:x.t,x:x.x,y:x.y,m:x.m,
+      measured:!!x.ms,deg:x.d,turn:x.tn,text:x.tx}); }).filter(Boolean);
+    if(clean.length){ EB.blocks=clean; EB.touched=true; EB.scale=num(o.sc2,70)||70;
+      var mx=0; EB.blocks.forEach(function(b){ var n=parseInt(String(b.id).replace(/\D/g,''),10); if(n>mx)mx=n; }); EB.uid=mx; }
+  }
+  return true;
+}
+function shareUrl(){
+  var code=encodeShare(shareState());
+  if(!code) return '';
+  var url=location.origin+location.pathname+'#p='+code;
+  if(url.length>SHARE_MAX){                          // не влезла ручная раскладка — шлём хотя бы размеры
+    var st=shareState(); delete st.b; delete st.sc2;
+    url=location.origin+location.pathname+'#p='+encodeShare(st);
+  }
+  return url;
+}
+function copyShare(){
+  var url=shareUrl(); if(!url){ toast('Не удалось собрать ссылку'); return; }
+  var done=function(){ toast('Ссылка скопирована — можно отправить клиенту'); };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,function(){ fallbackCopy(url,done); });
+  else fallbackCopy(url,done);
+}
+function fallbackCopy(text,done){
+  var ta=document.getElementById('eexport'); if(!ta){ toast('Скопируйте вручную: '+text); return; }
+  ta.value=text; ta.style.display='block'; ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('Скопируйте ссылку из поля ниже'); }
+}
+function readShareFromUrl(){
+  var m=(location.hash||'').match(/[#&]p=([^&]+)/); if(!m) return false;
+  var o=decodeShare(m[1]); if(!o) return false;
+  return applyShare(o);
+}
+
 /* --- Заказ: контакт → заявка с расчётом уходит Андрею --- */
 // Цену на странице не считаем и не показываем: её называет Андрей по телефону,
 // вместе с доставкой. В заявку кладём готовый расчёт, чтобы звонок был предметным.
@@ -1131,10 +1218,17 @@ function bindOrder(){
   });
 }
 
+var fromLink=readShareFromUrl();      // расчёт мог прийти ссылкой — применяем до первой отрисовки
 renderAll();
 initEditor();
 bindDims();
 bindOrder();
+(function(){ var b=document.getElementById('shareBtn'); if(b) b.addEventListener('click',copyShare); })();
+if(fromLink){
+  // раскладка из ссылки уже готова — показываем её, а не пересобираем из схемы
+  if(EB.blocks.length){ EB.builtSig=schemaSig(); renderEditor(); totals(); }
+  toast('Открыт расчёт из ссылки');
+}
 </script>
 <script src="/js/lead.js?v=1"></script>
 </body>

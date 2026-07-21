@@ -921,7 +921,7 @@ function calcFence(){
     deliveryCost = totalPal > 0 ? 40 * trips : 0;
   } else {
     var ratePerKm = km <= 160 ? 1.00 : 0.70;
-    deliveryCost = km > 0 ? Math.round(km * ratePerKm * trips * 100) / 100 : 0;
+    deliveryCost = km > 0 ? Math.ceil(km * ratePerKm * trips / 10) * 10 : 0;
   }
   var grandTotal = (ang * 3.40 + row * 3.60 + palCost + deliveryCost).toFixed(2);
 
@@ -1101,11 +1101,11 @@ calcFence();
   <div style="font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:14px">Сколько стоит доставка в Лиду</div>
   <table style="width:100%;border-collapse:collapse;font-size:15px;color:#555">
     <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece6">Расстояние от производства в Кобрине</td><td style="padding:8px 0;border-bottom:1px solid #f0ece6;text-align:right;font-weight:600;color:#1a1a1a;white-space:nowrap">260 км</td></tr>
-    <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece6">Доставка за один рейс</td><td style="padding:8px 0;border-bottom:1px solid #f0ece6;text-align:right;font-weight:600;color:#1a1a1a;white-space:nowrap">182 руб</td></tr>
+    <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece6">Доставка за один рейс</td><td style="padding:8px 0;border-bottom:1px solid #f0ece6;text-align:right;font-weight:600;color:#1a1a1a;white-space:nowrap">190 руб</td></tr>
     <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece6">Входит в рейс</td><td style="padding:8px 0;border-bottom:1px solid #f0ece6;text-align:right;font-weight:600;color:#1a1a1a;white-space:nowrap">3 поддона</td></tr>
     <tr><td style="padding:8px 0">Это до</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1a1a1a">864 угловых или 630 рядовых</td></tr>
   </table>
-  <div style="font-size:13px;color:#7a7268;margin-top:12px">Тариф на этом плече — 0,70 руб/км за рейс, поэтому полная машина всегда выгоднее в пересчёте на кирпич. Точную сумму под ваш объём посчитает калькулятор выше или менеджер по телефону.</div>
+  <div style="font-size:13px;color:#7a7268;margin-top:12px">Тариф на этом плече — 0,70 руб/км за рейс, с округлением до 10 рублей. Полная машина всегда выгоднее в пересчёте на кирпич. Точную сумму под ваш объём посчитает калькулятор выше или менеджер по телефону.</div>
 </div>
 
     <p style="font-size:16px;line-height:1.8;color:#555;margin-bottom:16px">Если вы строите забор в Лиде или Лидском районе, свяжитесь с нами заранее — возможно, в это время будет ещё одна доставка в ваш регион. Угловой и рядовой кирпич доступны в четырёх цветах.</p>

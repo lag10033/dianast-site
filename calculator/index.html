@@ -431,7 +431,7 @@ function calcFence(){
     deliveryCost = totalPal > 0 ? 40 * trips : 0;
   } else {
     var ratePerKm = km <= 160 ? 1.00 : 0.70;
-    deliveryCost = km > 0 ? Math.round(km * ratePerKm * trips * 100) / 100 : 0;
+    deliveryCost = km > 0 ? Math.ceil(km * ratePerKm * trips / 10) * 10 : 0;
   }
   var grandTotal = (ang * 3.40 + row * 3.60 + palCost + deliveryCost).toFixed(2);
 

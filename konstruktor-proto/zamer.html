@@ -294,8 +294,8 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
       <div class="pnTitle">Примечания (заполните при замере):</div>
       <div class="pline"></div><div class="pline"></div><div class="pline"></div>
     </div>
-    <button id="printBtn" class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
-    <span class="note noprint" style="margin-left:12px">Удобнее заполнить размеры от руки на участке.</span>
+    <button id="printBtn" class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Печать / PDF — шаблон замера</button>
+    <span class="note noprint" style="margin-left:12px">Чтобы получить файл — в окне печати выберите «Сохранить как PDF». Удобно отправить клиенту или заполнить от руки на участке.</span>
   </div>
 
   <div class="card noprint" id="brickCard">
@@ -949,7 +949,9 @@ window.addEventListener('afterprint',afterPrintLayout);
 // кнопка печати честно говорит, что именно уйдёт на бумагу
 function updatePrintBtn(){ var b=document.getElementById('printBtn'); if(!b)return;
   var corner=(S.side==='corner'&&S.sideLen>0);       // угловая печатается компоновкой и без редактора
-  b.textContent=((S.editMode&&EB.blocks.length)||corner)?'🖨 Распечатать мою компоновку':'🖨 Распечатать / скачать шаблон'; }
+  b.textContent=((S.editMode&&EB.blocks.length)||corner)
+    ? '🖨 Печать / PDF — моя компоновка'
+    : '🖨 Печать / PDF — шаблон замера'; }
 function updateHint(){ var el=document.getElementById('ehint'); if(!el)return;
   el.style.display=EB.dirty?'block':'none'; }
 // Автоподстановка: любое изменение размеров/схемы сразу пересобирает раскладку Шага 5

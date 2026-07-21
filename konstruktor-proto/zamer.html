@@ -147,6 +147,20 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 #brickCard .brprice{margin-top:14px;padding:12px 14px;background:#f7f3ec;border:1px dashed #d9cdb4;border-radius:9px}
 #brickCard .brlock{font-size:13px;color:#7a6a4e;font-weight:600}
 #brickCard .brempty{color:#9a8f7a;font-size:14px;padding:8px 0}
+#ordBox{margin-top:18px;padding:16px;background:#fff;border:1.5px solid var(--orange);border-radius:12px}
+#ordBox .ordTitle{font-family:Montserrat,sans-serif;font-weight:800;font-size:16px;color:#1a1a1a;margin-bottom:4px}
+#ordBox .ordSub{font-size:12.5px;color:#6b6255;line-height:1.5;margin-bottom:12px}
+#ordBox .ordRow{display:flex;flex-wrap:wrap;gap:8px}
+#ordBox .ordIn{flex:1 1 180px;min-width:0;border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;font-size:14px;font-family:Inter,sans-serif;outline:none}
+#ordBox .ordIn:focus{border-color:var(--orange)}
+#ordBox .ordIn.bad{border-color:#d9534f;background:#fdecea}
+#ordBox .ordBtn{flex:0 0 auto;background:var(--orange);color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:11px 22px;border:none;border-radius:8px;cursor:pointer}
+#ordBox .ordBtn:hover{filter:brightness(.94)}
+#ordBox .ordBtn[disabled]{opacity:.55;cursor:default}
+#ordBox .ordMsg{font-size:13px;margin-top:10px;line-height:1.5;display:none}
+#ordBox .ordMsg.ok{display:block;color:#2e7d32}
+#ordBox .ordMsg.err{display:block;color:#b3261e}
+.hp-f{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .eblk.sel{outline:2px solid var(--orange);outline-offset:1px;z-index:60}
 .eblk.span{background:#f4f0eb;border:1px solid #c9bfae;color:#7a6a4e}
 .eblk.gate{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange)}
@@ -284,6 +298,19 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     <div class="step">Шаг 6 · Сколько нужно кирпича</div>
     <div id="brickOut"></div>
     <div class="note" id="brickNote"></div>
+
+    <div id="ordBox">
+      <div class="ordTitle">Узнать цену и заказать</div>
+      <div class="ordSub">Оставьте Telegram, Viber или телефон — Андрей перезвонит и назовёт точную цену с учётом доставки. Расчёт выше уйдёт вместе с заявкой.</div>
+      <div class="ordRow">
+        <input id="ordName" class="ordIn" placeholder="Имя" autocomplete="name">
+        <input id="ordContact" class="ordIn" placeholder="Telegram, Viber или телефон" autocomplete="tel">
+        <button id="ordBtn" type="button" class="ordBtn">Получить цену</button>
+      </div>
+      <!-- ловушка для ботов: человек это поле не видит и не заполняет -->
+      <input class="hp-f" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div id="ordMsg" class="ordMsg"></div>
+    </div>
   </div>
 </div>
 <div id="etoast" class="noprint"></div>
@@ -708,11 +735,10 @@ function renderBrick(){
   h+=rowHtml('Кирпич рядовой','продлёнка '+c.fill+' ряд.: '+fmt(c.g.spanLen)+' м × '+ROW_PER_M+' × '+c.fill+' + запас '+ROW_SPARE_TOTAL,c.row,'шт');
   h+=rowHtml('Крышки на столбы','по числу столбов',c.caps,'шт');
   h+='<div class="brline brpallet"><div class="brname">Поддоны<span class="brdetail">угловой '+c.palletsAng+' + рядовой '+c.palletsRow+', округление вверх</span></div><div class="brqty">'+(c.palletsAng+c.palletsRow)+' шт</div></div>';
-  // цену на страницу НЕ выводим ни в каком виде — её считает сервер и отдаёт за контакт
-  h+='<div class="brprice"><span class="brlock">🔒 Цена и заявка — на шаге заказа (оставьте Telegram или Viber)</span></div>';
+  // цену на страницу НЕ выводим ни в каком виде — её называет Андрей по телефону (форма заказа ниже)
   out.innerHTML=h;
   var bn=document.getElementById('brickNote');
-  if(bn) bn.textContent='Расчёт по нормативам Dianast: бесшовная кладка, 4 кирпича на п.м продлёнки, запас на бой штуками. Цена актуальна на '+NORMS.date+'.';
+  if(bn) bn.textContent='Расчёт по нормативам Dianast: бесшовная кладка, 4 кирпича на п.м продлёнки, запас на бой штуками. Нормативы на '+NORMS.date+'.';
 }
 
 function refreshNames(){
@@ -1046,9 +1072,70 @@ function initEditor(){
 }
 
 function renderAll(){ renderDims(); renderControls(); renderFence(); updatePrintHead(); editorSyncOnSchema(); renderBrick(); updatePrintBtn(); }
+/* --- Заказ: контакт → заявка с расчётом уходит Андрею --- */
+// Цену на странице не считаем и не показываем: её называет Андрей по телефону,
+// вместе с доставкой. В заявку кладём готовый расчёт, чтобы звонок был предметным.
+function orderText(name, contact){
+  var c=brickCounts(), g=c.g;
+  var corner=(S.side==='corner'&&S.sideLen>0);
+  var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
+  var h=S.rows*ROW_M+(S.heightFrom==='ground'?FOUND_M:0);
+  return [
+    '🧱 Заявка из конструктора забора',
+    '',
+    'Имя: '+(name||'не указано'),
+    'Телефон: '+contact,                        // сервер ищет метки «Имя:» и «Телефон:»
+    '',
+    'Участок: '+(corner
+      ? 'фасад '+fmt(S.plotLen)+' м + боковая '+fmt(S.sideLen)+' м (с поворотом)'
+      : fmt(S.plotLen)+' м (прямой)'),
+    'Схема: '+scObj.nm+' · ворота '+fmt(S.gateW[0]!=null?S.gateW[0]:4)+' м, калитка '+fmt(S.wicketW)+' м',
+    'Высота: '+S.rows+' рядов ≈ '+fmt(h)+' м '+(S.heightFrom==='ground'?'от земли':'от фундамента')+', продлёнка '+c.fill+' ряд.',
+    '',
+    'Нужно кирпича:',
+    '— угловой (столбы): '+c.ang+' шт',
+    '— рядовой (продлёнка): '+c.row+' шт',
+    '— крышки на столбы: '+c.caps+' шт',
+    '— поддоны: '+c.palletsAng+' угл. + '+c.palletsRow+' ряд.',
+    '',
+    'Столбов '+g.posts+', пролётов '+g.spans+', продлёнки '+fmt(g.spanLen)+' м.'
+  ].join('\n');
+}
+function bindOrder(){
+  var btn=document.getElementById('ordBtn'); if(!btn)return;
+  btn.addEventListener('click',function(){
+    var nameEl=document.getElementById('ordName'), cEl=document.getElementById('ordContact'),
+        msg=document.getElementById('ordMsg');
+    var contact=(cEl.value||'').trim();
+    cEl.classList.remove('bad');
+    if(contact.length<3){
+      cEl.classList.add('bad'); msg.className='ordMsg err';
+      msg.textContent='Оставьте Telegram, Viber или телефон — иначе не сможем перезвонить.'; cEl.focus(); return; }
+    if(!S.plotLen||S.plotLen<=0){
+      msg.className='ordMsg err'; msg.textContent='Сначала укажите длину участка на Шаге 2 — иначе нечего считать.'; return; }
+    btn.disabled=true; msg.className='ordMsg'; msg.textContent='Отправляем…';
+    var text=orderText((nameEl.value||'').trim(), contact);
+    function done(okFlag){
+      btn.disabled=false;
+      if(okFlag){
+        msg.className='ordMsg ok';
+        msg.textContent='Заявка принята — расчёт ушёл Андрею. Перезвоним и назовём точную цену с доставкой.';
+        if(typeof ym==='function') ym(110181067,'reachGoal','lead_form');
+      } else {
+        msg.className='ordMsg err';
+        msg.innerHTML='Не удалось отправить. Позвоните напрямую: <a href="tel:+375297974362">+375 29 797-43-62</a>';
+      }
+    }
+    if(typeof sendLead==='function') sendLead(text, function(){done(true);}, function(){done(false);});
+    else done(false);
+  });
+}
+
 renderAll();
 initEditor();
 bindDims();
+bindOrder();
 </script>
+<script src="/js/lead.js?v=1"></script>
 </body>
 </html>

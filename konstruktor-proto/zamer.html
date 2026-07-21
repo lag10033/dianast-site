@@ -137,6 +137,16 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     #fbf9f5}
 .eblk{position:absolute;border-radius:8px;font-size:12px;font-weight:600;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;box-shadow:0 1px 4px #0002;touch-action:none;padding:2px;box-sizing:border-box;min-width:26px}
+.rowsh{font-size:12px;color:var(--mid);white-space:nowrap;padding-left:6px}
+#brickCard .brline{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid #eee6d8}
+#brickCard .brline:last-of-type{border-bottom:none}
+#brickCard .brname{font-size:14px;font-weight:700;color:#3a3a3a}
+#brickCard .brdetail{display:block;font-size:11px;font-weight:400;color:#9a8f7a;margin-top:2px}
+#brickCard .brqty{font-size:15px;font-weight:800;color:#1a1a1a;white-space:nowrap}
+#brickCard .brpallet .brqty{color:#7a6a4e}
+#brickCard .brprice{margin-top:14px;padding:12px 14px;background:#f7f3ec;border:1px dashed #d9cdb4;border-radius:9px}
+#brickCard .brlock{font-size:13px;color:#7a6a4e;font-weight:600}
+#brickCard .brempty{color:#9a8f7a;font-size:14px;padding:8px 0}
 .eblk.sel{outline:2px solid var(--orange);outline-offset:1px;z-index:60}
 .eblk.span{background:#f4f0eb;border:1px solid #c9bfae;color:#7a6a4e}
 .eblk.gate{background:#fdecdf;border:1.5px solid var(--orange);color:var(--orange)}
@@ -212,6 +222,16 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
         <div class="lbl">Ширина калитки</div>
         <div class="inrow"><input class="dimin" id="wicketW" inputmode="decimal"><span class="unitlbl">м</span></div>
       </div>
+      <div class="dimfield">
+        <div class="lbl">Высота столба, рядов кирпича</div>
+        <div class="inrow"><input class="dimin" id="rowsIn" inputmode="numeric" placeholder="19"><span class="rowsh" id="rowsH">≈1,83 м</span></div>
+        <div class="grp" id="heightFrom" style="margin-top:6px"></div>
+      </div>
+      <div class="dimfield">
+        <div class="lbl">Продлёнка (заполнение пролёта), рядов</div>
+        <div class="grp" id="fillRows"></div>
+        <div class="note" style="margin-top:4px">Минимум 3 ряда — иначе нет шахматной перевязки. При высоком заборе делают 4–5.</div>
+      </div>
     </div>
     <div class="note">Эти размеры автоматически расставятся на Шаге 5 — вам останется только двигать расстояния между столбами. Пролёт целимся ≈2,98 м; максимум 3,48 м (с предупреждением).</div>
   </div>
@@ -254,12 +274,29 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
     <button id="printBtn" class="noprint" onclick="window.print()" style="margin-top:16px;background:#1a1a1a;color:#fff;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;padding:12px 24px;border:none;border-radius:8px;cursor:pointer">🖨 Распечатать / скачать шаблон</button>
     <span class="note noprint" style="margin-left:12px">Удобнее заполнить размеры от руки на участке.</span>
   </div>
+
+  <div class="card noprint" id="brickCard">
+    <div class="step">Шаг 6 · Сколько нужно кирпича</div>
+    <div id="brickOut"></div>
+    <div class="note" id="brickNote"></div>
+  </div>
 </div>
 <div id="etoast" class="noprint"></div>
 
 <script>
 var S={ side:'straight', gates:'one', scheme:'A', pairOrder:'gate', ref:'center', slope:'flat',
-        unit:'m', plotLen:30, gateW:[4.0,4.0], wicketW:1.0 };
+        unit:'m', plotLen:30, gateW:[4.0,4.0], wicketW:1.0,
+        rows:19, heightFrom:'foundation', fillRows:3 };
+// Цены и нормативы Dianast — ОДНО место, менять здесь (дата — для подписи «цена актуальна на»)
+// Вместимость поддонов и дата — только для показа КОЛИЧЕСТВА.
+// Цены на страницу НЕ пускаем: сумму считает сервер и отдаёт лишь за контакт (см. кнопку «Заказать»).
+var NORMS={ palletAng:288, palletRow:210, date:'20.07.2026' };
+var ROW_M=1.73/18;                 // 1 ряд кладки ≈ 0,0961 м (та же формула, что в квизе)
+var FOUND_M=0.10;                  // фундамент над землёй ~10 см (для режима «от земли»)
+var ANG_PER_ROW=4;                 // угловых кирпичей в ряду столба
+var ROW_PER_M=4;                   // рядовых кирпичей на погонный метр продлёнки (бесшовно, 250 мм шаг)
+var ANG_SPARE_PER_POST=3;          // запас углового: 3 шт на столб (Андрей 20.07)
+var ROW_SPARE_TOTAL=20;            // запас рядового: +20 шт на весь забор
 function gateCount(){ return S.gates==='two'?2:1; }
 
 // схемы: P=часть, G=ворота, W=калитка, PAIR=ворота+калитка через столб
@@ -346,12 +383,27 @@ function renderDims(){
   }
   var ww=document.getElementById('wicketW'); if(ww && document.activeElement!==ww) ww.value=dispVal(S.wicketW);
   document.querySelectorAll('#dimcard .unitlbl').forEach(function(x){ x.textContent=u; });
+  // высота столба (ряды) + откуда считать
+  var ri=document.getElementById('rowsIn'); if(ri && document.activeElement!==ri) ri.value=S.rows;
+  var rh=document.getElementById('rowsH'); if(rh){ var hm=S.rows*ROW_M+(S.heightFrom==='ground'?FOUND_M:0);
+    rh.textContent='≈'+fmt(hm)+' м'; }
+  var hf=document.getElementById('heightFrom'); if(hf) btnGroup(hf,
+    [{v:'foundation',t:'От фундамента'},{v:'ground',t:'От земли'}],S.heightFrom,
+    function(v){ S.heightFrom=v; renderDims(); renderBrick(); });
+  var fr=document.getElementById('fillRows'); if(fr) btnGroup(fr,
+    [{v:3,t:'3 ряда'},{v:4,t:'4 ряда'},{v:5,t:'5 рядов'}],S.fillRows,
+    function(v){ S.fillRows=v; renderBrick(); });
 }
-function markDimsChanged(){ editorSyncOnSchema(); }
+function markDimsChanged(){ editorSyncOnSchema(); renderBrick(); }
 function bindDims(){
   var card=document.getElementById('dimcard'); if(!card)return;
   card.addEventListener('input',function(e){
-    var t=e.target; if(!t.classList||!t.classList.contains('dimin'))return; var m=inToM(t.value);
+    var t=e.target; if(!t.classList||!t.classList.contains('dimin'))return;
+    if(t.id==='rowsIn'){ var r=parseInt(String(t.value).replace(/[^0-9]/g,''),10);
+      if(!isNaN(r)&&r>0){ S.rows=Math.max(1,Math.min(60,r)); var rh=document.getElementById('rowsH');
+        if(rh){ var hm=S.rows*ROW_M+(S.heightFrom==='ground'?FOUND_M:0); rh.textContent='≈'+fmt(hm)+' м'; } renderBrick(); }
+      return; }
+    var m=inToM(t.value);
     if(t.id==='plotLen'){ S.plotLen=(t.value.trim()===''?null:(m!=null&&m>0?m:S.plotLen)); }
     else if(t.classList.contains('gwin')){ var gi=+t.dataset.gi; if(m!=null&&m>0) S.gateW[gi]=m; }
     else if(t.id==='wicketW'){ if(m!=null&&m>0) S.wicketW=m; }
@@ -574,6 +626,52 @@ function drawRuler(){
     s+='<span style="position:absolute;left:'+xp+'px;top:0;font-size:9px;color:#b3a789;border-left:1px solid #ddd3c0;height:'+(i%5===0?'11px':'6px')+';padding-left:2px">'+(i%5===0?i+'м':'')+'</span>'; }
   el.style.width=(20+meters*EB.scale+20)+'px'; el.innerHTML=s;
 }
+/* --- Шаг 6 · подсчёт кирпича --- */
+// геометрия забора: столбы и суммарная длина продлёнки.
+// Считаем по расставленным блокам (учитывает ручные правки), а если редактор не трогали — прямо из схемы.
+function fenceGeom(){
+  var posts=0, spanLen=0, spans=0;
+  if(EB.blocks && EB.blocks.length){
+    EB.blocks.forEach(function(b){ if(b.type==='post')posts++; else if(b.type==='span'){ spanLen+=(b.m||0); spans++; } });
+  } else {
+    var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
+    var seq=expand(scObj.seq), plan=planSpans(seq), nOpen=0;
+    seq.forEach(function(e){ if(e.t!=='P')nOpen++; });
+    spans=plan.nSpans; spanLen=plan.nSpans*plan.spanLen; posts=plan.nSpans+nOpen+1;
+  }
+  return { posts:posts, spanLen:spanLen, spans:spans };
+}
+function brickCounts(){
+  var g=fenceGeom();
+  var rows=Math.max(1,S.rows), fill=Math.max(1,Math.min(S.fillRows,rows));   // продлёнка не выше столба
+  var angBase=g.posts*rows*ANG_PER_ROW;
+  var ang=angBase + g.posts*ANG_SPARE_PER_POST;
+  var rowBase=Math.ceil(g.spanLen*ROW_PER_M*fill - 1e-9);
+  var row=rowBase + (g.spanLen>0?ROW_SPARE_TOTAL:0);
+  var caps=g.posts;
+  var palletsAng=Math.ceil(ang/NORMS.palletAng - 1e-9), palletsRow=Math.ceil(row/NORMS.palletRow - 1e-9);
+  // сумму НЕ считаем на странице — цену отдаёт сервер за контакт (см. кнопку «Заказать»)
+  return { g:g, rows:rows, fill:fill, ang:ang, angBase:angBase, row:row, rowBase:rowBase,
+           caps:caps, palletsAng:palletsAng, palletsRow:palletsRow };
+}
+function renderBrick(){
+  var out=document.getElementById('brickOut'); if(!out)return;
+  if(!S.plotLen||S.plotLen<=0){ out.innerHTML='<div class="brempty">Введите длину участка на Шаге 2 — посчитаем кирпич.</div>';
+    var bn0=document.getElementById('brickNote'); if(bn0)bn0.textContent=''; return; }
+  var c=brickCounts();
+  function rowHtml(name,detail,qty,unit){ return '<div class="brline"><div class="brname">'+esc(name)+'<span class="brdetail">'+esc(detail)+'</span></div><div class="brqty">'+qty+' '+unit+'</div></div>'; }
+  var h='';
+  h+=rowHtml('Кирпич угловой','столбы: '+c.g.posts+' × '+c.rows+' ряд. × '+ANG_PER_ROW+' + запас '+(c.g.posts*ANG_SPARE_PER_POST),c.ang,'шт');
+  h+=rowHtml('Кирпич рядовой','продлёнка '+c.fill+' ряд.: '+fmt(c.g.spanLen)+' м × '+ROW_PER_M+' × '+c.fill+' + запас '+ROW_SPARE_TOTAL,c.row,'шт');
+  h+=rowHtml('Крышки на столбы','по числу столбов',c.caps,'шт');
+  h+='<div class="brline brpallet"><div class="brname">Поддоны<span class="brdetail">угловой '+c.palletsAng+' + рядовой '+c.palletsRow+', округление вверх</span></div><div class="brqty">'+(c.palletsAng+c.palletsRow)+' шт</div></div>';
+  // цену на страницу НЕ выводим ни в каком виде — её считает сервер и отдаёт за контакт
+  h+='<div class="brprice"><span class="brlock">🔒 Цена и заявка — на шаге заказа (оставьте Telegram или Viber)</span></div>';
+  out.innerHTML=h;
+  var bn=document.getElementById('brickNote');
+  if(bn) bn.textContent='Расчёт по нормативам Dianast: бесшовная кладка, 4 кирпича на п.м продлёнки, запас на бой штуками. Цена актуальна на '+NORMS.date+'.';
+}
+
 function refreshNames(){
   if(!ecanvas)return;
   EB.blocks.forEach(function(b){ var n=ecanvas.querySelector('.eblk[data-id="'+b.id+'"] .en'); if(n&&b.type!=='label') n.textContent=(b.name||b.type); });
@@ -607,7 +705,7 @@ function renumber(){
 function totals(){ var t=0; EB.blocks.forEach(function(b){ if(b.m!=null)t+=b.m; });
   var el=document.getElementById('etotal'); if(el){ var tg=S.plotLen, off=(tg&&Math.abs(t-tg)>0.02);
     el.innerHTML='Σ '+fmt(t)+' м'+(tg?'<span class="etgt'+(off?' off':'')+'">/ участок '+fmt(tg)+' м</span>':''); }
-  checkWarn(); }
+  checkWarn(); renderBrick(); }   // смета следует за ручными правками раскладки
 function checkWarn(){
   var el=document.getElementById('ewarn'); if(!el)return; var msgs=[];
   if(EB.planWarn==='short'){
@@ -872,7 +970,7 @@ function initEditor(){
   buildEbar(); bindCanvas();
 }
 
-function renderAll(){ renderDims(); renderControls(); renderFence(); updatePrintHead(); editorSyncOnSchema(); }
+function renderAll(){ renderDims(); renderControls(); renderFence(); updatePrintHead(); editorSyncOnSchema(); renderBrick(); }
 renderAll();
 initEditor();
 bindDims();

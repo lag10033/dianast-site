@@ -135,6 +135,8 @@ footer a{color:rgba(255,255,255,0.6)}
 document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
   if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+  var w=e.target.closest&&e.target.closest('a[href*="wa.me"]');
+  if(w&&typeof ym==='function'){ym(110181067,'reachGoal','wa_click');}
 });
 </script>
 <!-- Стандарт Dianast: фикс-шапка + CTA, кнопки Viber/звонок, стрелка наверх -->
@@ -145,12 +147,12 @@ body{padding-top:72px}
 .hdr-cta:hover{background:#c94f06;text-decoration:none}
 @media(max-width:620px){.header-phone{display:none}.hdr-cta{margin-right:0}}
 .viber-float{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;align-items:center;gap:8px}
-.viber-wrap,.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.viber-wrap,.wa-wrap,.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
 .viber-label,.phone-label{background:rgba(0,0,0,0.75);color:#fff;font-family:Montserrat,sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all .2s}
-.viber-wrap:hover .viber-label,.phone-wrap:hover .phone-label{opacity:1;transform:translateY(0)}
+.viber-wrap:hover .viber-label,.wa-wrap:hover .wa-label,.phone-wrap:hover .phone-label{opacity:1;transform:translateY(0)}
 .viber-btn{width:60px;height:60px;border-radius:50%;background:#1A1A1A;box-shadow:0 4px 20px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:all .2s}
 .viber-btn:hover{transform:scale(1.1)}
-.viber-btn svg{width:32px;height:32px;fill:#F5C400}
+.viber-btn svg{width:32px;height:32px;fill:#F5C400}.wa-btn{width:60px;height:60px;border-radius:50%;background:#25D366;box-shadow:0 4px 20px rgba(37,211,102,0.4);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s}.wa-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(37,211,102,0.55)}.wa-btn svg{width:32px;height:32px;fill:#fff}.wa-label{background:rgba(0,0,0,0.75);color:white;font-family:"Montserrat",sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all 0.2s}
 .phone-float{width:60px;height:60px;border-radius:50%;background:#E8600A;box-shadow:0 4px 20px rgba(232,96,10,.45);display:flex;align-items:center;justify-content:center;transition:all .2s}
 .phone-float:hover{transform:scale(1.1)}
 .phone-float svg{width:26px;height:26px;fill:#fff}
@@ -160,6 +162,14 @@ body{padding-top:72px}
     <div class="viber-label">Написать в Viber</div>
     <a href="viber://chat?number=%2B375297974362" class="viber-btn" aria-label="Написать в Viber" onclick="if(typeof ym==='function')ym(110181067,'reachGoal','viber_click')">
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C8.82 2 3 7.37 3 14c0 3.54 1.55 6.73 4.04 9.01L6 28l5.23-1.37C12.7 27.17 14.32 27.5 16 27.5c7.18 0 13-5.37 13-12S23.18 2 16 2zm5.5 16.5c-.28.78-1.64 1.5-2.28 1.56-.58.05-1.14.23-3.83-.8-3.24-1.25-5.32-4.55-5.48-4.76-.16-.21-1.3-1.73-1.3-3.3s.82-2.34 1.12-2.66c.28-.3.62-.38.83-.38.2 0 .41 0 .58.01.2.01.46-.07.72.55.27.64.93 2.27.1 2.46.09.19-.06.41-.19.58-.13.17-.27.38-.39.5-.13.13-.26.28-.11.54.15.26.66 1.09 1.42 1.76.98.87 1.8 1.14 2.06 1.27.26.13.41.11.57-.07.16-.18.67-.78.85-1.05.18-.27.36-.22.6-.13.25.09 1.56.74 1.83.87.26.13.44.2.5.31.07.11.07.64-.21 1.42z"/></svg>
+  </a>
+  </div>
+  <div class="wa-wrap">
+    <div class="wa-label">Написать в WhatsApp</div>
+    <a href="https://wa.me/375297974362" target="_blank" rel="noopener" class="wa-btn" aria-label="Написать в WhatsApp">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 2C8.82 2 3 7.37 3 14c0 3.54 1.55 6.73 4.04 9.01L6 28l5.23-1.37C12.7 27.17 14.32 27.5 16 27.5c7.18 0 13-5.37 13-12S23.18 2 16 2zm5.5 16.5c-.28.78-1.64 1.5-2.28 1.56-.58.05-1.14.23-3.83-.8-3.24-1.25-5.32-4.55-5.48-4.76-.16-.21-1.3-1.73-1.3-3.3s.82-2.34 1.12-2.66c.28-.3.62-.38.83-.38.2 0 .41 0 .58.01.2.01.46-.07.72.55.27.64.93 2.27.1 2.46.09.19-.06.41-.19.58-.13.17-.27.38-.39.5-.13.13-.26.28-.11.54.15.26.66 1.09 1.42 1.76 .98.87 1.8 1.14 2.06 1.27.26.13.41.11.57-.07.16-.18.67-.78.85-1.05.18-.27.36-.22.6-.13.25.09 1.56.74 1.83.87.26.13.44.2.5.31.07.11.07.64-.21 1.42z"/>
+    </svg>
   </a>
   </div>
   <div class="phone-wrap">

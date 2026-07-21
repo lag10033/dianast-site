@@ -319,17 +319,8 @@ document.addEventListener('click',function(e){
 </script>
 
 <!-- Логика калькулятора -->
+<script src="/js/lead.js?v=1"></script>
 <script>
-// Заявка уходит на сервер CRM: он кладёт её в базу и шлёт в Telegram.
-// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
-var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
-function sendLead(text){
-  fetch(LEAD_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text, page: location.pathname, hp: [].map.call(document.querySelectorAll('.hp-f'),function(i){return i.value}).join('')})
-  }).catch(function(){});
-}
 
 // Цель calc_used — один раз при первом взаимодействии с калькулятором
 var calcUsedFired = false;

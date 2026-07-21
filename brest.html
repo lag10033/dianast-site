@@ -1223,17 +1223,8 @@ calcHero();
 </script>
 
 
+<script src="/js/lead.js?v=1"></script>
 <script>
-// Заявка уходит на сервер CRM: он кладёт её в базу и шлёт в Telegram.
-// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
-var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
-function sendLead(text, onOk, onErr){
-  fetch(LEAD_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text, page: location.pathname, hp: [].map.call(document.querySelectorAll('.hp-f'),function(i){return i.value}).join('')})
-  }).then(function(r){ if(r.ok) onOk(); else onErr(); }).catch(onErr);
-}
 function sendHeroForm(e){
   e.preventDefault();
   var name = document.getElementById('hero-name').value.trim();

@@ -1561,6 +1561,7 @@ button { font-family: inherit; cursor: pointer; }
   </div>
 </section>
 
+<script src="/js/lead.js?v=1"></script>
 <script>
 // ── State ──────────────────────────────────────────────
 const state = {
@@ -1776,9 +1777,6 @@ function goBack() {
 }
 
 // ── Submit ─────────────────────────────────────────────
-// Заявки уходят на сервер CRM: он кладёт их в базу и шлёт в Telegram.
-// Токен бота живёт в переменных окружения Vercel, в коде сайта его нет.
-var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
 
 function submitQuiz(advance) {
   if(typeof ym==='function'){ym(110181067,'reachGoal','quiz_submit');}

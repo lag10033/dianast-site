@@ -261,4 +261,14 @@
     <changefreq>monthly</changefreq>
   </url>
   <url><loc>https://dianast.by/ceny/</loc><lastmod>2026-07-21</lastmod></url>
+  <url>
+    <loc>https://dianast.by/uglovoy</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dianast.by/ryadovoy</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>

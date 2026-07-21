@@ -6,17 +6,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/quiz</loc>
+    <loc>https://dianast.by/quiz/</loc>
     <priority>1.0</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/calculator</loc>
+    <loc>https://dianast.by/calculator/</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/zabor-iz-profnastila</loc>
+    <loc>https://dianast.by/zabor-iz-profnastila/</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -26,7 +26,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/rigelnyj-fundament</loc>
+    <loc>https://dianast.by/rigelnyj-fundament/</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -56,17 +56,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/vybor-kirpicha</loc>
+    <loc>https://dianast.by/vybor-kirpicha/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/stoimost-zabora</loc>
+    <loc>https://dianast.by/stoimost-zabora/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/kirpich-vs-profnastil</loc>
+    <loc>https://dianast.by/kirpich-vs-profnastil/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -76,12 +76,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/kirpichnyj-zabor-svoimi-rukami</loc>
+    <loc>https://dianast.by/kirpichnyj-zabor-svoimi-rukami/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/foto-zaborov</loc>
+    <loc>https://dianast.by/foto-zaborov/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -241,24 +241,24 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/uhod-za-kirpichnym-zaborom</loc>
+    <loc>https://dianast.by/uhod-za-kirpichnym-zaborom/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/obrabotka-zabora</loc>
+    <loc>https://dianast.by/obrabotka-zabora/</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/kirpichnyj-zabor-ili-metallicheskij</loc>
+    <loc>https://dianast.by/kirpichnyj-zabor-ili-metallicheskij/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://dianast.by/cvet-zabora-pod-kryshu</loc>
+    <loc>https://dianast.by/cvet-zabora-pod-kryshu/</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
-  <url><loc>https://dianast.by/ceny</loc><lastmod>2026-07-21</lastmod></url>
+  <url><loc>https://dianast.by/ceny/</loc><lastmod>2026-07-21</lastmod></url>
 </urlset>

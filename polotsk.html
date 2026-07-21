@@ -377,6 +377,7 @@ function submitLead(e){
         <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;background:white;transition:border-color 0.2s" id="hero-phone-wrap">
           <span style="padding:11px 0 11px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);user-select:none;">+375</span>
           <input type="tel" id="hero-phone" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('hero-phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('hero-phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
+          <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
         </div>
       </div>
       <button class="btn-calc" onclick="sendHeroForm(event)">Отправить заявку →</button>
@@ -715,6 +716,7 @@ function submitLead(e){
             <label style="display:block;font-size:11px;font-weight:600;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Телефон</label>
             <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden" onfocusin="this.style.borderColor='#D4521E'" onfocusout="this.style.borderColor='#E8E3DC'">
               <input type="tel" id="c-phone" value="+375 " style="flex:1;border:none;outline:none;padding:10px 14px;font-size:15px;font-family:Inter,sans-serif;color:var(--dark);background:transparent" oninput="(function(el){var v=el.value;var prefix='+375 ';if(!v.startsWith(prefix)){el.value=prefix;return;}var d=v.slice(prefix.length).replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=prefix+f;})(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)">
+          <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
             </div>
           </div>
         </div>
@@ -1099,6 +1101,7 @@ calcFence();
         <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:8px;background:white;transition:border-color 0.2s" id="phone-wrap">
           <span style="padding:11px 0 11px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);user-select:none;">+375</span>
           <input type="tel" id="contact-phone" placeholder=" XX XXX XX XX" style="border:none;outline:none;padding:11px 14px 11px 4px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;background:transparent" onfocus="document.getElementById('phone-wrap').style.borderColor='var(--orange)'" onblur="document.getElementById('phone-wrap').style.borderColor='var(--border)'" oninput="(function(el){var d=el.value.replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=f;})(this)">
+          <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
         </div>
       </div>
 
@@ -1275,7 +1278,7 @@ function sendLead(text, onOk, onErr){
   fetch(LEAD_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text, page: location.pathname})
+    body: JSON.stringify({text: text, page: location.pathname, hp: [].map.call(document.querySelectorAll('.hp-f'),function(i){return i.value}).join('')})
   }).then(function(r){ if(r.ok) onOk(); else onErr(); }).catch(onErr);
 }
 function sendHeroForm(e){

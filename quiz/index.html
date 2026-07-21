@@ -1859,11 +1859,6 @@ function submitQuiz(advance) {
     leadReq.then(function(){ showThankyou(); });
   }
 
-  var mailLink = document.createElement('a');
-  mailLink.href = 'mailto:lag10033@gmail.com'
-    + '?subject=' + encodeURIComponent('Заявка с квиза — ' + state.name)
-    + '&body='    + encodeURIComponent(text);
-  mailLink.click();
 }
 
 function showThankyou() {

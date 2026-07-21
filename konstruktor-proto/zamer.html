@@ -528,7 +528,7 @@ function updatePrintHead(){
     +'</div>';
 }
 /* ==================== РЕДАКТОР БЛОКОВ (Шаг 5) ==================== */
-var EB={scale:70, blocks:[], sel:null, undo:null, builtSig:'', dirty:false, uid:0, planWarn:null, sideWarn:null};
+var EB={scale:70, blocks:[], sel:null, undo:null, builtSig:'', dirty:false, uid:0, planWarn:null, sideWarn:null, touched:false};
 var LSKEY='dianast:zamer-editor:v1';
 var MODS=[2.61,2.73,2.86,2.98,3.11];
 var MAXM=200;
@@ -603,7 +603,7 @@ function buildBlocksFromSchema(){
   // столбы между всеми элементами и по краям
   EB.blocks=[]; EB.sel=null; EB.undo=null;   // undo от прошлой раскладки протух — блоки с чужими id ломают сумму
   EB.planWarn=plan.warn;                     // 'short' — участок физически короче суммы проёмов и столбов
-  EB.sideWarn=null;
+  EB.sideWarn=null; EB.touched=false;        // свежая авто-раскладка: ручных правок в ней ещё нет
   // Г-образный участок: фасад + боковая сторона, между ними ОДИН общий угловой столб.
   // Он завершает фасад (входит в его длину), боковая начинается сразу за ним.
   var isCorner=(S.side==='corner' && S.sideLen>0);
@@ -773,11 +773,13 @@ function checkWarn(){
 
 /* --- копирование / удаление --- */
 function copyBlock(id){ var b=byId(id); if(!b)return; var c=JSON.parse(JSON.stringify(b));
+  EB.touched=true;
   c.id=uid(); c.x=b.x+20; c.y=b.y+20; EB.blocks.push(c); renumber(); totals(); renderEditor(); selectBlock(c.id); }
 function delBlock(id){ var i=EB.blocks.findIndex(function(b){return b.id===id;}); if(i<0)return;
+  EB.touched=true;
   EB.undo={block:EB.blocks[i],index:i}; EB.blocks.splice(i,1); if(EB.sel===id)EB.sel=null;
   renumber(); totals(); renderEditor(); toast('Удалено',' Вернуть',undoDel); }
-function undoDel(){ if(!EB.undo)return; EB.blocks.splice(Math.min(EB.undo.index,EB.blocks.length),0,EB.undo.block); EB.undo=null; renumber(); totals(); renderEditor(); }
+function undoDel(){ if(!EB.undo)return; EB.touched=true; EB.blocks.splice(Math.min(EB.undo.index,EB.blocks.length),0,EB.undo.block); EB.undo=null; renumber(); totals(); renderEditor(); }
 
 /* --- масштаб / раскладка --- */
 function setScale(v){ var nv=Math.max(24,Math.min(160,v)), f=(EB.scale>0?nv/EB.scale:1); EB.scale=nv;
@@ -919,8 +921,20 @@ function updateHint(){ var el=document.getElementById('ehint'); if(!el)return;
 function editorSyncOnSchema(){
   if(!EB||!EB.blocks||!EB.blocks.length) return;   // редактор ещё не строился — соберётся при входе
   if(schemaSig()===EB.builtSig) return;            // ничего не изменилось
+  // Правка размеров пересобирает раскладку — но если её двигали руками, эту работу
+  // нельзя терять молча: держим снимок и предлагаем вернуть одним кликом.
+  var snap=EB.touched ? {blocks:JSON.parse(JSON.stringify(EB.blocks)), scale:EB.scale, uid:EB.uid} : null;
   buildBlocksFromSchema();                          // пересобрать из новых размеров
   if(S.editMode) relayoutFit(); else totals();
+  if(snap) toast('Раскладка пересобрана под новые размеры',' Вернуть мою',function(){ restoreLayout(snap); });
+}
+function restoreLayout(snap){
+  if(!snap||!snap.blocks) return;
+  EB.blocks=snap.blocks; EB.scale=snap.scale||EB.scale; EB.uid=snap.uid||EB.uid;
+  EB.sel=null; EB.undo=null; EB.touched=true;
+  EB.builtSig=schemaSig();                          // иначе следующий рендер снова её снесёт
+  renumber(); renderEditor(); totals();
+  toast('Ваша раскладка возвращена');
 }
 
 /* --- перетаскивание / ресайз --- */
@@ -939,6 +953,7 @@ function endDrag(e){ if(!drag)return; var d=drag; drag=null; document.body.style
   if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
   var lv=d.node.querySelector('.mlive'); if(lv)lv.remove();
   if(!d.moved)return;
+  EB.touched=true;                         // блок двигали/тянули — это ручная работа
   if(d.mode==='move'){ d.b.x=d._x; d.b.y=d._y; d.node.style.left=d._x+'px'; d.node.style.top=d._y+'px'; renumber(); drawRuler(); }
   else { d.b.m=d._m; d.b.measured=true; d.node.style.width=mpx(d._m)+'px'; d.node.classList.remove('est');
     d.node.classList.toggle('warn', d.b.type==='span'&&spanBad(d.b.m));
@@ -961,6 +976,7 @@ function bindCanvas(){
   ecanvas.addEventListener('pointercancel',endDrag);
   ecanvas.addEventListener('input',function(e){
     var node=e.target.closest('.eblk'); if(!node)return; var b=byId(node.dataset.id); if(!b)return;
+    EB.touched=true;                       // раскладку правят руками — при пересборке предложим её вернуть
     if(e.target.classList.contains('em')){ var m=parseM(e.target.value); if(m!=null&&m>0){ b.m=Math.min(Math.round(m*100)/100,MAXM); b.measured=true;
       node.style.width=mpx(b.m)+'px'; node.classList.remove('est'); node.classList.toggle('warn', b.type==='span'&&spanBad(b.m)); var mod=node.querySelector('.emod'); if(mod)mod.textContent=moduleReadout(b.m); totals(); drawRuler(); } }
     else if(e.target.classList.contains('edeg')){ var d=parseInt(e.target.value,10); if(!isNaN(d))b.deg=d; }
@@ -975,7 +991,7 @@ function bindCanvas(){
     var t=e.target.closest('[data-act]');
     if(t){ var node=t.closest('.eblk'); var b=byId(node.dataset.id); if(!b)return; var a=t.dataset.act;
       if(a==='copy')copyBlock(b.id); else if(a==='del')delBlock(b.id);
-      else if(a==='turn'){ b.turn=(b.turn==='right'?'left':'right'); t.textContent=(b.turn==='right'?'↱ вправо':'↰ влево'); } return; }
+      else if(a==='turn'){ EB.touched=true; b.turn=(b.turn==='right'?'left':'right'); t.textContent=(b.turn==='right'?'↱ вправо':'↰ влево'); } return; }
     if(e.target===ecanvas||e.target.id==='eruler') selectBlock(null);
   });
   document.addEventListener('keydown',function(e){
@@ -987,6 +1003,7 @@ function bindCanvas(){
 }
 
 function addNew(type){ var vx=(ecanvas.scrollLeft||0)+40, b=mkBlock(type,vx,60,null);
+  EB.touched=true;
   EB.blocks.push(b); renumber(); totals(); renderEditor(); selectBlock(b.id); }
 
 function buildEbar(){

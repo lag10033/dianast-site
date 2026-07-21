@@ -46,8 +46,8 @@
   var win = document.createElement('div');
   win.className = 'dch-win';
   win.innerHTML =
-    '<div class="dch-head"><div class="dch-ava">И</div><div><b>Инженер Dianast</b><small>кирпич и заборы — отвечу без воды</small></div><button class="dch-close" aria-label="Закрыть">×</button></div>' +
-    '<div class="dch-msgs"></div><div class="dch-typing">Инженер печатает…</div>' +
+    '<div class="dch-head"><div class="dch-ava">Г</div><div><b>Григорич · Dianast</b><small>инженер, кирпич и заборы — отвечу без воды</small></div><button class="dch-close" aria-label="Закрыть">×</button></div>' +
+    '<div class="dch-msgs"></div><div class="dch-typing">Григорич печатает…</div>' +
     '<div class="dch-quick">' +
       '<button class="dch-q" data-t="Сколько стоит кирпич?">Цена кирпича</button>' +
       '<button class="dch-q" data-t="Как считается доставка?">Доставка</button>' +
@@ -74,7 +74,7 @@
     if (history.length){ history.forEach(function(m){ add(m.role, m.text, false); }); return; }
     fetch(API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[]})})
       .then(function(r){return r.json()}).then(function(d){ add('assistant', d.reply); })
-      .catch(function(){ add('assistant', 'Здравствуйте! Инженер Dianast на связи — спрашивайте про кирпич и заборы.'); });
+      .catch(function(){ add('assistant', 'Здравствуйте! Григорич на связи — спрашивайте про кирпич и заборы.'); });
   }
 
   function send(text){

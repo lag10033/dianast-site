@@ -54,6 +54,10 @@ function makeSandbox() {
     },
     navigator: { clipboard: { writeText: () => Promise.resolve() } },
     getComputedStyle: () => ({ display: 'none', getPropertyValue: () => '' }),
+    location: { hash: '', origin: 'https://dianast.by', pathname: '/konstruktor-proto/zamer.html' },
+    btoa: (s) => Buffer.from(s, 'binary').toString('base64'),
+    atob: (s) => Buffer.from(s, 'base64').toString('binary'),
+    escape, unescape,
     requestAnimationFrame: () => 0,
     cancelAnimationFrame: () => {},
     setTimeout: () => 0, clearTimeout: () => {},
@@ -276,6 +280,64 @@ ok('очень длинный участок (200 м) считается', layou
   near('«Дрогичин» по действующему модулю 2980: Σ = 26,27 м', 6 * 2.98 + posts + gate + wicket, 26.27, 0.01);
   near('старый чертёж с 2950 давал 26,09 м — разница 18 см на 6 пролётов', 6 * 2.95 + posts + gate + wicket, 26.09, 0.01);
   near('расхождение модулей 2980 vs 2950 = 30 мм на пролёт', 2.98 - 2.95, 0.03, 0.0001);
+}
+
+/* 15. Расчёт в ссылке: размеры переживают круг «собрал → открыл» */
+{
+  build({ len: 30, side: 15, scheme: 'A', rows: 21, fill: 4 });
+  P.S.wicketW = 1.1; P.S.gateW = [4.2, 4.0]; P.S.heightFrom = 'ground';
+  const url = P.shareUrl();
+  ok('ссылка собирается', url.indexOf('#p=') > 0, url.slice(0, 60));
+  ok('ссылка не длиннее разумного', url.length < 6000, 'длина ' + url.length);
+  ok('в ссылке нет личных данных', !/ordName|ordContact|phone|@/.test(url));
+
+  // «открываем» ссылку на чистом состоянии
+  const code = url.split('#p=')[1];
+  P.S.plotLen = 1; P.S.sideLen = 0; P.S.side = 'straight'; P.S.rows = 19; P.S.fillRows = 3;
+  const okApply = P.applyShare(P.decodeShare(code));
+  ok('ссылка применяется', okApply === true);
+  near('из ссылки: длина фасада', P.S.plotLen, 30);
+  near('из ссылки: боковая', P.S.sideLen, 15);
+  eq('из ссылки: тип участка', P.S.side, 'corner');
+  eq('из ссылки: рядов высоты', P.S.rows, 21);
+  eq('из ссылки: рядов продлёнки', P.S.fillRows, 4);
+  near('из ссылки: калитка', P.S.wicketW, 1.1);
+  near('из ссылки: ворота', P.S.gateW[0], 4.2);
+  eq('из ссылки: отсчёт высоты', P.S.heightFrom, 'ground');
+
+  // расчёт после открытия ссылки совпадает с исходным
+  P.EB.blocks = [];
+  P.buildBlocksFromSchema();
+  near('расчёт из ссылки: Σ = 45 м', layoutSum(), 45, 0.005);
+}
+
+/* 16. Подделанная ссылка не ломает расчёт и не тащит разметку */
+{
+  const evil = {
+    v: 1, side: '<script>alert(1)</script>', sl: 'много', g: 'три', sc: 'Z', po: 'нет',
+    pl: -100, gw: ['абв', Infinity], ww: NaN, u: 'парсеки', rf: 'x', sp: 'y',
+    r: 9999, hf: 'ниоткуда', fr: -5,
+    b: [{ i: 'b1"><img src=x onerror=alert(1)>', t: 'corner', x: 'NaN', y: Infinity, m: 1e9 },
+        { i: 'b2', t: '<script>', x: 0, y: 0, m: 3 }],
+  };
+  let threw = false;
+  try { P.applyShare(evil); } catch (e) { threw = true; }
+  ok('подделанная ссылка не роняет страницу', !threw);
+  eq('мусорный тип участка отброшен', P.S.side, 'straight');
+  eq('мусорное число ворот отброшено', P.S.gates, 'one');
+  ok('отрицательная длина не принята', P.S.plotLen === null || P.S.plotLen > 0, 'plotLen=' + P.S.plotLen);
+  ok('высота зажата в разумные рамки', P.S.rows >= 1 && P.S.rows <= 60, 'rows=' + P.S.rows);
+  ok('продлёнка зажата', P.S.fillRows >= 1, 'fillRows=' + P.S.fillRows);
+  eq('единицы измерения — из белого списка', P.S.unit, 'm');
+  const badId = P.EB.blocks.some((b) => /[<>"]/.test(String(b.id)));
+  ok('id блоков очищены от разметки', !badId);
+  const badType = P.EB.blocks.some((b) => !['span', 'gate', 'wicket', 'post', 'corner', 'label'].includes(b.type));
+  ok('типы блоков только из белого списка', !badType);
+  P.EB.blocks.forEach((b) => {
+    ok('координаты блока — конечные числа', isFinite(b.x) && isFinite(b.y));
+  });
+  ok('битая ссылка не применяется', P.applyShare(P.decodeShare('это-не-base64!!!')) !== true);
+  ok('пустая ссылка не применяется', P.decodeShare('') === null);
 }
 
 /* ── итог ─────────────────────────────────────────────────────────────────── */

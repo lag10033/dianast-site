@@ -32,7 +32,7 @@ self.addEventListener('fetch', (e) => {
 
   // свои скрипты и стили — сначала сеть: иначе после правки на устройстве
   // останется старая версия, пока пользователь не почистит браузер
-  if (/\.(js|css|webmanifest)(\?|$)/.test(req.url)) {
+  if (/\.(js|css|webmanifest|json)(\?|$)/.test(req.url)) {
     e.respondWith(
       fetch(req).then((r) => { const cp = r.clone(); caches.open(CACHE).then((c) => c.put(req, cp)); return r; })
         .catch(() => caches.match(req))

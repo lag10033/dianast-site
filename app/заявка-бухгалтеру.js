@@ -15,9 +15,18 @@ const ЗаявкаБухгалтеру = (function () {
   // ── реквизиты поставщика: из настроек устройства, в коде их нет ──
   // Приложение опубликовано на сайте, поэтому реквизиты вводятся один раз
   // на главной («⚙ Настройки») и хранятся в памяти браузера.
+  function фирмы() {
+    try { return JSON.parse(localStorage.getItem('dianast_orgs_v1') || '[]') || []; } catch (e) { return []; }
+  }
+  function фирма() {
+    const список = фирмы();
+    return список.find(o => o.id === (inv && inv.orgId)) ||
+           список.find(o => o.id === localStorage.getItem('dianast_org_active')) ||
+           список[0] || null;
+  }
   function поставщик() {
-    let р = {};
-    try { р = JSON.parse(localStorage.getItem('dianast_requisites_v1') || '{}') || {}; } catch (e) {}
+    let р = фирма();
+    if (!р) { try { р = JSON.parse(localStorage.getItem('dianast_requisites_v1') || '{}') || {}; } catch (e) { р = {}; } }
     return {
       name: р.краткое || р.полное || '',
       addr: р.юрАдрес || '',
@@ -317,6 +326,9 @@ const ЗаявкаБухгалтеру = (function () {
     <div class="zb-sec">
       <h3>Счёт</h3>
       <div class="zb-row">
+        <div class="zb-f grow"><label>От кого счёт</label><select id="zb-org"></select></div>
+      </div>
+      <div class="zb-row">
         <div class="zb-f"><label>Дата</label><input id="zb-date" type="date"></div>
         <div class="zb-f"><label>Действителен, дн.</label><input id="zb-days" class="num" type="number" step="1" min="1" inputmode="numeric"></div>
         <div class="zb-f zb-tariff-only"><label>Тариф, руб/м² без НДС</label><input id="zb-tariff" class="num" type="number" step="0.01" inputmode="decimal"></div>
@@ -377,6 +389,12 @@ const ЗаявкаБухгалтеру = (function () {
     v('zb-cl-agent', c ? c.agent : ''); v('zb-cl-fee', c ? c.fee : 0);
   }
   function рисоватьШапку() {
+    const список = фирмы(), sel = $('zb-org');
+    sel.innerHTML = список.length
+      ? список.map(o => `<option value="${o.id}">${escHtml(o.краткое || o.полное || 'без названия')}</option>`).join('')
+      : '<option value="">— фирма не заведена —</option>';
+    const т = фирма();
+    if (т) { sel.value = т.id; inv.orgId = т.id; }
     $('zb-date').value = inv.date;
     $('zb-days').value = inv.days;
     $('zb-tariff').value = inv.tariff;
@@ -480,6 +498,12 @@ const ЗаявкаБухгалтеру = (function () {
     $('zb-x').onclick = закрыть;
     ov.onclick = e => { if (e.target === ov) закрыть(); };
 
+    $('zb-org').onchange = e => {
+      inv.orgId = e.target.value;
+      const о = фирма();
+      if (о && о.ндс != null) inv.vat = о.ндс;      // у фирм разные режимы: НДС или упрощёнка
+      рисоватьШапку(); рисоватьПозиции(); рисоватьИтоги(); сохранить();
+    };
     $('zb-client').onchange = e => {
       inv.clientId = e.target.value;
       const c = клиент();
@@ -739,6 +763,7 @@ ${строки}
               minp: c && c.minp != null ? c.minp : ДЕФОЛТ.minp,
               markup: c ? (c.markup || 0) : 0, vat: c && c.vat != null ? c.vat : ДЕФОЛТ.vat,
               agent: c ? (c.agent || '') : '', fee: c ? (c.fee || 0) : 0,
+              orgId: (фирма() || {}).id || '',
               fullNames: false, lines: [], sig };
       inv.lines = нормализовать(позиции);            // имена зависят от inv.fullNames — только после создания inv
     }

@@ -10,7 +10,10 @@
 // ============================================================
 
 const Настройки = (function () {
-  const КЛЮЧ_П = 'dianast_price_v1', КЛЮЧ_Р = 'dianast_requisites_v1';
+  const КЛЮЧ_П = 'dianast_price_v1';
+  const КЛЮЧ_О = 'dianast_orgs_v1';          // список своих фирм
+  const КЛЮЧ_А = 'dianast_org_active';       // какая фирма выбрана по умолчанию
+  const КЛЮЧ_Р = 'dianast_requisites_v1';    // старый формат: одна фирма (мигрируем)
   let смонтировано = false;
   const $ = id => document.getElementById(id);
   const чит = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') || d; } catch (e) { return d; } };
@@ -47,7 +50,10 @@ const Настройки = (function () {
   .ns-btn{ border:none; border-radius:11px; background:#D4521E; color:#fff; font-size:14px; font-weight:800; padding:13px 18px; flex:1; min-width:160px; }
   .ns-btn:hover{ background:#C1440E; }
   .ns-btn.ghost{ background:#fff; color:#1A1A1A; border:1.5px solid #E2DCD3; flex:0 0 auto; }
-  .ns-btn.ghost:hover{ border-color:#D4521E; color:#D4521E; }`;
+  .ns-btn.ghost:hover{ border-color:#D4521E; color:#D4521E; }
+  .ns-mini{ border:1.5px solid #E2DCD3; background:#fff; color:#4a4a4a; border-radius:9px; font-size:12.5px; font-weight:700; padding:9px 12px; white-space:nowrap; }
+  .ns-mini:hover{ border-color:#D4521E; color:#D4521E; }
+  .ns-f select{ font-size:14.5px; padding:8px 10px; border:1.5px solid #E2DCD3; border-radius:9px; font-family:inherit; background:#fff; color:#1A1A1A; width:100%; }`;
 
   const HTML = `
   <div id="ns-box">
@@ -57,7 +63,7 @@ const Настройки = (function () {
     <div class="ns-warn" id="ns-warn"></div>
     <div class="ns-tabs">
       <button class="ns-tab on" data-pane="price" type="button">Прайс</button>
-      <button class="ns-tab" data-pane="req" type="button">Реквизиты</button>
+      <button class="ns-tab" data-pane="req" type="button">Мои фирмы</button>
     </div>
 
     <div class="ns-pane on" id="ns-pane-price">
@@ -85,7 +91,21 @@ const Настройки = (function () {
 
     <div class="ns-pane" id="ns-pane-req">
       <div class="ns-sec">
-        <h3>Компания — как в счетах и КП</h3>
+        <h3>Фирма</h3>
+        <div class="ns-row">
+          <div class="ns-f grow"><label>Реквизиты какой фирмы смотрим</label><select id="ns-org"></select></div>
+          <button class="ns-mini" id="ns-org-new" type="button">+ Добавить фирму</button>
+          <button class="ns-mini" id="ns-org-del" type="button">Удалить</button>
+        </div>
+        <div class="ns-row" style="margin-bottom:0">
+          <button class="ns-mini" id="ns-org-main" type="button">✓ Выставлять счета от неё</button>
+          <div class="ns-hint" id="ns-org-status" style="margin:0 0 9px"></div>
+        </div>
+        <div class="ns-hint">Переключение в списке только показывает реквизиты — продавца по умолчанию
+          оно не меняет. В самой заявке бухгалтеру продавца можно выбрать на один конкретный счёт.</div>
+      </div>
+      <div class="ns-sec">
+        <h3>Реквизиты — как в счетах и КП</h3>
         <div class="ns-row">
           <div class="ns-f grow"><label>Полное наименование</label><input id="ns-full" placeholder="Частное предприятие «Ромашка»"></div>
           <div class="ns-f grow"><label>Кратко</label><input id="ns-short" placeholder="ЧПТУП «Ромашка»"></div>
@@ -121,6 +141,7 @@ const Настройки = (function () {
           <div class="ns-f grow"><label>Директор</label><input id="ns-dir" placeholder="Иванов Иван Иванович"></div>
           <div class="ns-f"><label>Коротко</label><input id="ns-dir2" placeholder="Иванов И.И."></div>
           <div class="ns-f"><label>Действует на основании</label><input id="ns-osn" placeholder="Устава"></div>
+          <div class="ns-f"><label>НДС фирмы, %</label><input id="ns-orgvat" class="num" type="number" step="1" inputmode="numeric" placeholder="20 или 0"></div>
         </div>
       </div>
     </div>
@@ -146,6 +167,40 @@ const Настройки = (function () {
       ov.querySelectorAll('.ns-tab').forEach(x => x.classList.toggle('on', x === t));
       ov.querySelectorAll('.ns-pane').forEach(p => p.classList.toggle('on', p.id === 'ns-pane-' + t.dataset.pane));
     });
+    $('ns-org').onchange = e => {
+      const список = фирмы();
+      // правки текущей не теряем: сохраняем перед переключением
+      if (текущаяФирма) {
+        const i = список.findIndex(o => o.id === текущаяФирма.id);
+        if (i >= 0) { список[i] = Object.assign({ id: текущаяФирма.id }, собратьФирму()); сохранитьФирмы(список); }
+      }
+      текущаяФирма = фирмы().find(o => o.id === e.target.value) || null;
+      заполнитьФирму(текущаяФирма || {});
+      статусОсновной();
+    };
+    $('ns-org-new').onclick = () => {
+      const список = фирмы();
+      const нов = { id: 'org' + Date.now(), полное: '', краткое: 'Новая фирма', юрАдрес: '', почтАдрес: '',
+                    унп: '', окпо: '', телФакс: '', моб: '', email: '', заказыEmail: '',
+                    iban: '', bic: '', банк: '', директор: '', директорКоротко: '', основание: 'Устава', ндс: 20 };
+      список.push(нов); текущаяФирма = нов;
+      сохранитьФирмы(список);                       // основную не трогаем — это отдельная кнопка
+      рисоватьФирмы(); $('ns-full').focus();
+    };
+    $('ns-org-del').onclick = () => {
+      const список = фирмы(); if (!текущаяФирма || !список.length) return;
+      if (!confirm('Удалить фирму «' + (текущаяФирма.краткое || текущаяФирма.полное) + '»?')) return;
+      const остались = список.filter(o => o.id !== текущаяФирма.id);
+      текущаяФирма = остались[0] || null;
+      сохранитьФирмы(остались, текущаяФирма ? текущаяФирма.id : '');
+      рисоватьФирмы();
+    };
+    $('ns-org-main').onclick = () => {
+      if (!текущаяФирма) return;
+      localStorage.setItem(КЛЮЧ_А, текущаяФирма.id);
+      сохранитьФирмы(фирмы(), текущаяФирма.id);
+      статусОсновной();
+    };
     $('ns-save').onclick = сохранить;
     $('ns-load').onclick = () => {
       if (typeof ДанныеУстройства === 'undefined') {          // модуль данные.js подключён только на главной
@@ -164,8 +219,69 @@ const Настройки = (function () {
     $('ns-reset').onclick = () => {
       if (!confirm('Убрать свой прайс и реквизиты с этого устройства и вернуть демо-значения?')) return;
       localStorage.removeItem(КЛЮЧ_П); localStorage.removeItem(КЛЮЧ_Р);
+      localStorage.removeItem(КЛЮЧ_О); localStorage.removeItem(КЛЮЧ_А);
       alert('Готово. Страница обновится.'); location.reload();
     };
+  }
+
+  // ── свои фирмы: список + активная ──
+  function фирмы() {
+    let список = чит(КЛЮЧ_О, null);
+    if (!список) {                                  // миграция со старого формата «одна фирма»
+      const одна = чит(КЛЮЧ_Р, null);
+      список = (одна && (одна.краткое || одна.полное || одна.унп))
+        ? [Object.assign({ id: 'org1' }, одна)] : [];
+      if (список.length) { localStorage.setItem(КЛЮЧ_О, JSON.stringify(список)); localStorage.setItem(КЛЮЧ_А, 'org1'); }
+    }
+    return список;
+  }
+  function сохранитьФирмы(список, активная) {
+    try {
+      localStorage.setItem(КЛЮЧ_О, JSON.stringify(список));
+      if (активная) localStorage.setItem(КЛЮЧ_А, активная);
+      const а = список.find(o => o.id === (активная || localStorage.getItem(КЛЮЧ_А))) || список[0];
+      // старый ключ держим синхронным: им пользуются калькулятор отливов и бланк заявки
+      if (а) localStorage.setItem(КЛЮЧ_Р, JSON.stringify(а)); else localStorage.removeItem(КЛЮЧ_Р);
+    } catch (e) { alert('Не удалось сохранить: ' + e.message); }
+  }
+  let текущаяФирма = null;
+  function рисоватьФирмы() {
+    const список = фирмы(), sel = $('ns-org');
+    const активная = localStorage.getItem(КЛЮЧ_А);
+    sel.innerHTML = список.length
+      ? список.map(o => `<option value="${o.id}">${(o.краткое || o.полное || 'без названия').replace(/</g, '&lt;')}</option>`).join('')
+      : '<option value="">— фирм пока нет, добавьте —</option>';
+    текущаяФирма = список.find(o => o.id === (текущаяФирма || активная)) || список[0] || null;
+    if (текущаяФирма) sel.value = текущаяФирма.id;
+    заполнитьФирму(текущаяФирма || {});
+    статусОсновной();
+  }
+  function статусОсновной() {
+    const эл = $('ns-org-status'), кн = $('ns-org-main');
+    if (!эл) return;
+    const активная = localStorage.getItem(КЛЮЧ_А);
+    const о = фирмы().find(x => x.id === активная);
+    const это = текущаяФирма && активная === текущаяФирма.id;
+    эл.innerHTML = о ? ('Счета по умолчанию — от <b>' + (о.краткое || о.полное || 'без названия') + '</b>')
+                     : 'Основная фирма не выбрана';
+    кн.style.display = это ? 'none' : '';
+  }
+  function заполнитьФирму(о) {
+    const v = (id, val) => { const e = $(id); if (e) e.value = val == null ? '' : val; };
+    v('ns-full', о.полное); v('ns-short', о.краткое); v('ns-addr', о.юрАдрес); v('ns-post', о.почтАдрес);
+    v('ns-unp', о.унп); v('ns-okpo', о.окпо); v('ns-tel', о.телФакс); v('ns-mob', о.моб);
+    v('ns-mail', о.email); v('ns-mail2', о.заказыEmail);
+    v('ns-iban', о.iban); v('ns-bic', о.bic); v('ns-bank', о.банк);
+    v('ns-dir', о.директор); v('ns-dir2', о.директорКоротко); v('ns-osn', о.основание || 'Устава');
+    v('ns-orgvat', о.ндс != null ? о.ндс : 20);
+  }
+  function собратьФирму() {
+    const т = id => ($(id) ? $(id).value.trim() : '');
+    return { полное: т('ns-full'), краткое: т('ns-short'), юрАдрес: т('ns-addr'), почтАдрес: т('ns-post'),
+             унп: т('ns-unp'), окпо: т('ns-okpo'), телФакс: т('ns-tel'), моб: т('ns-mob'),
+             email: т('ns-mail'), заказыEmail: т('ns-mail2'), iban: т('ns-iban'), bic: т('ns-bic'),
+             банк: т('ns-bank'), директор: т('ns-dir'), директорКоротко: т('ns-dir2'),
+             основание: т('ns-osn') || 'Устава', ндс: т('ns-orgvat') === '' ? 20 : (parseFloat(т('ns-orgvat')) || 0) };
   }
 
   function рисоватьЦвета(п) {
@@ -185,26 +301,22 @@ const Настройки = (function () {
   }
 
   function заполнить() {
-    const п = чит(КЛЮЧ_П, ДЕМО_ЦЕНЫ), р = чит(КЛЮЧ_Р, ДЕМО_РЕКВИЗИТЫ);
+    const п = чит(КЛЮЧ_П, ДЕМО_ЦЕНЫ);
     рисоватьЦвета(п);
+    рисоватьФирмы();
     const v = (id, val) => { const e = $(id); if (e) e.value = val == null ? '' : val; };
     v('ns-min', п.минималка); v('ns-k15', п.коэф_до_1500); v('ns-vat', п.ндс_процент); v('ns-mark', п.наценка_процент || 0);
     v('ns-maxlen', п.макс_заготовка_м); v('ns-maxw', п.макс_ширина_мм);
     v('ns-deflen', п.заготовка_по_умолчанию_м); v('ns-lap', п.нахлёст_м);
-    v('ns-full', р.полное); v('ns-short', р.краткое); v('ns-addr', р.юрАдрес); v('ns-post', р.почтАдрес);
-    v('ns-unp', р.унп); v('ns-okpo', р.окпо); v('ns-tel', р.телФакс); v('ns-mob', р.моб);
-    v('ns-mail', р.email); v('ns-mail2', р.заказыEmail);
-    v('ns-iban', р.iban); v('ns-bic', р.bic); v('ns-bank', р.банк);
-    v('ns-dir', р.директор); v('ns-dir2', р.директорКоротко); v('ns-osn', р.основание);
 
-    const демоПрайс = !localStorage.getItem(КЛЮЧ_П), демоРекв = !localStorage.getItem(КЛЮЧ_Р);
+    const демоПрайс = !localStorage.getItem(КЛЮЧ_П), демоРекв = !фирмы().length;
     const w = $('ns-warn');
     if (демоПрайс || демоРекв) {
       w.style.display = '';
       w.textContent = демоПрайс && демоРекв
-        ? 'Сейчас стоят демо-цены и пустые реквизиты. Впишите свои — иначе сметы и счета уйдут клиенту с чужими цифрами.'
+        ? 'Сейчас стоят демо-цены и не заведено ни одной фирмы. Впишите своё — иначе сметы и счета уйдут клиенту с чужими цифрами.'
         : (демоПрайс ? 'Прайс демонстрационный — цены не ваши. Замените своими.'
-                     : 'Реквизиты не заполнены — в счетах и КП будут пустые поля.');
+                     : 'Не заведено ни одной фирмы — в счетах и КП будут пустые поля.');
     } else { w.style.display = 'none'; }
   }
 
@@ -222,22 +334,24 @@ const Настройки = (function () {
     п.заготовка_по_умолчанию_м = ч('ns-deflen'); п.нахлёст_м = ч('ns-lap');
     delete п.демо;
 
-    const т = id => $(id).value.trim();
-    const р = { полное: т('ns-full'), краткое: т('ns-short'), юрАдрес: т('ns-addr'), почтАдрес: т('ns-post'),
-                унп: т('ns-unp'), окпо: т('ns-okpo'), телФакс: т('ns-tel'), моб: т('ns-mob'),
-                email: т('ns-mail'), заказыEmail: т('ns-mail2'), iban: т('ns-iban'), bic: т('ns-bic'),
-                банк: т('ns-bank'), директор: т('ns-dir'), директорКоротко: т('ns-dir2'), основание: т('ns-osn') };
-    try {
-      localStorage.setItem(КЛЮЧ_П, JSON.stringify(п));
-      localStorage.setItem(КЛЮЧ_Р, JSON.stringify(р));
-    } catch (e) { alert('Не удалось сохранить: ' + e.message); return; }
+    try { localStorage.setItem(КЛЮЧ_П, JSON.stringify(п)); }
+    catch (e) { alert('Не удалось сохранить: ' + e.message); return; }
+
+    const список = фирмы();
+    if (текущаяФирма) {
+      const i = список.findIndex(o => o.id === текущаяФирма.id);
+      const обновлённая = Object.assign({ id: текущаяФирма.id }, собратьФирму());
+      if (i >= 0) список[i] = обновлённая; else список.push(обновлённая);
+      текущаяФирма = обновлённая;
+      сохранитьФирмы(список, $('ns-org').value || обновлённая.id);
+    }
     const b = $('ns-save'), t = b.textContent; b.textContent = 'Сохранено ✓';
     setTimeout(() => { b.textContent = t; location.reload(); }, 900);   // перечитать цены во всех расчётах
   }
 
   function открыть() { монтировать(); заполнить(); $('ns-overlay').classList.add('show'); }
   function закрыть() { const o = $('ns-overlay'); if (o) o.classList.remove('show'); }
-  function настроено() { return !!(localStorage.getItem(КЛЮЧ_П) && localStorage.getItem(КЛЮЧ_Р)); }
+  function настроено() { return !!localStorage.getItem(КЛЮЧ_П) && фирмы().length > 0; }
 
-  return { открыть, закрыть, настроено };
+  return { открыть, закрыть, настроено, фирмы };
 })();

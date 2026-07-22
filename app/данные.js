@@ -12,12 +12,16 @@
 
 const ДанныеУстройства = (function () {
   const ПРЕФИКС = 'dianast_';
+  // Служебное — не данные работы: не выгружаем и не затираем при импорте,
+  // иначе после загрузки файла человека выбрасывает на ввод кода доступа.
+  const СЛУЖЕБНЫЕ = ['dianast_app_session_v2'];
+  const свои = k => k && k.startsWith(ПРЕФИКС) && СЛУЖЕБНЫЕ.indexOf(k) === -1;
 
   function собрать() {
     const out = {};
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && k.startsWith(ПРЕФИКС)) out[k] = localStorage.getItem(k);
+      if (свои(k)) out[k] = localStorage.getItem(k);
     }
     return out;
   }
@@ -48,8 +52,8 @@ const ДанныеУстройства = (function () {
       const дата = (пакет.дата || '').slice(0, 10);
       if (!confirm(`Загрузить данные от ${дата} (${ключей} записей)?\n\nТо, что сейчас хранится на этом устройстве, будет заменено.`)) return;
       try {
-        for (const k of Object.keys(localStorage)) if (k.startsWith(ПРЕФИКС)) localStorage.removeItem(k);
-        for (const [k, v] of Object.entries(пакет.данные)) localStorage.setItem(k, v);
+        for (const k of Object.keys(localStorage)) if (свои(k)) localStorage.removeItem(k);
+        for (const [k, v] of Object.entries(пакет.данные)) if (свои(k)) localStorage.setItem(k, v);
       } catch (e) { alert('Не удалось записать данные: ' + e.message); return; }
       if (готово) готово(ключей);
     };

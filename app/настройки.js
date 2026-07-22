@@ -127,8 +127,12 @@ const Настройки = (function () {
 
     <div class="ns-actions">
       <button class="ns-btn" id="ns-save" type="button">Сохранить</button>
+      <button class="ns-btn ghost" id="ns-load" type="button">📂 Загрузить из файла</button>
       <button class="ns-btn ghost" id="ns-reset" type="button">Сбросить к демо</button>
+      <input type="file" id="ns-file" accept="application/json,.json" hidden>
     </div>
+    <div class="ns-hint">Есть файл с данными (прайс, реквизиты, клиенты)? Загрузите — заполнится всё разом,
+      вручную вбивать не придётся. Такой же файл делает кнопка «Сохранить в файл» на главной.</div>
   </div>`;
 
   function монтировать() {
@@ -143,6 +147,20 @@ const Настройки = (function () {
       ov.querySelectorAll('.ns-pane').forEach(p => p.classList.toggle('on', p.id === 'ns-pane-' + t.dataset.pane));
     });
     $('ns-save').onclick = сохранить;
+    $('ns-load').onclick = () => {
+      if (typeof ДанныеУстройства === 'undefined') {          // модуль данные.js подключён только на главной
+        alert('Загрузка файла доступна на главной странице приложения.'); return;
+      }
+      $('ns-file').click();
+    };
+    $('ns-file').onchange = (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      ДанныеУстройства.импорт(f, (n) => {
+        alert('Загружено записей: ' + n + '. Страница обновится.');
+        location.reload();
+      });
+      e.target.value = '';
+    };
     $('ns-reset').onclick = () => {
       if (!confirm('Убрать свой прайс и реквизиты с этого устройства и вернуть демо-значения?')) return;
       localStorage.removeItem(КЛЮЧ_П); localStorage.removeItem(КЛЮЧ_Р);

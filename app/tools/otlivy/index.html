@@ -60,6 +60,12 @@ select, input[type=number], input[type=text], input[type=email], textarea{
 }
 select:focus-visible, input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--терракота); }
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.pick-row{ display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
+.pick-row .chip{ white-space:nowrap; }
+/* на телефоне кнопка съедала пол-строки — уводим её под список */
+@media (max-width:430px){ .pick-row{ grid-template-columns:1fr; } .pick-row .chip{ justify-self:start; } }
+#client-price .btn-price{ margin-left:8px; background:none; border:none; padding:0; font:inherit;
+  color:var(--терракота); font-weight:700; text-decoration:underline; cursor:pointer; }
 .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 .other-wrap{ display:none; }
 .other-wrap.show{ display:grid; grid-template-columns:1.4fr 1fr; gap:10px; }
@@ -160,7 +166,7 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 }
 </style>
 <script src="../../vendor/supabase-2.110.8.js"></script>
-<script src="../../облако.js?v=2026-07-22k"></script>
+<script src="../../облако.js?v=2026-07-22l"></script>
 </head>
 <body>
 
@@ -202,6 +208,12 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 
   <div class="card">
     <h2>Данные для счёта и связи</h2>
+    <label class="f" for="client-pick">Клиент <span>(из справочника — подставит контакты и его цену)</span></label>
+    <div class="pick-row">
+      <select id="client-pick"></select>
+      <button class="chip" id="client-add" type="button" style="display:none">＋ В справочник</button>
+    </div>
+    <div class="cutline" id="client-price"></div>
     <label class="f">Организация или ФИО <span>(попадёт в счёт)</span></label>
     <input type="text" id="client" placeholder="ООО «Окна Плюс» / Иванов Иван Иванович">
     <div class="row2" style="margin-top:2px">
@@ -224,7 +236,7 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
     <div class="t">Смета</div>
     <table class="res"><tbody id="res-body"></tbody></table>
     <div class="res-row"><div class="l">Итого без НДС</div><div class="v" id="total">—</div></div>
-    <div class="res-row"><div class="l">НДС 20%</div><div class="v" id="total-vat">—</div></div>
+    <div class="res-row"><div class="l" id="vat-label">НДС 20%</div><div class="v" id="total-vat">—</div></div>
     <div class="res-row big"><div class="l">Всего с НДС</div><div class="v" id="total-nds">—</div></div>
     <div class="res-note" id="note"></div>
     <div class="btns">
@@ -255,9 +267,9 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 </div>
 
 <!-- цены.js — единый конфиг цен приложения (лежит в корне DIANAST-app, один на все инструменты) -->
-<script src="../../цены.js?v=2026-07-22k"></script>
+<script src="../../цены.js?v=2026-07-22l"></script>
 <!-- заявка-бухгалтеру.js — общая форма заявки на счёт (та же, что в калькуляторе доборных) -->
-<script src="../../заявка-бухгалтеру.js?v=2026-07-22k"></script>
-<script src="app.js?v=2026-07-22k"></script>
+<script src="../../заявка-бухгалтеру.js?v=2026-07-22l"></script>
+<script src="app.js?v=2026-07-22l"></script>
 </body>
 </html>

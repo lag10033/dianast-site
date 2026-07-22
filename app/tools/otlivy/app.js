@@ -101,10 +101,15 @@ function calcItem(el, k) {
   el.querySelector('.fld-piece').style.display = (isList || mode === 'piece') ? 'block' : 'none';
   el.querySelector('.plen-label').textContent = isList ? 'Длина 1 шт, мм' : 'Длина 1 шт, м';
 
-  const m2 = r2((c.ручной ? (parseFloat(el.querySelector('.other-price').value) || 0) : c[p.колонка]) * idx);
-  const minB = r2(ЦЕНЫ.минималка * idx);
   const wMM = Math.max(0, parseFloat(el.querySelector('.width').value) || 0);
-  const wM = wMM / 1000;
+  // Цена метра квадратного: обычный прайс — по цвету; выбран клиент со своим тарифом —
+  // тариф с его наценкой, а ширина берётся с припуском. Припуск даётся ТОЛЬКО отливам
+  // (проверено на счетах бухгалтера № 7 и № 8 от 13.07.2026). Цвет на цену клиента не влияет.
+  const К = ценаКлиента();
+  const прайсМ2 = r2((c.ручной ? (parseFloat(el.querySelector('.other-price').value) || 0) : c[p.колонка]) * idx);
+  const m2 = К ? r2(К.tariff * (1 + (К.markup || 0) / 100)) : прайсМ2;
+  const minB = К ? r2(К.minp || 0) : r2(ЦЕНЫ.минималка * idx);
+  const wM = (wMM + (К && отливЛи(p) ? (К.gap || 0) : 0)) / 1000;
   const цвет = c.ручной ? (el.querySelector('.other-name').value || 'цвет уточняется') : c.название;
 
   let warn = '';
@@ -217,6 +222,74 @@ function calcItem(el, k) {
            база: p.коротко || p.название, разв: wMM, цветКод, едЗБ: ед === 'м.п.' ? 'пог.м' : ед };
 }
 
+// ── Клиент из справочника ──
+// Справочник общий для всех калькуляторов и живёт в модуле «Заявка бухгалтеру».
+// Выбор клиента подставляет контакты; если у него задан свой тариф — смета считается
+// по его условиям, иначе остаётся обычный прайс (у нового клиента тарифа ещё нет).
+let КЛИЕНТ = null;
+// модуль объявлен через const — в window его нет, проверяем саму переменную
+const естьМодуль = () => typeof ЗаявкаБухгалтеру !== 'undefined' && ЗаявкаБухгалтеру;
+const справочник = () => (естьМодуль() ? ЗаявкаБухгалтеру.клиенты() : []);
+const ценаКлиента = () => (КЛИЕНТ && КЛИЕНТ.tariff > 0) ? КЛИЕНТ : null;
+const отливЛи = p => /отлив/i.test((p.название || '') + ' ' + (p.коротко || ''));
+const ндсПроцент = () => (КЛИЕНТ && КЛИЕНТ.vat != null) ? КЛИЕНТ.vat : ЦЕНЫ.ндс_процент;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+function рисоватьКлиентов() {
+  const sel = $('client-pick'), было = КЛИЕНТ ? КЛИЕНТ.id : '';
+  sel.innerHTML = '<option value="">— по обычному прайсу —</option>' +
+    справочник().map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  sel.value = было;
+}
+
+function выбратьКлиента(id) {
+  КЛИЕНТ = справочник().find(c => c.id === id) || null;
+  if (КЛИЕНТ) {
+    // подставляем карточку целиком: пустое поле у клиента должно очистить поле формы,
+    // иначе в счёт уедет телефон предыдущего покупателя
+    $('client').value = КЛИЕНТ.name || '';
+    $('client-phone').value = КЛИЕНТ.tel || '';
+    $('client-email').value = КЛИЕНТ.email || '';
+  }
+  плашкаКлиента(); кнопкаДобавить(); calc();
+}
+
+function плашкаКлиента() {
+  const b = $('client-price');
+  if (!КЛИЕНТ) { b.classList.remove('show'); b.innerHTML = ''; return; }
+  const назад = '<button class="btn-price" type="button" id="client-price-off">обычный прайс</button>';
+  if (ценаКлиента()) {
+    const ч = [`тариф ${fmt(КЛИЕНТ.tariff)} руб/м²`];
+    if (КЛИЕНТ.markup) ч.push(`наценка ${trimM(КЛИЕНТ.markup)} %`);
+    if (КЛИЕНТ.gap) ч.push(`припуск отливам ${Math.round(КЛИЕНТ.gap)} мм`);
+    if (КЛИЕНТ.minp) ч.push(`не ниже ${fmt(КЛИЕНТ.minp)} руб за м.п`);
+    b.innerHTML = `<b>Считаем по цене клиента:</b> ${ч.join(', ')}. Цвет на цену не влияет.` + назад;
+  } else {
+    b.innerHTML = '<b>Контакты подставлены.</b> Своего тарифа у клиента нет — считаем по обычному прайсу. ' +
+      'Задать тариф: «Заявка бухгалтеру» → «✎ Реквизиты».' + назад;
+  }
+  b.classList.add('show');
+  $('client-price-off').onclick = () => { $('client-pick').value = ''; выбратьКлиента(''); };
+}
+
+// Кнопка у поля имени: завести нового клиента либо дописать контакты выбранному.
+// Прячем, когда заводить нечего — чтобы не мозолила глаза при обычном расчёте.
+function кнопкаДобавить() {
+  const b = $('client-add');
+  const имя = $('client').value.trim();
+  const тел = $('client-phone').value.trim(), почта = $('client-email').value.trim();
+  if (!имя) { b.style.display = 'none'; return; }
+  if (КЛИЕНТ) {
+    const новые = (тел && тел !== (КЛИЕНТ.tel || '')) || (почта && почта !== (КЛИЕНТ.email || ''));
+    b.textContent = '⟳ Обновить контакты';
+    b.style.display = новые ? '' : 'none';
+    return;
+  }
+  const есть = справочник().some(c => (c.name || '').trim().toLowerCase() === имя.toLowerCase());
+  b.textContent = '＋ В справочник';
+  b.style.display = есть ? 'none' : '';
+}
+
 function calc() {
   const kUrg = parseFloat($('urgency').value) || 1;
   const kM = parseFloat($('markup').value) || 1;
@@ -245,20 +318,25 @@ function calc() {
     `<tr><td>${i + 1}. ${r.наимен}<div class="d">${r.колвоСтр} ${r.ед} × ${fmt(r.цена)} руб</div></td><td class="r">${руб(r.сумма)}</td></tr>`
   ).join('') || '<tr><td class="d">Добавьте позицию с размерами</td><td></td></tr>';
 
-  const vat = r2(totB * ЦЕНЫ.ндс_процент / 100), totN = r2(totB + vat);
+  const ндс = ндсПроцент();
+  const vat = r2(totB * ндс / 100), totN = r2(totB + vat);
+  $('vat-label').textContent = `НДС ${trimM(ндс)}%`;
   $('total').textContent = руб(totB);
   $('total-vat').textContent = руб(vat);
   $('total-nds').textContent = руб(totN);
   $('note').textContent =
-    (НАЦЕНКА_ПРОЦЕНТ ? `Наценка ${НАЦЕНКА_ПРОЦЕНТ}% ко всем ценам. ` : '') +
+    (ценаКлиента() ? '' : (НАЦЕНКА_ПРОЦЕНТ ? `Наценка ${НАЦЕНКА_ПРОЦЕНТ}% ко всем ценам. ` : '')) +
     (kUrg > 1 ? `Срочность ×${String(kUrg).replace('.', ',')}. ` : '') +
     (kM !== 1 ? `Повышающий коэффициент ×${String(kM).replace('.', ',')}. ` : '') +
-    'Цены — по действующему прайсу ЧПТУП «Дианаст». Изготовление 1–3 дня, доставка по РБ.';
+    (ценаКлиента()
+      ? `Цены — по условиям клиента «${КЛИЕНТ.name}». `
+      : 'Цены — по действующему прайсу ЧПТУП «Дианаст». ') +
+    'Изготовление 1–3 дня, доставка по РБ.';
 
-  window._rows = rows; window._totB = totB; window._vat = vat; window._totN = totN;
+  window._rows = rows; window._totB = totB; window._vat = vat; window._totN = totN; window._ндс = ндс;
   window._copyText = 'Смета DIANAST (отливы и изделия из жести):\n' +
     rows.map((r, i) => `${i + 1}) ${r.наимен} — ${r.колвоСтр} ${r.ед} × ${fmt(r.цена)} руб = ${руб(r.сумма)} без НДС`).join('\n') +
-    `\nИтого: ${руб(totB)} без НДС + НДС ${ЦЕНЫ.ндс_процент}% ${руб(vat)} = ${руб(totN)}` +
+    `\nИтого: ${руб(totB)} без НДС + НДС ${trimM(ндс)}% ${руб(vat)} = ${руб(totN)}` +
     '\nИзготовление 1–3 дня, доставка по РБ. Тел/Viber: +375 29 797-43-62';
 }
 
@@ -341,7 +419,7 @@ function buildInvoice() {
   </table>
   <div style="text-align:right;margin-top:10px;font-size:12.5px;line-height:1.7">
     Итого без НДС: <b>${fmt(window._totB)}</b> руб.<br>
-    НДС ${ЦЕНЫ.ндс_процент}%: <b>${fmt(window._vat)}</b> руб.<br>
+    НДС ${trimM(window._ндс != null ? window._ндс : ЦЕНЫ.ндс_процент)}%: <b>${fmt(window._vat)}</b> руб.<br>
     <span style="font-size:14.5px">Всего к оплате: <b style="color:#C1440E">${fmt(window._totN)} руб.</b></span>
   </div>
   <div style="margin-top:8px;font-size:12px"><b>Сумма прописью:</b> ${пропись(window._totN)}</div>
@@ -402,6 +480,31 @@ async function sendOrder() {
 $('client-file').addEventListener('change', () => {
   $('file-name').textContent = $('client-file').files[0] ? '📎 ' + $('client-file').files[0].name : 'Прикрепить файл…';
 });
+
+// ── справочник клиентов в форме заказа ──
+рисоватьКлиентов();
+$('client-pick').addEventListener('focus', рисоватьКлиентов);   // список могли пополнить в «Заявке бухгалтеру»
+$('client-pick').onchange = e => выбратьКлиента(e.target.value);
+$('client').addEventListener('input', () => {
+  // имя правят руками — отвязываемся от карточки, цена возвращается к прайсу
+  if (КЛИЕНТ && $('client').value.trim() !== (КЛИЕНТ.name || '').trim()) {
+    КЛИЕНТ = null; $('client-pick').value = ''; плашкаКлиента(); calc();
+  }
+  кнопкаДобавить();
+});
+['client-phone', 'client-email'].forEach(id => $(id).addEventListener('input', кнопкаДобавить));
+$('client-add').onclick = () => {
+  if (!естьМодуль()) return;
+  const c = ЗаявкаБухгалтеру.добавитьКлиента({
+    name: $('client').value.trim(),
+    tel: $('client-phone').value.trim(),
+    email: $('client-email').value.trim(),
+  });
+  if (!c) return;
+  рисоватьКлиентов(); $('client-pick').value = c.id; выбратьКлиента(c.id);
+  const b = $('client-add'); b.style.display = ''; b.textContent = 'Сохранено ✓';
+  setTimeout(кнопкаДобавить, 1400);
+};
 $('add').onclick = () => { if (!window._invalid) addItem(); };
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText(window._copyText); }
@@ -426,7 +529,8 @@ function позицииДляЗаявки() {
 $('zayavka-btn').onclick = () => {
   if (window._invalid) return;
   calc();
-  ЗаявкаБухгалтеру.открыть({ источник: позицииДляЗаявки, ключЧерновика: 'dianast_invoice_otlivy_v1', тариф: false });
+  ЗаявкаБухгалтеру.открыть({ источник: позицииДляЗаявки, ключЧерновика: 'dianast_invoice_otlivy_v1',
+                             тариф: false, клиентId: КЛИЕНТ ? КЛИЕНТ.id : '' });
 };
 $('inv-close').onclick = () => $('invoice-overlay').classList.remove('show');
 $('inv-print').onclick = () => window.print();

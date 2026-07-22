@@ -294,6 +294,7 @@ const ЗаявкаБухгалтеру = (function () {
         <div class="zb-row">
           <div class="zb-f grow"><label>Адрес</label><input id="zb-cl-addr" placeholder="РБ 220019 г. Минск ул. ..."></div>
           <div class="zb-f"><label>Тел./факс</label><input id="zb-cl-tel" placeholder="8(01642) 4-66-66"></div>
+          <div class="zb-f"><label>Email</label><input id="zb-cl-email" placeholder="pochta@example.com"></div>
         </div>
         <div class="zb-row">
           <div class="zb-f grow"><label>Расчётный счёт</label><input id="zb-cl-rs" placeholder="BY.."></div>
@@ -372,6 +373,35 @@ const ЗаявкаБухгалтеру = (function () {
   }
 
   // ── отрисовка ──
+  // условия выбранного клиента → в шапку заявки (тариф, припуск, минималка, наценка, НДС, вознаграждение)
+  function применитьКлиента() {
+    const c = клиент(); if (!c) return;
+    if (c.tariff) inv.tariff = c.tariff;
+    inv.gap = c.gap != null ? c.gap : ПРИПУСК_ПО_УМОЛЧАНИЮ;
+    inv.minp = c.minp || 0;
+    inv.markup = c.markup || 0;
+    inv.agent = c.agent || ''; inv.fee = c.fee || 0;
+    if (c.vat != null) inv.vat = c.vat;
+  }
+  // Завести карточку прямо из калькулятора (форма заказа в отливах). Реквизиты и условия —
+  // по умолчанию, дозаполняются здесь же, в «Реквизитах». Если имя уже есть — дописываем контакты.
+  function добавитьКлиента(д) {
+    д = д || {};
+    const имя = (д.name || '').trim(); if (!имя) return null;
+    const есть = clients.find(c => (c.name || '').trim().toLowerCase() === имя.toLowerCase());
+    if (есть) {                                   // такой уже заведён — обновляем контакты
+      if (д.tel) есть.tel = д.tel;
+      if (д.email) есть.email = д.email;
+      saveClients(); return есть;
+    }
+    // тариф НЕ ставим: условий нового клиента мы не знаем, и цена в калькуляторе
+    // не должна молча измениться. Пока тарифа нет — считается обычный прайс.
+    const c = { id: 'cl' + Date.now(), name: имя, addr: '', tel: д.tel || '', email: д.email || '',
+                unp: '', rs: '', bank: '', bic: '', goal: '', extra: '', agent: '', fee: 0,
+                tariff: 0, gap: ДЕФОЛТ.gap, minp: ДЕФОЛТ.minp,
+                markup: ДЕФОЛТ.markup, vat: ДЕФОЛТ.vat };
+    clients.push(c); saveClients(); return c;
+  }
   function рисоватьКлиентов() {
     const sel = $('zb-client');
     sel.innerHTML = clients.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('')
@@ -381,7 +411,7 @@ const ЗаявкаБухгалтеру = (function () {
   function заполнитьКарточку() {
     const c = клиент(), v = (id, val) => { $(id).value = val == null ? '' : val; };
     v('zb-cl-name', c ? c.name : ''); v('zb-cl-unp', c ? c.unp : ''); v('zb-cl-addr', c ? c.addr : '');
-    v('zb-cl-tel', c ? c.tel : '');
+    v('zb-cl-tel', c ? c.tel : ''); v('zb-cl-email', c ? c.email : '');
     v('zb-cl-rs', c ? c.rs : ''); v('zb-cl-bank', c ? c.bank : ''); v('zb-cl-bic', c ? c.bic : '');
     v('zb-cl-goal', c ? c.goal : ''); v('zb-cl-extra', c ? c.extra : '');
     v('zb-cl-tariff', c ? c.tariff : ''); v('zb-cl-gap', c ? c.gap : ПРИПУСК_ПО_УМОЛЧАНИЮ);
@@ -506,15 +536,7 @@ const ЗаявкаБухгалтеру = (function () {
     };
     $('zb-client').onchange = e => {
       inv.clientId = e.target.value;
-      const c = клиент();
-      if (c) {
-        if (c.tariff) inv.tariff = c.tariff;
-        inv.gap = c.gap != null ? c.gap : ПРИПУСК_ПО_УМОЛЧАНИЮ;
-        inv.minp = c.minp || 0;
-        inv.markup = c.markup || 0;
-        inv.agent = c.agent || ''; inv.fee = c.fee || 0;
-        if (c.vat != null) inv.vat = c.vat;
-      }
+      применитьКлиента();
       заполнитьКарточку(); рисоватьШапку(); рисоватьПозиции(); рисоватьИтоги(); сохранить();
     };
     ['date', 'days', 'tariff', 'gap', 'minp', 'markup', 'vat'].forEach(f => {
@@ -536,7 +558,7 @@ const ЗаявкаБухгалтеру = (function () {
     $('zb-cl-toggle').onclick = () => $('zb-cl-edit').classList.toggle('show');
     $('zb-cl-new').onclick = () => {
       const id = 'cl' + Date.now();
-      clients.push({ id, name: 'Новый клиент', addr: '', tel: '', unp: '', rs: '', bank: '', bic: '', goal: '', extra: '',
+      clients.push({ id, name: 'Новый клиент', addr: '', tel: '', email: '', unp: '', rs: '', bank: '', bic: '', goal: '', extra: '',
                      tariff: inv.tariff || ДЕФОЛТ.tariff, gap: inv.gap != null ? inv.gap : ДЕФОЛТ.gap,
                      minp: inv.minp != null ? inv.minp : ДЕФОЛТ.minp,
                      markup: inv.markup || 0, vat: inv.vat != null ? inv.vat : ДЕФОЛТ.vat });
@@ -547,7 +569,7 @@ const ЗаявкаБухгалтеру = (function () {
       const c = клиент(); if (!c) return;
       const g = id => $(id).value.trim();
       c.name = g('zb-cl-name') || 'Без названия'; c.unp = g('zb-cl-unp'); c.addr = g('zb-cl-addr');
-      c.tel = g('zb-cl-tel');
+      c.tel = g('zb-cl-tel'); c.email = g('zb-cl-email');
       c.rs = g('zb-cl-rs'); c.bank = g('zb-cl-bank'); c.bic = g('zb-cl-bic');
       c.goal = g('zb-cl-goal'); c.extra = g('zb-cl-extra');
       c.tariff = parseFloat(g('zb-cl-tariff')) || 0;
@@ -754,8 +776,11 @@ ${строки}
     const sig = сигнатура(позиции);
     if (saved && saved.sig === sig && Array.isArray(saved.lines) && saved.lines.length) {
       inv = saved;                                   // расчёт не менялся — возвращаем правки
+      if (о.клиентId && inv.clientId !== о.клиентId && clients.some(c => c.id === о.клиентId)) {
+        inv.clientId = о.клиентId; применитьКлиента();   // в калькуляторе выбрали другого клиента
+      }
     } else {
-      const c = clients[0] || null;
+      const c = (о.клиентId && clients.find(x => x.id === о.клиентId)) || clients[0] || null;
       const d = new Date();
       const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       inv = { clientId: c ? c.id : '', date: iso, days: 5,
@@ -778,5 +803,5 @@ ${строки}
   }
   function закрыть() { const o = $('zb-overlay'); if (o) o.classList.remove('show'); }
 
-  return { открыть, закрыть, клиенты: () => clients, поставщик, суммаПрописью };
+  return { открыть, закрыть, клиенты: () => clients, добавитьКлиента, поставщик, суммаПрописью };
 })();

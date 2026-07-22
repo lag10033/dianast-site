@@ -81,7 +81,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 .dbtn.ghost{ background:#fff; color:var(--чёрный); border:1.5px solid var(--рамка); }
 .dbtn.ghost:hover{ border-color:var(--терракота); color:var(--терракота); }
 </style>
-<script src="вход.js?v=2026-07-22h"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="облако.js?v=2026-07-22i"></script>
 </head>
 <body>
 
@@ -170,14 +171,13 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   Рабочее место жестянщика · версия 0.1 (каркас)
 </footer>
 
-<script src="цены.js?v=2026-07-22h"></script>
-<script src="настройки.js?v=2026-07-22h"></script>
-<script src="данные.js?v=2026-07-22h"></script>
+<script src="цены.js?v=2026-07-22i"></script>
+<script src="настройки.js?v=2026-07-22i"></script>
+<script src="данные.js?v=2026-07-22i"></script>
 <script>
 // ── Выход: сбрасывает код доступа на этом устройстве ──
 document.getElementById('logout').onclick = () => {
-  if (confirm('Выйти? Код доступа придётся ввести заново. Данные (клиенты, заказы) останутся на устройстве.'))
-    ВыйтиИзПриложения();
+  if (confirm('Выйти из аккаунта? Данные останутся на устройстве и в облаке.')) Облако.выйти();
 };
 
 // ── Настройки: прайс и реквизиты ──

@@ -123,7 +123,13 @@
   document.body.appendChild(hint);
   var hintSeen = false;
   try{ hintSeen = !!localStorage.getItem(HINT_LS); }catch(e){}
-  if (!hintSeen) setTimeout(function(){ if (!win.classList.contains('open')) hint.style.display = 'block'; }, 5000);
+  // Показываем подсказку через 5 сек и убираем через 10 сек показа:
+  // фиксированная подсказка перекрывала главную кнопку в первом экране на мобильных.
+  if (!hintSeen) setTimeout(function(){
+    if (win.classList.contains('open')) return;
+    hint.style.display = 'block';
+    setTimeout(function(){ hint.style.display = 'none'; }, 10000);
+  }, 5000);
 
   window.dianastChat = { open: open };
 })();

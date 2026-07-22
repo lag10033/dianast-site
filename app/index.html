@@ -153,11 +153,12 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   </section>
 
   <section class="data-box">
-    <h4>Данные устройства</h4>
-    <p>Клиенты, заказы, свои профили и настройки хранятся в этом браузере. На другом устройстве
-       их нет — перенесите файлом. Он же резервная копия: чистка браузера стирает всё разом.</p>
+    <h4>Настройки и данные устройства</h4>
+    <p id="settings-note">Прайс, реквизиты, клиенты и заказы хранятся в этом браузере, а не в коде программы.
+       На другом устройстве их нет — перенесите файлом. Он же резервная копия: чистка браузера стирает всё разом.</p>
     <div class="data-actions">
-      <button class="dbtn" id="data-export" type="button">💾 Сохранить в файл</button>
+      <button class="dbtn" id="open-settings" type="button">⚙ Настройки: прайс и реквизиты</button>
+      <button class="dbtn ghost" id="data-export" type="button">💾 Сохранить в файл</button>
       <button class="dbtn ghost" id="data-import" type="button">📂 Загрузить из файла</button>
       <input type="file" id="data-file" accept="application/json,.json" hidden>
     </div>
@@ -169,6 +170,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   Рабочее место жестянщика · версия 0.1 (каркас)
 </footer>
 
+<script src="цены.js"></script>
+<script src="настройки.js"></script>
 <script src="данные.js"></script>
 <script>
 // ── Выход: сбрасывает код доступа на этом устройстве ──
@@ -176,6 +179,15 @@ document.getElementById('logout').onclick = () => {
   if (confirm('Выйти? Код доступа придётся ввести заново. Данные (клиенты, заказы) останутся на устройстве.'))
     ВыйтиИзПриложения();
 };
+
+// ── Настройки: прайс и реквизиты ──
+document.getElementById('open-settings').onclick = () => Настройки.открыть();
+if (!Настройки.настроено()) {
+  const n = document.getElementById('settings-note');
+  n.innerHTML = '<b style="color:#C1440E">Прайс пока демонстрационный, реквизиты пустые.</b> ' +
+    'Откройте настройки и впишите свои — иначе сметы и счета уйдут клиенту с чужими цифрами. ' +
+    'Дальше всё хранится в этом браузере и переносится файлом.';
+}
 
 // ── Перенос данных между устройствами ──
 document.getElementById('data-export').onclick = () => {

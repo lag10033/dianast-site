@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Библиотека доборных элементов — DIANAST</title>
+<meta name="description" content="Параметрические доборные элементы: уголки, отлив, нащельник, пешка. Вводите стороны — профиль перестраивается и считается развёртка. Производство DIANAST, Кобрин.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A;
+  --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B;
+  --жесть:#aeb7bf; --жесть2:#7f8a93;
+}
+html{ scroll-behavior:smooth; }
+body{ font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--фон); color:var(--чёрный); line-height:1.5; min-height:100vh; }
+img{ max-width:100%; display:block; }
+button{ cursor:pointer; font-family:inherit; }
+
+header{ background:#fff; border-bottom:1px solid var(--рамка); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand img{ height:44px; }
+.bn{ font-size:22px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:9px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.phone{ text-align:right; }
+.phone a{ font-size:16px; font-weight:800; color:var(--чёрный); text-decoration:none; }
+.phone div{ font-size:11px; color:var(--текст2); }
+
+main{ max-width:820px; margin:0 auto; padding:20px 16px 40px; }
+h1{ font-size:clamp(20px,5vw,26px); line-height:1.25; font-weight:800; margin:6px 0 4px; }
+h1 em{ font-style:normal; color:var(--терракота); }
+.sub{ font-size:13.5px; color:var(--текст2); margin-bottom:16px; }
+
+.card{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; margin-bottom:14px; }
+.card h2{ font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--терракота); margin-bottom:8px; }
+
+.tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+.tab{ border:1.5px solid var(--рамка); background:#fff; border-radius:999px; font-size:13px; padding:9px 15px; transition:all .15s; color:var(--текст2); font-weight:700; }
+.tab.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.gallery{ display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:8px; }
+.gcard{ position:relative; border:1.5px solid var(--рамка); border-radius:10px; background:#fff; padding:5px 5px 4px; cursor:pointer; text-align:center; transition:border-color .12s, box-shadow .12s; }
+.gx{ position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; border:none; background:#e2ddd6; color:#6f695f; font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center; z-index:2; padding:0; }
+.gx:hover{ background:var(--кирпич); color:#fff; }
+.el-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+.el-head h2{ margin:0; }
+.manage-btn{ border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:9px; font-size:12px; font-weight:700; padding:5px 10px; flex:0 0 auto; }
+.manage-btn:hover{ border-color:var(--терракота); color:var(--терракота); }
+.manage-btn.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.gcard.trashcard{ border-style:dashed; color:var(--текст2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; min-height:60px; }
+/* перетаскивание порядка в режиме настройки — «как на iPhone» */
+@keyframes jgl{ 0%{transform:rotate(-1.1deg)} 50%{transform:rotate(1.1deg)} 100%{transform:rotate(-1.1deg)} }
+.gallery.manage-on .gcard:not(.plus):not(.trashcard){ animation:jgl .4s ease-in-out infinite; touch-action:none; cursor:grab; }
+.gallery.manage-on .gcard:not(.plus):not(.trashcard):nth-child(odd){ animation-delay:-.2s; }
+.gallery.manage-on .gcard.dragging{ animation:none; opacity:.35; }
+.gcard.dragclone{ position:fixed; z-index:110; pointer-events:none; opacity:.9; box-shadow:0 10px 26px rgba(0,0,0,.3); transform:translate(-50%,-50%); margin:0; animation:none; background:#fff; }
+#trash-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:75; overflow:auto; padding:24px 12px; }
+#trash-overlay.show{ display:block; }
+#trash-box{ max-width:480px; margin:0 auto; background:#fff; border-radius:16px; padding:18px 20px; position:relative; }
+#trash-box h2{ margin:0 0 4px; }
+.trash-sub{ font-size:12.5px; color:var(--текст2); margin-bottom:12px; }
+.gcard:hover{ border-color:var(--акцент); }
+.gcard.on{ border-color:var(--терракота); box-shadow:0 0 0 2px rgba(212,82,30,.16); }
+.gcard svg{ width:100%; height:auto; display:block; background:#fbfaf8; border-radius:6px; }
+.gcard .gname{ font-size:10.5px; font-weight:700; color:var(--текст2); margin-top:3px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gcard.on .gname{ color:var(--терракота); }
+.gcard.plus{ border-style:dashed; border-color:var(--терракота); color:var(--терракота); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px; min-height:86px; }
+.gcard.plus:hover{ background:#fdf1ea; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip{ border:1.5px solid var(--рамка); background:#fff; border-radius:999px; font-size:12.5px; padding:7px 12px; color:var(--текст2); font-weight:700; transition:all .12s; }
+.chip.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.hemnote{ font-size:11.5px; color:#7a5c00; background:#fdf6df; border:1px solid #ead9a0; border-radius:8px; padding:7px 9px; margin-top:8px; line-height:1.4; }
+.hem-subtle{ border:none; background:none; color:#9a938a; font-size:11px; text-decoration:underline dotted; padding:2px; cursor:pointer; }
+.hem-subtle.on{ color:var(--терракота); }
+.mini-lbl{ font-size:12px; font-weight:700; color:var(--текст2); margin:11px 0 6px; }
+.mrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
+.mrow label{ font-size:12.5px; font-weight:600; color:var(--текст2); flex:1; }
+.mrow input{ width:96px; font-size:15px; padding:7px 9px; border:1.5px solid var(--рамка); border-radius:9px; text-align:right; font-family:inherit; }
+.mrow input:focus-visible{ outline:none; border-color:var(--терракота); }
+.mwarn{ font-size:12px; font-weight:700; color:#b3261e; margin-top:6px; line-height:1.4; }
+.arrow-hint{ font-size:10.5px; color:#9a938a; margin-top:6px; line-height:1.4; }
+
+.history-wrap{ margin-top:12px; border-top:1px solid var(--рамка); padding-top:12px; }
+.history-head{ display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:800; color:var(--текст2); text-transform:uppercase; letter-spacing:.7px; margin-bottom:8px; }
+.history-head button{ border:none; background:none; color:var(--терракота); font-size:11.5px; font-weight:700; text-transform:none; letter-spacing:0; padding:2px 4px; }
+.hist-empty{ font-size:12px; color:#9a938a; background:#faf8f5; border:1px dashed var(--рамка); border-radius:9px; padding:10px 11px; line-height:1.4; }
+.hist-row{ display:flex; align-items:center; gap:8px; border:1px solid var(--рамка); border-radius:10px; padding:8px 10px; margin-bottom:7px; background:#fff; }
+.hist-row:hover{ border-color:var(--акцент); }
+.hist-mini{ flex:0 0 auto; width:56px; height:44px; background:#faf8f5; border:1px solid var(--рамка); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+.hist-mini svg{ width:100%; height:100%; display:block; }
+.hist-main{ flex:1; min-width:0; }
+.hist-name{ font-size:11px; font-weight:700; color:var(--текст2); margin-bottom:1px; }
+.hist-sides{ font-size:14px; font-weight:800; color:var(--чёрный); display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.hist-razv{ font-size:11.5px; font-weight:800; color:var(--терракота); }
+.hist-meta{ font-size:11px; color:var(--текст2); margin-top:2px; }
+.hist-btns{ display:flex; gap:4px; flex:0 0 auto; }
+.hist-b{ border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:30px; height:30px; font-size:15px; line-height:1; color:var(--текст2); display:flex; align-items:center; justify-content:center; }
+.hist-b.load:hover{ border-color:var(--терракота); color:var(--терракота); }
+.hist-b.copy:hover{ border-color:#2e7d32; color:#2e7d32; }
+.hist-b.del:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+
+.workspace{ display:grid; grid-template-columns:1.15fr 1fr; gap:14px; }
+@media (max-width:660px){ .workspace{ grid-template-columns:1fr; } }
+
+.draw-wrap{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; position:relative; }
+/* размеры на чертеже кликабельны */
+.dimlbl{ cursor:pointer; }
+.dimlbl:hover rect{ fill:#fff; stroke:var(--терракота); stroke-width:1.5; }
+.dimlbl:hover text{ text-decoration:underline; }
+.dim-input{ position:absolute; transform:translate(-50%,-50%); width:66px; font-size:15px; font-weight:800; text-align:center; padding:4px 6px; border:2px solid var(--терракота); border-radius:8px; background:#fff; z-index:6; box-shadow:0 4px 14px rgba(0,0,0,.18); font-family:inherit; }
+.dim-input:focus-visible{ outline:none; }
+.draw-wrap .dt{ font-size:15px; font-weight:800; margin-bottom:2px; }
+.draw-wrap .dd{ font-size:12px; color:var(--текст2); margin-bottom:8px; }
+svg.profile{ width:100%; height:auto; display:block; background:#fbfaf8; border:1px solid var(--рамка); border-radius:10px; }
+.draft-note{ font-size:11.5px; color:#7a5c00; background:#fdf6df; border:1px solid #ead9a0; border-radius:8px; padding:8px 10px; margin-top:10px; line-height:1.4; }
+
+.inputs{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; }
+.inputs h3{ font-size:12px; text-transform:uppercase; letter-spacing:.8px; color:var(--текст2); margin-bottom:8px; }
+.frow{ display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+.frow .swatch{ width:14px; height:14px; border-radius:4px; flex:0 0 auto; }
+.frow label{ flex:1; font-size:13px; font-weight:700; }
+.frow label span{ font-weight:400; color:var(--текст2); font-size:11.5px; }
+.frow input{ width:96px; font-size:16px; padding:8px 10px; border:1.5px solid var(--рамка); border-radius:9px; text-align:right; font-family:inherit; }
+.frow input:focus-visible{ outline:none; border-color:var(--терракота); }
+.frow.ang label{ color:var(--текст2); }
+.frow .fdel{ flex:0 0 auto; border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:28px; height:28px; font-size:15px; line-height:1; color:var(--текст2); display:flex; align-items:center; justify-content:center; }
+.frow .fdel:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.sep{ height:1px; background:var(--рамка); margin:12px 0; }
+
+.razv{ background:var(--чёрный); color:#fff; border-radius:12px; padding:14px 16px; margin-top:12px; }
+.razv .rt{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#9a9a9a; }
+.razv .rv{ font-size:30px; font-weight:900; color:var(--акцент); line-height:1.1; margin-top:2px; }
+.razv .rv small{ font-size:15px; font-weight:700; color:#cfcfcf; }
+.razv .formula{ font-size:12px; color:#bdbdbd; margin-top:6px; }
+
+.flat{ margin-top:12px; }
+.flat .fh{ font-size:12px; font-weight:700; color:var(--текст2); margin-bottom:6px; }
+svg.flatsvg{ width:100%; height:auto; display:block; }
+.tpl-btn{ margin-top:9px; width:100%; border:1.5px solid var(--рамка); background:#fff; color:var(--чёрный); border-radius:9px; font-size:13px; font-weight:700; padding:9px; cursor:pointer; }
+.tpl-btn:hover{ border-color:var(--терракота); color:var(--терракота); }
+#tpl-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:70; overflow:auto; padding:20px 10px; }
+#tpl-overlay.show{ display:block; }
+#tpl-box{ max-width:1120px; margin:0 auto; }
+#tpl-actions{ display:flex; gap:8px; justify-content:flex-end; margin-bottom:10px; flex-wrap:wrap; }
+#tpl-actions button{ font-family:inherit; font-size:13.5px; font-weight:700; padding:9px 14px; border-radius:9px; cursor:pointer; border:1.5px solid #fff; background:#fff; color:#1a1a1a; }
+#tpl-actions #tpl-print{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.tpl-page{ width:190mm; height:277mm; background:#fff; margin:0 auto 12px; box-shadow:0 8px 30px rgba(0,0,0,.35); border-radius:3px; overflow:hidden; }
+.tpl-page svg{ display:block; width:100%; height:100%; }
+#tpl-list{ max-width:760px; margin:0 auto 14px; background:#fff; border-radius:12px; padding:12px 14px; }
+#tpl-list h3{ margin:0 0 4px; font-size:15px; }
+.tpl-sub{ font-size:12.5px; color:var(--текст2); margin-bottom:10px; }
+.tplrow{ display:flex; align-items:center; gap:10px; border:1px solid var(--рамка); border-radius:10px; padding:8px 11px; margin-bottom:7px; }
+.tplrow .tn{ flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--терракота); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+.tplrow .tm{ flex:1; min-width:0; }
+.tplrow .tm b{ font-size:14px; } .tplrow .tm span{ font-size:11.5px; color:var(--текст2); }
+.tplrow .tdel{ flex:0 0 auto; border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:30px; height:30px; font-size:15px; color:var(--текст2); }
+.tplrow .tdel:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.tpl-empty{ font-size:13px; color:var(--текст2); background:#faf8f5; border:1px dashed var(--рамка); border-radius:9px; padding:12px; text-align:center; }
+@media print{
+  html, body{ margin:0 !important; padding:0 !important; background:#fff !important; height:auto !important; }
+  body > *:not(#tpl-overlay){ display:none !important; }   /* печатаем ТОЛЬКО страницы шаблонов */
+  #tpl-overlay{ display:block !important; position:static !important; inset:auto !important; z-index:auto !important; background:#fff !important; padding:0 !important; margin:0 !important; overflow:visible !important; }
+  #tpl-box{ max-width:none !important; margin:0 !important; }
+  #tpl-actions, #tpl-list{ display:none !important; }
+  .tpl-page{ box-shadow:none !important; border-radius:0 !important; margin:0 !important; overflow:hidden; page-break-after:always; break-after:page; }
+  .tpl-page:last-child{ page-break-after:auto; break-after:auto; }
+  @page{ size:A4 portrait; margin:10mm; }
+}
+
+.parts-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px; font-weight:800; color:var(--текст2); text-transform:uppercase; letter-spacing:.6px; margin:12px 0 9px; }
+.parts-razv{ color:var(--терракота); text-transform:none; letter-spacing:0; font-weight:800; white-space:nowrap; }
+.part-row{ display:flex; align-items:center; gap:7px; margin-bottom:8px; flex-wrap:wrap; }
+.part-row .pin{ width:76px; font-size:15px; padding:7px 9px; border:1.5px solid var(--рамка); border-radius:9px; text-align:right; font-family:inherit; }
+.part-row .pin:focus-visible{ outline:none; border-color:var(--терракота); }
+.part-row .pu{ font-size:12.5px; color:var(--текст2); font-weight:600; }
+.part-row .peq{ flex:1; min-width:118px; text-align:right; font-size:13px; font-weight:800; color:var(--чёрный); }
+.part-row .pdel{ border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:30px; height:30px; font-size:16px; line-height:1; color:var(--текст2); flex:0 0 auto; }
+.part-row .pdel:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.part-warn{ width:100%; font-size:11.5px; color:#b3261e; font-weight:700; }
+.parts-add{ width:100%; border:1.5px dashed var(--терракота); color:var(--терракота); background:#fff; border-radius:10px; font-weight:800; font-size:13px; padding:9px; margin:4px 0 11px; }
+.parts-add:hover{ background:#fdf1ea; }
+.parts-sum{ font-size:12.5px; color:var(--текст2); margin-bottom:11px; }
+.parts-sum b{ color:var(--чёрный); font-weight:800; }
+.parts-copy{ width:100%; background:var(--терракота); color:#fff; border:none; border-radius:10px; font-size:14.5px; font-weight:800; padding:12px; }
+.parts-copy:hover{ background:var(--кирпич); }
+.parts-copy:disabled, .parts-copy.disabled{ background:#d9d2c8; color:#fff; cursor:not-allowed; }
+.parts-block-note{ font-size:12px; color:#b3261e; font-weight:700; margin-bottom:9px; line-height:1.4; }
+.ral-row{ display:flex; align-items:center; gap:9px; }
+.ral-swatch{ width:26px; height:26px; border-radius:7px; border:1.5px dashed var(--рамка); flex:0 0 auto; background:transparent; }
+.ral-select{ flex:1; font-size:13.5px; padding:8px 9px; border:1.5px solid var(--рамка); border-radius:9px; font-family:inherit; background:#fff; color:var(--чёрный); }
+.ral-select:focus-visible{ outline:none; border-color:var(--терракота); }
+.ral-custom{ width:100%; margin-top:8px; font-size:15px; padding:8px 10px; border:1.5px solid var(--рамка); border-radius:9px; text-align:right; font-family:inherit; }
+.ral-custom:focus-visible{ outline:none; border-color:var(--терракота); }
+
+.tab-plus{ border-style:dashed; color:var(--терракота); border-color:var(--терракота); }
+.el-del{ border:none; background:none; color:#b3261e; font-size:12px; font-weight:700; padding:0 0 8px; cursor:pointer; }
+.el-del:hover{ text-decoration:underline; }
+.el-name-input{ width:100%; font-size:15px; font-weight:800; padding:8px 10px; border:1.5px solid var(--рамка); border-radius:9px; font-family:inherit; margin-bottom:4px; color:var(--чёрный); }
+.el-name-input:focus-visible{ outline:none; border-color:var(--терракота); }
+.el-name-input::placeholder{ font-weight:600; color:#b5aca0; }
+.copy-section{ font-size:11.5px; color:var(--текст2); margin:8px 0 2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.copy-section .cs-lbl{ font-weight:700; }
+.copy-section .cs-btn{ border:1.5px solid var(--рамка); background:#fff; color:var(--терракота); border-radius:8px; font-size:11.5px; font-weight:700; padding:4px 9px; }
+.copy-section .cs-btn:hover{ background:#fdf1ea; border-color:var(--терракота); }
+
+#builder-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:60; overflow:auto; padding:24px 12px; }
+#builder-overlay.show{ display:block; }
+#builder-box{ max-width:540px; margin:0 auto; background:#fff; border-radius:16px; padding:20px; }
+#builder-box h2{ font-size:18px; font-weight:800; margin-bottom:4px; }
+#builder-box .b-sub{ font-size:12.5px; color:var(--текст2); margin-bottom:6px; }
+.b-lbl{ font-size:12px; font-weight:800; color:var(--текст2); text-transform:uppercase; letter-spacing:.6px; margin:14px 0 6px; }
+#b-name{ width:100%; font-size:16px; padding:10px 11px; border:1.5px solid var(--рамка); border-radius:10px; font-family:inherit; }
+#b-name:focus-visible{ outline:none; border-color:var(--терракота); }
+.b-seg{ border:1px solid var(--рамка); border-radius:10px; padding:10px; margin-bottom:8px; }
+.b-seg-head{ display:flex; align-items:center; gap:8px; }
+.b-seg-n{ font-size:13px; font-weight:800; flex:1; }
+.b-len{ width:92px; font-size:15px; padding:7px 9px; border:1.5px solid var(--рамка); border-radius:8px; text-align:right; font-family:inherit; }
+.b-mm{ font-size:12px; color:var(--текст2); }
+.b-del{ border:none; background:none; color:#b5aca0; font-size:19px; line-height:1; padding:2px 4px; }
+.b-del:hover{ color:var(--кирпич); }
+.b-bend{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:9px; padding-top:9px; border-top:1px dashed var(--рамка); font-size:12px; color:var(--текст2); }
+.b-dir{ border:1.5px solid var(--рамка); background:#fff; border-radius:8px; font-size:12px; font-weight:700; padding:5px 10px; color:var(--текст2); }
+.b-dir.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.b-ang{ width:58px; font-size:14px; padding:5px 7px; border:1.5px solid var(--рамка); border-radius:8px; text-align:right; font-family:inherit; }
+.b-add{ width:100%; border:1.5px dashed var(--терракота); color:var(--терракота); background:#fff; border-radius:10px; font-weight:800; font-size:13.5px; padding:10px; margin-top:2px; }
+.b-add:hover{ background:#fdf1ea; }
+.b-preview-wrap{ margin-top:14px; }
+#b-preview{ width:100%; height:auto; background:#fbfaf8; border:1px solid var(--рамка); border-radius:10px; }
+.b-razv{ font-size:13px; margin-top:6px; color:var(--текст2); }
+.b-razv b{ color:var(--терракота); font-size:15px; }
+.b-error{ color:#b3261e; font-size:12.5px; font-weight:700; margin-top:8px; min-height:15px; }
+.b-actions{ display:flex; gap:10px; margin-top:8px; }
+.b-btn{ flex:1; border:none; border-radius:10px; font-size:14.5px; font-weight:800; padding:12px; }
+.b-btn.cancel{ background:#ece8e2; color:#333; }
+.b-btn.save{ background:var(--терракота); color:#fff; }
+.b-btn.save:hover{ background:var(--кирпич); }
+
+footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18px 16px 30px; }
+footer a{ color:var(--терракота); font-weight:700; text-decoration:none; }
+
+/* ── Корзина / заказ-лист ── */
+.parts-order{ width:100%; margin-top:9px; background:#fff; color:var(--терракота); border:1.5px solid var(--терракота); border-radius:10px; font-size:14px; font-weight:800; padding:11px; }
+.parts-order:hover{ background:#fdf1ea; }
+.parts-mode{ display:flex; gap:0; background:#f1ede7; border-radius:9px; padding:3px; margin:2px 0 10px; }
+.parts-mode button{ flex:1; border:none; background:none; font-size:12.5px; font-weight:800; color:var(--текст2); padding:7px; border-radius:7px; }
+.parts-mode button.on{ background:#fff; color:var(--терракота); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.parts-meters{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.parts-meters label{ font-size:13px; font-weight:700; flex:1; }
+.parts-meters input{ width:110px; font-size:16px; padding:8px 10px; border:1.5px solid var(--рамка); border-radius:9px; text-align:right; font-family:inherit; }
+.parts-meters input:focus-visible{ outline:none; border-color:var(--терракота); }
+.parts-meters-note{ font-size:11.5px; color:var(--текст2); margin:0 0 10px; line-height:1.4; }
+.order-flash{ font-size:12px; font-weight:700; color:#1f5130; background:#eef7f0; border:1px solid #b7ddc3; border-radius:8px; padding:7px 9px; margin-top:8px; display:none; }
+.cart-fab{ position:fixed; right:16px; bottom:16px; z-index:50; background:var(--терракота); color:#fff; border:none; border-radius:999px; font-size:14px; font-weight:800; padding:13px 17px; box-shadow:0 6px 20px rgba(193,68,14,.35); display:flex; align-items:center; gap:9px; }
+.cart-fab:hover{ background:var(--кирпич); }
+.cart-fab .cnt{ background:#fff; color:var(--терракота); border-radius:999px; min-width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:900; padding:0 6px; }
+#order-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:60; overflow:auto; padding:24px 12px; }
+#order-overlay.show{ display:block; }
+#order-box{ max-width:560px; margin:0 auto; background:#fff; border-radius:16px; padding:20px; position:relative; }
+#order-box h2{ font-size:18px; font-weight:800; margin-bottom:2px; }
+.order-sub{ font-size:12.5px; color:var(--текст2); margin-bottom:12px; }
+.order-x{ position:absolute; top:14px; right:14px; border:none; background:none; font-size:24px; line-height:1; color:#b5aca0; }
+.order-x:hover{ color:var(--кирпич); }
+.order-empty{ font-size:13px; color:#9a938a; background:#faf8f5; border:1px dashed var(--рамка); border-radius:10px; padding:16px; text-align:center; line-height:1.45; }
+.oitem{ display:flex; gap:10px; align-items:flex-start; border:1px solid var(--рамка); border-radius:11px; padding:11px 12px; margin-bottom:9px; }
+.oitem-mini{ flex:0 0 auto; width:58px; height:46px; background:#faf8f5; border:1px solid var(--рамка); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+.oitem-mini svg{ width:100%; height:100%; display:block; }
+.oitem-body{ flex:1; min-width:0; }
+.oitem-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.oitem-name{ font-size:14.5px; font-weight:800; cursor:pointer; }
+.oitem-name:hover{ color:var(--терракота); }
+.oitem-num{ flex:0 0 auto; width:22px; height:22px; border-radius:50%; background:var(--терракота); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+.oitem-edit,.hist-edit{ font-size:11px; color:#b5aca0; }
+.oitem-name-inp,.hist-name-inp{ font-size:14px; font-weight:800; padding:2px 7px; border:1.5px solid var(--терракота); border-radius:7px; font-family:inherit; width:100%; max-width:220px; }
+.oitem-name-inp:focus-visible,.hist-name-inp:focus-visible{ outline:none; }
+.hist-name-txt{ cursor:pointer; }
+.hist-name-txt:hover{ color:var(--терракота); }
+.oitem-razv{ font-size:12px; font-weight:800; color:var(--терракота); white-space:nowrap; }
+.oitem-meta{ font-size:11.5px; color:var(--текст2); margin-top:2px; }
+.oitem-sides{ margin-top:6px; display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+.oside-chip{ font-size:12.5px; font-weight:800; padding:2px 9px; border-radius:6px; line-height:1.5; }
+.oside-mm{ font-size:11px; color:var(--текст2); }
+.oitem-tpl{ display:inline-flex; align-items:center; gap:7px; margin-top:8px; font-size:12.5px; font-weight:700; color:var(--текст2); cursor:pointer; }
+.oitem-tpl input{ width:16px; height:16px; accent-color:var(--терракота); cursor:pointer; }
+.oitem-tpl input:disabled{ cursor:not-allowed; opacity:.5; }
+.order-tpl-btn{ width:100%; margin:10px 0 0; background:#fff; color:var(--терракота); border:1.5px solid var(--терракота); border-radius:10px; font-size:14px; font-weight:800; padding:11px; }
+.order-tpl-btn:hover{ background:#fdf1ea; }
+.order-tpl-btn:disabled{ opacity:.5; border-color:var(--рамка); color:var(--текст2); cursor:not-allowed; background:#fff; }
+.oitem-rows{ display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:7px; }
+.oitem-rows .chip-r{ background:#f3efe9; border-radius:6px; padding:2px 7px; font-size:12px; font-weight:700; }
+.oitem-del{ margin-left:auto; border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:28px; height:28px; font-size:15px; color:var(--текст2); flex:0 0 auto; }
+.oitem-del:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.order-total{ font-size:12.5px; color:var(--текст2); margin-top:10px; }
+.order-total b{ color:var(--чёрный); }
+.order-actions{ display:flex; gap:10px; margin-top:14px; }
+.order-clear{ border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:11px; font-size:13.5px; font-weight:800; padding:13px 16px; flex:0 0 auto; }
+.order-clear:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.order-to-raskroy{ border:none; background:var(--терракота); color:#fff; border-radius:11px; font-size:14.5px; font-weight:800; padding:13px; flex:1; }
+.order-to-raskroy:hover{ background:var(--кирпич); }
+.order-to-raskroy:disabled{ background:#d9d2c8; cursor:not-allowed; }
+
+/* ── Заявка бухгалтеру (счёт) ── */
+.order-inv-btn{ width:100%; margin:9px 0 0; background:var(--чёрный); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:800; padding:12px; }
+.order-inv-btn:hover{ background:var(--терракота); }
+.order-inv-btn:disabled{ background:#d9d2c8; cursor:not-allowed; }
+/* ── Визуальный редактор формы ── */
+.edit-shape-btn{ width:100%; margin:2px 0 8px; background:#fff; color:var(--терракота); border:1.5px solid var(--терракота); border-radius:10px; font-size:13.5px; font-weight:800; padding:9px; }
+.save-row{ display:flex; gap:8px; margin:-4px 0 8px; }
+.save-cur-btn{ flex:1; background:var(--терракота); color:#fff; border:1.5px solid var(--терракота); border-radius:10px; font-size:13.5px; font-weight:800; padding:9px; }
+.save-cur-btn:hover{ background:var(--кирпич); border-color:var(--кирпич); }
+.save-cur-btn:disabled{ opacity:.7; }
+.save-new-btn{ flex:1; background:#fff; color:var(--текст2); border:1.5px solid var(--рамка); border-radius:10px; font-size:13.5px; font-weight:800; padding:9px; }
+.save-new-btn:hover{ border-color:var(--терракота); color:var(--терракота); }
+.edit-shape-btn:hover{ background:#fdf1ea; }
+#shape-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:70; overflow:auto; padding:20px 12px; }
+#shape-overlay.show{ display:block; }
+#shape-box{ max-width:640px; margin:0 auto; background:#fff; border-radius:16px; padding:18px 20px; position:relative; }
+#shape-box h2{ font-size:18px; font-weight:800; }
+.shape-sub{ font-size:12.5px; color:var(--текст2); margin:2px 0 10px; line-height:1.45; }
+.shape-x{ position:absolute; top:12px; right:14px; border:none; background:none; font-size:26px; line-height:1; color:#b5aca0; }
+.shape-x:hover{ color:var(--кирпич); }
+#shape-preview{ width:100%; height:auto; background:#fbfaf8; border:1px solid var(--рамка); border-radius:12px; }
+#shape-preview.sketching{ cursor:crosshair; touch-action:none; border-color:var(--терракота); }
+.sketch-btn{ width:100%; margin:0 0 10px; background:#fff; color:var(--текст2); border:1.5px dashed var(--рамка); border-radius:10px; font-size:13px; font-weight:800; padding:8px; }
+.sketch-btn:hover{ border-color:var(--терракота); color:var(--терракота); }
+.sketch-btn.on{ border-color:var(--терракота); border-style:solid; color:var(--терракота); background:#fdf3ec; }
+.sketch-hint{ font-size:12px; color:var(--текст2); background:#fdf3ec; border:1px dashed var(--терракота); border-radius:9px; padding:8px 10px; margin-bottom:10px; line-height:1.45; }
+.seg-lbl{ font-size:12px; font-weight:800; color:var(--текст2); text-transform:uppercase; letter-spacing:.5px; margin:13px 0 7px; }
+.seg{ display:flex; align-items:center; gap:11px; border:1px solid var(--рамка); border-radius:11px; padding:9px 10px; margin-bottom:8px; flex-wrap:wrap; }
+.seg-n{ font-size:14px; font-weight:800; color:var(--терракота); width:18px; flex:0 0 auto; }
+.dpad{ display:grid; grid-template-columns:repeat(3,27px); grid-template-rows:repeat(3,27px); gap:3px; flex:0 0 auto; }
+.dpad button{ border:1.5px solid var(--рамка); background:#fff; border-radius:6px; font-size:15px; line-height:1; color:var(--текст2); padding:0; display:flex; align-items:center; justify-content:center; }
+.dpad button:hover{ border-color:var(--акцент); }
+.dpad button.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.dpad .mid{ border:1px dashed var(--рамка); background:#faf8f5; cursor:default; }
+.seg-f{ display:flex; flex-direction:column; gap:3px; }
+.seg-f label{ font-size:10px; color:var(--текст2); font-weight:700; }
+.seg-f input{ font-size:15px; padding:6px 8px; border:1.5px solid var(--рамка); border-radius:8px; text-align:right; font-family:inherit; }
+.seg-f.len input{ width:72px; }
+.seg-f.ang input{ width:56px; }
+.seg-del{ margin-left:auto; border:1.5px solid var(--рамка); background:#fff; border-radius:8px; width:30px; height:30px; font-size:16px; color:var(--текст2); flex:0 0 auto; }
+.seg-del:hover{ border-color:var(--кирпич); color:var(--кирпич); }
+.seg-add{ width:100%; border:1.5px dashed var(--терракота); color:var(--терракота); background:#fff; border-radius:10px; font-weight:800; font-size:13.5px; padding:10px; }
+.seg-add:hover{ background:#fdf1ea; }
+.shape-row{ display:flex; gap:20px; flex-wrap:wrap; margin-top:14px; }
+.shape-mini h4{ font-size:11.5px; font-weight:800; color:var(--текст2); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
+.mini-chips{ display:flex; gap:5px; }
+.mini-chips button{ border:1.5px solid var(--рамка); background:#fff; border-radius:8px; font-size:12.5px; font-weight:700; padding:6px 10px; color:var(--текст2); min-width:34px; }
+.mini-chips button.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.shape-actions{ display:flex; gap:10px; margin-top:18px; }
+.shape-cancel{ border:none; background:#ece8e2; color:#333; border-radius:11px; font-size:14px; font-weight:800; padding:13px 20px; flex:0 0 auto; }
+.shape-save{ border:none; background:var(--терракота); color:#fff; border-radius:11px; font-size:14.5px; font-weight:800; padding:13px; flex:1; }
+.shape-save:hover{ background:var(--кирпич); }
+</style>
+<script src="../../вход.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="DIANAST">
+    <div>
+      <div class="bn"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+      <div class="bs">ОТЛИВЫ ОТ ПРОИЗВОДИТЕЛЯ И НЕ ТОЛЬКО!</div>
+    </div>
+  </div>
+  <div class="phone">
+    <a href="tel:+375297974362">+375 29 797-43-62</a>
+    <div>звонок · Viber</div>
+  </div>
+</header>
+
+<main>
+  <h1>Библиотека доборных элементов — <em>вводишь стороны, профиль перестраивается</em></h1>
+  <div class="sub">Выберите элемент, задайте размеры сторон — чертёж профиля обновится, а развёртка (ширина плоской заготовки) посчитается сама. Развёртку переносите в калькулятор раскроя.</div>
+
+  <div class="card">
+    <h2>Раздел</h2>
+    <div class="tabs" id="sections"></div>
+    <div class="el-head">
+      <h2>Элемент</h2>
+      <button id="manage-btn" class="manage-btn" type="button">⚙ Настройка</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="workspace">
+    <div class="draw-wrap">
+      <input class="el-name-input" id="el-name" placeholder="Название элемента — впишите своё" maxlength="40">
+      <div class="dd" id="el-desc"></div>
+      <div class="copy-section" id="copy-section"></div>
+      <button class="edit-shape-btn" id="edit-shape-btn" type="button">✏️ Изменить форму (подогнать под эскиз)</button>
+      <div class="save-row">
+        <button class="save-cur-btn" id="save-current" type="button">💾 Сохранить</button>
+        <button class="save-new-btn" id="save-as-new" type="button">Сохранить как…</button>
+      </div>
+      <button class="el-del" id="el-del" type="button" style="display:none">× удалить свой элемент</button>
+      <svg class="profile" id="profile" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="arrow-hint">Цифру размера на чертеже можно нажать и вписать новую — профиль перестроится. Стрелку «цвет» можно перетащить мышкой, а за кружок на кончике — повернуть. Двойной клик по ней — сброс.</div>
+      <div class="draft-note" id="draft-note"></div>
+      <div class="history-wrap">
+        <div class="history-head"><span>История копирования</span><button id="hist-clear" type="button">очистить</button></div>
+        <div id="history"></div>
+      </div>
+    </div>
+
+    <div class="inputs">
+      <h3>Станок — ограничения</h3>
+      <div class="mrow"><label>Макс. длина листа, м</label><input type="number" id="m-maxlen" min="0.1" step="0.01"></div>
+      <div class="mrow"><label>Мин. полка (что гнёт станок), мм</label><input type="number" id="m-minpolka" min="0" placeholder="напр. 20"></div>
+      <div class="sep"></div>
+
+      <h3>Металл и завальцовка</h3>
+      <div class="mini-lbl">Толщина металла</div>
+      <div class="chips" id="thick-chips">
+        <button class="chip" data-th="0.45" type="button">0,45 мм</button>
+        <button class="chip" data-th="0.5" type="button">0,5 мм</button>
+      </div>
+      <div class="mini-lbl">Завальцовка</div>
+      <div class="chips" id="hem-chips">
+        <button class="chip" data-mode="both" type="button">С двух сторон</button>
+        <button class="chip" data-mode="one" type="button">С одной стороны</button>
+        <button class="chip" data-mode="none" type="button">Нет</button>
+      </div>
+      <div class="chips" id="hemside-chips" style="margin-top:8px; display:none">
+        <button class="chip" data-side="left" type="button">◐ Слева</button>
+        <button class="chip" data-side="right" type="button">Справа ◑</button>
+      </div>
+      <div class="chips" id="hemrev-chips" style="margin-top:8px; display:none">
+        <button class="chip" id="hem-reverse" type="button">⟲ Подогнуть к цвету (обычно — к грунту)</button>
+      </div>
+      <div class="hemnote" id="hem-note"></div>
+      <div class="mrow" style="margin-top:8px"><label>Отступ завальцовки от стороны, мм</label><input type="number" id="v-hemgap" min="0" step="0.5"></div>
+      <div class="sep"></div>
+
+      <h3>Цвет (RAL)</h3>
+      <div class="ral-row">
+        <span class="ral-swatch" id="ral-swatch" title="Выбранный цвет"></span>
+        <select class="ral-select" id="ral-select"></select>
+      </div>
+      <input type="number" class="ral-custom" id="ral-custom" placeholder="номер RAL, напр. 8017" min="1000" max="9999" step="1" inputmode="numeric" style="display:none">
+      <div class="mrow" style="margin-top:8px"><label>Размер подписи RAL</label><input type="number" id="v-labelsize" min="6" max="40" step="1"></div>
+      <div class="mrow"><label>Размер стрелки «цвет»</label><input type="number" id="v-arrowlen" min="6" max="60" step="1"></div>
+      <div class="sep"></div>
+
+      <h3>Размеры сторон, мм</h3>
+      <div id="side-fields"></div>
+      <div id="angle-block"></div>
+      <div class="mwarn" id="m-warn" style="display:none"></div>
+
+      <div class="razv">
+        <div class="rt">Развёртка (ширина заготовки)</div>
+        <div class="rv"><span id="razv-val">—</span> <small>мм</small></div>
+        <div class="formula" id="razv-formula"></div>
+      </div>
+
+      <div class="flat">
+        <div class="fh">Плоская заготовка — разметка с двух сторон:</div>
+        <svg class="flatsvg" id="flatsvg" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg"></svg>
+        <button class="tpl-btn" id="tpl-btn" type="button">📐 ＋ в шаблоны разметки (1:1)</button>
+        <button class="tpl-btn" id="tpl-open" type="button" style="margin-top:6px">🗂 Шаблоны на печать (0)</button>
+      </div>
+
+      <div class="sep"></div>
+      <div class="parts-head"><span>Детали этого профиля</span><span class="parts-razv" id="parts-razv"></span></div>
+      <div class="parts-mode" id="parts-mode">
+        <button type="button" data-pm="lengths">по длинам</button>
+        <button type="button" data-pm="meters">по метражу</button>
+      </div>
+      <div id="parts-list"></div>
+      <button class="parts-add" id="parts-add" type="button">＋ добавить строку (длина × кол-во)</button>
+      <div class="parts-meters" id="parts-meters-wrap" style="display:none">
+        <label>Всего метража, м</label>
+        <input type="number" id="parts-meters" min="0.1" step="0.1" inputmode="decimal" placeholder="30">
+      </div>
+      <div class="parts-meters-note" id="parts-meters-note" style="display:none">Длина куска не важна — программа сама нарежет на куски ≤ 3,18 м и разложит под плотную раскладку (добор до целого листа).</div>
+      <div class="parts-sum" id="parts-sum"></div>
+      <div class="parts-block-note" id="parts-block" style="display:none"></div>
+      <button class="parts-copy" id="parts-copy" type="button">⧉ Скопировать всё для раскроя</button>
+      <button class="parts-order" id="parts-order" type="button">🛒 Добавить профиль в заказ</button>
+      <div class="order-flash" id="order-flash">Добавлено в заказ ✓</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  ЧПТУП «Дианаст», г. Кобрин · заказ: <a href="tel:+375297974362">+375 29 797-43-62</a> · <a href="mailto:otlivy@bk.ru">otlivy@bk.ru</a><br>
+  Доборные элементы из жести · изготовление 1–3 дня
+</footer>
+
+<div id="shape-overlay">
+  <div id="shape-box">
+    <button class="shape-x" id="shape-x" type="button" title="Закрыть">×</button>
+    <h2>Форма профиля</h2>
+    <div class="shape-sub">Для каждой полки нажми стрелку — куда она идёт (вверх / вправо / вниз / влево / по диагонали). Чертёж рисуется сразу. Для наклона под точный угол (скаты, трапеции) — впиши число в «угол°». Подгони под свой эскиз.</div>
+    <button class="sketch-btn" id="sketch-btn" type="button">✍️ Нарисовать от руки (эскиз одной линией)</button>
+    <div class="sketch-hint" id="sketch-hint" style="display:none">Рисуй профиль в окне ниже <b>одной линией, не отрывая</b> — мышкой или пальцем. Отпустишь — программа выпрямит линию, привяжет углы и разложит на полки. Потом впиши точные размеры.</div>
+    <svg id="shape-preview" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="seg-lbl">Полки по порядку</div>
+    <div id="seg-list"></div>
+    <button class="seg-add" id="seg-add" type="button">＋ добавить полку</button>
+    <div class="shape-row">
+      <div class="shape-mini"><h4>Завальцовка</h4><div class="mini-chips" id="edit-hem"><button type="button" data-h="both">обе</button><button type="button" data-h="left">слева</button><button type="button" data-h="right">справа</button><button type="button" data-h="none">нет</button></div></div>
+      <div class="shape-mini"><h4>Сторона «цвет»</h4><div class="mini-chips" id="edit-color"><button type="button" data-c="top">↑</button><button type="button" data-c="bottom">↓</button><button type="button" data-c="left">←</button><button type="button" data-c="right">→</button></div></div>
+    </div>
+    <div class="shape-actions">
+      <button class="shape-cancel" id="shape-cancel" type="button">Отмена</button>
+      <button class="shape-save" id="shape-save" type="button">Сохранить форму</button>
+    </div>
+  </div>
+</div>
+
+<div id="trash-overlay">
+  <div id="trash-box">
+    <button class="shape-x" id="trash-x" type="button" title="Закрыть">×</button>
+    <h2>🗑 Корзина</h2>
+    <div class="trash-sub">Удалённые изделия хранятся здесь <b>7 дней</b>, потом стираются насовсем. «↩» — вернуть изделие в библиотеку.</div>
+    <div id="trash-list"></div>
+  </div>
+</div>
+
+<button class="cart-fab" id="cart-fab" type="button">🛒 Заказ <span class="cnt" id="cart-count">0</span></button>
+
+<div id="tpl-overlay">
+  <div id="tpl-box">
+    <div id="tpl-actions">
+      <button id="tpl-close" type="button">Закрыть</button>
+      <button id="tpl-clear" type="button">Очистить</button>
+      <button id="tpl-print" type="button">🖨 Печать всех</button>
+    </div>
+    <div id="tpl-list"></div>
+    <div id="tpl-sheets"></div>
+  </div>
+</div>
+
+<div id="order-overlay">
+  <div id="order-box">
+    <button class="order-x" id="order-x" type="button" title="Закрыть">×</button>
+    <h2>Заказ на раскрой</h2>
+    <div class="order-sub">Профили, собранные для раскроя. Можно добавить несколько разных — потом всё разом уйдёт в калькулятор раскроя.</div>
+    <div id="order-list"></div>
+    <div class="order-total" id="order-total"></div>
+    <button class="order-tpl-btn" id="order-tpl-print" type="button">🗂 Печать шаблонов разметки (0)</button>
+    <button class="order-inv-btn" id="order-invoice" type="button">📋 Заявка бухгалтеру (счёт)</button>
+    <div class="order-actions">
+      <button class="order-clear" id="order-clear" type="button">Очистить</button>
+      <button class="order-to-raskroy" id="order-to-raskroy" type="button">Передать в раскрой →</button>
+    </div>
+  </div>
+</div>
+
+<div id="builder-overlay">
+  <div id="builder-box">
+    <h2>Создать свой доборный элемент</h2>
+    <div class="b-sub">Добавьте полки и загибы по порядку — чертёж строится сразу. После сохранения элемент появится вкладкой и будет работать как встроенные (завальцовка, толщина, развёртка, углы, история).</div>
+    <div class="b-lbl">Название</div>
+    <input type="text" id="b-name" placeholder="Напр. Планка примыкания" maxlength="40">
+    <div class="b-lbl">Полки и загибы</div>
+    <div id="b-segs"></div>
+    <button class="b-add" id="b-add" type="button">+ Добавить полку</button>
+    <div class="b-preview-wrap">
+      <div class="b-lbl">Профиль (в разрезе)</div>
+      <svg id="b-preview" viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="b-razv" id="b-razv"></div>
+    </div>
+    <div class="b-error" id="b-error"></div>
+    <div class="b-actions">
+      <button class="b-btn cancel" id="b-cancel" type="button">Отмена</button>
+      <button class="b-btn save" id="b-save" type="button">Сохранить элемент</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../заявка-бухгалтеру.js?v=2026-07-22b"></script>
+<script>
+// ── Библиотека профилей ──
+// segs: полки (key, label, def). turns: загибы между полками (mag=°, dir=±1 направление, edit=редактируемый угол).
+// start: начальное направление (°, 0=вправо, 90=вверх). section: раздел. colorSide: сторона цвета (top/bottom/left/right).
+const SECTIONS = { okna:'Оконщикам', fasad:'Фасад и забор', krovlya:'Кровельщикам' };
+// Болванки заданы компактно: seg = [label, длина_мм, направление°] (0=вправо,90=вверх,180=влево,-90=вниз).
+// fromHeadings превращает последовательность направлений в start + turns (углы между полками).
+// color = сторона «цвет» (стрелка на эскизе). hem = завальцовка по умолчанию: 'both'|'left'|'right'|'none'.
+function fromHeadings(spec){
+  const segs = spec.segs.map((s,i)=>({ key:'S'+i, label:s[0], def:s[1] }));
+  const start = spec.segs[0][2];
+  const turns = [];
+  for(let i=0;i<spec.segs.length-1;i++){
+    let d = spec.segs[i+1][2]-spec.segs[i][2];
+    while(d>180) d-=360; while(d<=-180) d+=360;
+    turns.push({ mag:Math.abs(d), dir: d>=0?1:-1, edit:false, label:'Угол '+(i+1) });
+  }
+  return { name:'', desc:'', section:spec.section, colorSide:spec.color||'top', start, draft:true,
+           hem:spec.hem||'both', segs, turns };
+}
+// ── Реальная библиотека владельца (эскиз 14.07.2026). Формы черновые — уточняются по галерее. ──
+const SPECS = [
+  // ОКОНЩИКАМ (11)
+  { key:'okna_1',  section:'okna', color:'top', hem:'left', segs:[['Полка A',50,90],['Полка B',50,0]] },
+  { key:'okna_2',  section:'okna', color:'top', hem:'left', segs:[['Полка A',50,90],['Полка B',55,0],['Отгиб',12,-90]] },
+  { key:'okna_3',  section:'okna', color:'top', hem:'both', segs:[['Планка',120,0]] },
+  { key:'okna_4',  section:'okna', color:'top', hem:'both', segs:[['Полка A',30,0],['Подъём',15,90],['Верх',30,0],['Спуск',15,-90],['Полка B',30,0]] },
+  { key:'okna_5',  section:'okna', color:'top', hem:'both', segs:[['Полка A',25,0],['Скос',30,60],['Верх',40,0],['Скос',30,-60],['Полка B',25,0]] },
+  { key:'okna_6',  section:'okna', color:'top', hem:'left', segs:[['Полка A',45,0],['Ступень',25,-90],['Полка B',35,0],['Свес',60,-90]] },
+  { key:'okna_7',  section:'okna', color:'top', hem:'both', segs:[['Полка A',40,0],['Ступень',25,-90],['Полка B',40,0]] },
+  { key:'okna_8',  section:'okna', color:'top', hem:'left', segs:[['Отгиб',22,90],['Полка',90,0],['Свес',15,-90]] },
+  { key:'okna_9',  section:'okna', color:'top', hem:'both', segs:[['Полка A',30,0],['Ступень',20,-90],['Полка B',80,0],['Отгиб',10,90]] },
+  { key:'okna_10', section:'okna', color:'top', hem:'both', segs:[['Полка A',35,0],['Ступень',15,90],['Полка B',45,0]] },
+  { key:'okna_11', section:'okna', color:'top', hem:'both', segs:[['Полка A',28,0],['Скос',48,-55],['Полка B',30,0]] },
+  // ФАСАД И ЗАБОР (12)
+  { key:'fasad_1',  section:'fasad', color:'bottom', hem:'both', segs:[['Стенка A',50,90],['Основание',60,0],['Стенка B',50,-90]] },
+  { key:'fasad_2',  section:'fasad', color:'top', hem:'both', segs:[['Полка A',20,0],['Подъём',25,90],['Верх',45,0],['Спуск',25,-90],['Полка B',20,0]] },
+  { key:'fasad_3',  section:'fasad', color:'top', hem:'left', segs:[['Стенка',50,90],['Полка',60,0],['Отгиб',12,-90]] },
+  { key:'fasad_4',  section:'fasad', color:'top', hem:'both', segs:[['Полка A',25,0],['Скос',30,50],['Верх',70,0],['Скос',30,-50],['Полка B',25,0]] },
+  { key:'fasad_5',  section:'fasad', color:'top', hem:'both', segs:[['Полка A',25,0],['Скат A',50,30],['Скат B',50,-30],['Полка B',25,0]] },
+  { key:'fasad_6',  section:'fasad', color:'top', hem:'both', segs:[['Стенка A',35,90],['Верх',30,0],['Стенка B',35,-90]] },
+  { key:'fasad_7',  section:'fasad', color:'bottom', hem:'both', segs:[['Стенка A',35,90],['Верх',28,0],['Стенка B',35,-90]] },
+  { key:'fasad_8',  section:'fasad', color:'top', hem:'right', segs:[['Полка A',50,0],['Полка B',40,-90]] },
+  { key:'fasad_9',  section:'fasad', color:'top', hem:'both', segs:[['Полка A',45,0],['Ступень',35,-90],['Полка B',40,0]] },
+  { key:'fasad_10', section:'fasad', color:'top', hem:'both', segs:[['Полка A',40,0],['Ступень',25,-90],['Полка B',45,0],['Отгиб',12,90]] },
+  { key:'fasad_11', section:'fasad', color:'top', hem:'left', segs:[['Планка',80,0],['Отгиб',15,-90]] },
+  { key:'fasad_12', section:'fasad', color:'top', hem:'both', segs:[['Стенка',60,90],['Верх',45,0],['Ступень',30,-90],['Полка',40,0]] },
+  // КРОВЕЛЬЩИКАМ (6)
+  { key:'krovlya_1', section:'krovlya', color:'top', hem:'both', segs:[['Скат A',90,25],['Скат B',90,-25]] },
+  { key:'krovlya_2', section:'krovlya', color:'top', hem:'left', segs:[['Полка',52,0],['Скат',46,60]] },
+  { key:'krovlya_3', section:'krovlya', color:'top', hem:'left', segs:[['Полка A',30,0],['Ступень',16,-90],['Полка B',78,0],['Свес',12,-90]] },
+  { key:'krovlya_4', section:'krovlya', color:'top', hem:'both', segs:[['Скат A',46,35],['Скат B',46,-35]] },
+  { key:'krovlya_5', section:'krovlya', color:'top', hem:'right', segs:[['Стенка',50,90],['Полка',32,0]] },
+  { key:'krovlya_6', section:'krovlya', color:'top', hem:'both', segs:[['Полка A',30,0],['Скат A',55,30],['Скат B',55,-30],['Полка B',30,0]] },
+];
+const ELEMENTS = {};
+SPECS.forEach(s=>{ ELEMENTS[s.key]=fromHeadings(s); });
+// сохранённые правки формы (визуальный редактор) — накладываются поверх болванки
+const SHKEY='dianast_dobornye_shapes_v1';
+let shapeOverrides={}; try{ shapeOverrides=JSON.parse(localStorage.getItem(SHKEY)||'{}'); }catch(e){}
+function saveShapes(){ try{ localStorage.setItem(SHKEY, JSON.stringify(shapeOverrides)); }catch(e){} }
+// корзина удалённых изделий (данные; логика — внизу файла)
+const TRASH_KEY='dianast_dobornye_trash_v1', HIDDEN_KEY='dianast_dobornye_hidden_v1';
+const TRASH_TTL=7*24*3600*1000;   // неделя
+let trash=[]; try{ trash=JSON.parse(localStorage.getItem(TRASH_KEY)||'[]'); }catch(e){}
+let hiddenKeys=[]; try{ hiddenKeys=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]'); }catch(e){}
+let manageMode=false;
+function saveTrash(){ try{ localStorage.setItem(TRASH_KEY, JSON.stringify(trash)); }catch(e){} }
+function saveHidden(){ try{ localStorage.setItem(HIDDEN_KEY, JSON.stringify(hiddenKeys)); }catch(e){} }
+function trashHas(k){ return trash.some(t=>t.key===k); }
+// порядок карточек в галерее (перетаскивание в режиме настройки)
+const ORDER_KEY='dianast_dobornye_order_v1';
+let elemOrder={}; try{ elemOrder=JSON.parse(localStorage.getItem(ORDER_KEY)||'{}'); }catch(e){}
+function saveElemOrder(){ try{ localStorage.setItem(ORDER_KEY, JSON.stringify(elemOrder)); }catch(e){} }   // NB: не «saveOrder» — так называется сохранение корзины заказа
+Object.keys(shapeOverrides).forEach(k=>{ if(ELEMENTS[k]) Object.assign(ELEMENTS[k], shapeOverrides[k]); });
+const PALETTE = ['#4a90d9','#e08e45','#5aa469','#a86ec4','#d95a7a','#3fa6a0'];
+
+let cur=SPECS[0].key;
+let curSection='okna';
+let vals={};   // {segKey: mm}
+let angs={};   // {turnIndex: deg}
+let parts=[{len:1, qty:1}];   // детали текущего профиля (строки длина×кол-во, развёртка общая)
+const partsByEl={};           // список деталей на элемент (в памяти сессии)
+let partsMode='lengths';      // 'lengths' (длина×кол-во) | 'meters' (по метражу — режет программа)
+let partsMeters='';           // общий метраж для режима 'meters'
+const partsModeByEl={}, partsMetersByEl={};   // кэш режима/метража на элемент
+let thickness=0.5;   // 0.45 | 0.5 мм
+let anglesOn=false;  // переключатель: выкл → все загибы 90°, вкл → углы задаются
+let hemMode='both';  // 'both' | 'one' | 'none' — завальцовка
+let hemSide='left';  // сторона при 'one'
+let hemReverse=false; // подгиб к цвету (по умолч. К ГРУНТУ — правило цеха)
+// настройки завальцовки ЗАПОМИНАЮТСЯ на каждое изделие
+const HEMKEY='dianast_dobornye_hem_v1';
+let hemPrefs={}; try{ hemPrefs=JSON.parse(localStorage.getItem(HEMKEY)||'{}'); }catch(e){}
+function saveHemPref(){ hemPrefs[cur]={mode:hemMode, side:hemSide, reverse:hemReverse}; try{ localStorage.setItem(HEMKEY, JSON.stringify(hemPrefs)); }catch(e){} }
+// состояние завальцовки для мини-эскиза (галерея/заказ/корзина): сохранённое в hemPrefs (оно всегда
+// синхронно с большим чертежом — saveHemPref зовётся на каждое изменение), иначе из определения элемента
+// (подгиб к грунту). БЕЗ этого мини рисовал завальцовку всегда «к грунту» и расходился с чертежом при
+// «подгиб к цвету». Читаем из хранилища, а не из живых hemMode/hemReverse — не зависит от порядка загрузки
+// (renderTabs выполняется раньше loadElement, где живые переменные ещё не инициализированы элементом).
+function hemStateFor(k){
+  const hp=hemPrefs[k];
+  if(hp) return {hemMode:hp.mode||'both', hemSide:hp.side||'left', hemReverse:!!hp.reverse};
+  const h=ELEMENTS[k] && ELEMENTS[k].hem;
+  return { hemMode: h==='none'?'none' : h==='both'?'both' : h?'one':'both',
+           hemSide: (h==='left'||h==='right')?h:'left', hemReverse:false };
+}
+function refreshCurrentCard(){ const c=tabsEl.querySelector('.gcard[data-key="'+cur+'"] svg'); if(c) c.outerHTML=miniProfileSVG(cur,96,74,hemStateFor(cur)); }
+const MKEY='dianast_dobornye_machine_v1';
+let machine={ maxLen:3.18, minPolka:0 };
+try{ Object.assign(machine, JSON.parse(localStorage.getItem(MKEY)||'{}')); }catch(e){}
+function saveMachine(){ try{ localStorage.setItem(MKEY, JSON.stringify(machine)); }catch(e){} }
+// настройки вида эскиза (владелец подбирает цифрами): отступ завальцовки от стороны, размер стрелки, размер подписи RAL
+const VKEY='dianast_dobornye_view_v1';
+let view={ hemGap:5, arrowLen:18, labelSize:14 };
+try{ Object.assign(view, JSON.parse(localStorage.getItem(VKEY)||'{}')); }catch(e){}
+function saveView(){ try{ localStorage.setItem(VKEY, JSON.stringify(view)); }catch(e){} }
+// контрастный цвет текста под фон (тёмный текст на светлом RAL, светлый на тёмном) — авто
+function contrastText(hex){ const c=(hex||'').replace('#',''); if(c.length<6) return '#1A1A1A'; const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16); return (0.299*r+0.587*g+0.114*b)>150 ? '#1A1A1A' : '#ffffff'; }
+(function(){
+  const ml=document.getElementById('m-maxlen'), mp=document.getElementById('m-minpolka');
+  ml.value=machine.maxLen; mp.value=machine.minPolka||'';
+  ml.oninput=()=>{ machine.maxLen=parseFloat(ml.value)||3.18; saveMachine(); render(); };
+  mp.oninput=()=>{ machine.minPolka=parseFloat(mp.value)||0; saveMachine(); render(); };
+})();
+
+// ── Стрелка «цвет»: положение/угол на элемент, перетаскивание + вращение ──
+const AKEY='dianast_dobornye_arrows_v1';
+let arrowOverrides={}; try{ arrowOverrides=JSON.parse(localStorage.getItem(AKEY)||'{}'); }catch(e){}
+function saveArrows(){ try{ localStorage.setItem(AKEY, JSON.stringify(arrowOverrides)); }catch(e){} }
+let curArrow=null, dragMode=null, moveOff={dx:0,dy:0};
+function clientToSvg(svg,cx,cy){ const pt=svg.createSVGPoint(); pt.x=cx; pt.y=cy; const m=svg.getScreenCTM(); if(!m) return {x:cx,y:cy}; const p=pt.matrixTransform(m.inverse()); return {x:p.x,y:p.y}; }
+function updateArrowTransform(){
+  const g=document.getElementById('carrow-inner'); if(g) g.setAttribute('transform',`translate(${curArrow.x.toFixed(1)},${curArrow.y.toFixed(1)}) rotate(${curArrow.ang.toFixed(1)})`);
+  const lbl=document.getElementById('carrow-label'); if(lbl){ const a=curArrow.ang*Math.PI/180; const rectH=(view.labelSize||14)*1.55; const labelDist=8+rectH*0.6; lbl.setAttribute('transform',`translate(${(curArrow.x-labelDist*Math.cos(a)).toFixed(1)},${(curArrow.y-labelDist*Math.sin(a)).toFixed(1)})`); }
+}
+function setupArrowDrag(){
+  const svg=document.getElementById('profile');
+  svg.addEventListener('pointerdown',(e)=>{
+    if(!curArrow) return; const t=e.target;
+    if(t && t.id==='carrow-tip'){ dragMode='rotate'; }
+    else if(t && t.closest && t.closest('#carrow')){ dragMode='move'; const p=clientToSvg(svg,e.clientX,e.clientY); moveOff={dx:p.x-curArrow.x, dy:p.y-curArrow.y}; }
+    else return;
+    e.preventDefault(); try{ svg.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  svg.addEventListener('pointermove',(e)=>{
+    if(!dragMode||!curArrow) return; const p=clientToSvg(svg,e.clientX,e.clientY);
+    if(dragMode==='move'){ curArrow.x=p.x-moveOff.dx; curArrow.y=p.y-moveOff.dy; }
+    else { curArrow.ang=Math.atan2(p.y-curArrow.y,p.x-curArrow.x)*180/Math.PI; }
+    updateArrowTransform();
+  });
+  const end=()=>{ if(!dragMode) return; dragMode=null; arrowOverrides[cur]={x:curArrow.x,y:curArrow.y,ang:curArrow.ang}; saveArrows(); };
+  svg.addEventListener('pointerup',end); svg.addEventListener('pointercancel',end);
+  svg.addEventListener('dblclick',(e)=>{ if(e.target && e.target.closest && e.target.closest('#carrow')){ delete arrowOverrides[cur]; saveArrows(); render(); } });
+}
+let hemLeft=true, hemRight=true;   // выводятся из hemMode/hemSide (syncHems)
+const fmt = (n,d=0)=> (Math.round(n*10**d)/10**d).toLocaleString('ru-RU');
+function plural(n,one,few,many){ n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20) return many; if(n1>1&&n1<5) return few; if(n1===1) return one; return many; }
+
+// ── Разделы + Табы (встроенные + свои) ──
+const tabsEl=document.getElementById('tabs');
+const sectionsEl=document.getElementById('sections');
+const CKEY='dianast_dobornye_custom_v1';
+const NKEY='dianast_dobornye_names_v1';
+function loadCustom(){ try{ return JSON.parse(localStorage.getItem(CKEY)||'[]'); }catch(e){ return []; } }
+function saveCustom(a){ try{ localStorage.setItem(CKEY, JSON.stringify(a)); }catch(e){} }
+let nameOverrides={}; try{ nameOverrides=JSON.parse(localStorage.getItem(NKEY)||'{}'); }catch(e){}
+function saveNames(){ try{ localStorage.setItem(NKEY, JSON.stringify(nameOverrides)); }catch(e){} }
+function getName(k){ return (nameOverrides[k] ?? (ELEMENTS[k]?ELEMENTS[k].name:'')) || ''; }
+// размеры-переопределения: введённые владельцем размеры становятся дефолтом и сохраняются
+const SKEY='dianast_dobornye_sizes_v1';
+let sizeOverrides={}; try{ sizeOverrides=JSON.parse(localStorage.getItem(SKEY)||'{}'); }catch(e){}
+function saveSizes(){ try{ localStorage.setItem(SKEY, JSON.stringify(sizeOverrides)); }catch(e){} }
+function segDefault(k,s){ return (sizeOverrides[k] && sizeOverrides[k][s.key]!=null) ? sizeOverrides[k][s.key] : s.def; }
+// палитра сторон hex → rgb (для цветных чипов размеров в заказе)
+function hexRgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+// мини-чертёж профиля для карточки галереи (форма + завальцовка, без подписей)
+// opts (необязательно, для истории): {vals, angs, anglesOn, hemMode, hemSide, pad, sw} — рисовать по данным записи, не по текущим
+function miniProfileSVG(key,W,H,opts){
+  const el=ELEMENTS[key]; if(!el) return '';
+  const L=el.segs.map(s=>Math.max(0, (opts&&opts.vals ? (opts.vals[s.key]||0) : segDefault(key,s)||0)));
+  let ang=el.start*Math.PI/180,x=0,y=0; const P=[{x,y}];
+  L.forEach((len,i)=>{ x+=len*Math.cos(ang); y+=len*Math.sin(ang); P.push({x,y}); if(i<el.turns.length){ const t=el.turns[i]; const mag=(opts&&opts.anglesOn&&opts.angs&&opts.angs[i]!=null)?opts.angs[i]:t.mag; ang+=t.dir*mag*Math.PI/180; } });
+  const pad=(opts&&opts.pad)||Math.max(12, W*0.17);
+  const minX=Math.min(...P.map(p=>p.x)),maxX=Math.max(...P.map(p=>p.x)),minY=Math.min(...P.map(p=>p.y)),maxY=Math.max(...P.map(p=>p.y));
+  const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY);
+  const sc=Math.min((W-2*pad)/bw,(H-2*pad)/bh);
+  const offX=(W-bw*sc)/2-minX*sc, offY=(H-bh*sc)/2-minY*sc;
+  const TX=p=>({x:offX+p.x*sc, y:H-(offY+p.y*sc)});
+  const S=P.map(TX);
+  const cx=S.reduce((a,p)=>a+p.x,0)/S.length, cy=S.reduce((a,p)=>a+p.y,0)/S.length;
+  let path=''; S.forEach((p,i)=> path+=(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' ');
+  const hemLeft = (opts&&opts.hemMode!=null) ? (opts.hemMode==='both'||(opts.hemMode==='one'&&opts.hemSide==='left'))
+                                             : (el.hem==='both'||el.hem==='left');
+  const hemRight = (opts&&opts.hemMode!=null) ? (opts.hemMode==='both'||(opts.hemMode==='one'&&opts.hemSide==='right'))
+                                              : (el.hem==='both'||el.hem==='right');
+  const sw=(opts&&opts.sw)||3.2, hw=Math.round(sw*0.66*10)/10;
+  const CM=colorDirVecFor(el);
+  const mHemN=e=>{ const n=hemNormalAt(P,e,CM,!!(opts&&opts.hemReverse)); return {x:n.x, y:-n.y}; };  // к грунту по умолчанию
+  const hook=(E,Nb,nH)=>{ let tx=Nb.x-E.x,ty=Nb.y-E.y; const tl=Math.hypot(tx,ty)||1; tx/=tl;ty/=tl; let nx=nH.x,ny=nH.y; const g=2.2,ln=Math.min(8,tl*0.45); const p1={x:E.x+nx*g,y:E.y+ny*g},p2={x:p1.x+tx*ln,y:p1.y+ty*ln},tip={x:E.x+nx*g*0.5-tx*g,y:E.y+ny*g*0.5-ty*g}; return `<path d="M${p2.x.toFixed(1)} ${p2.y.toFixed(1)} L${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q${tip.x.toFixed(1)} ${tip.y.toFixed(1)} ${E.x.toFixed(1)} ${E.y.toFixed(1)}" fill="none" stroke="#c1440e" stroke-width="${hw}" stroke-linecap="round" stroke-linejoin="round"/>`; };
+  let hooks=''; if(hemLeft&&S.length>1)hooks+=hook(S[0],S[1],mHemN(0)); if(hemRight&&S.length>1){const n=S.length-1;hooks+=hook(S[n],S[n-1],mHemN(1));}
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><path d="${path}" fill="none" stroke="#7f8a93" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>${hooks}</svg>`;
+}
+function secShortLabel(k,i){ const nm=getName(k); if(nm) return nm; return '№'+(i+1); }
+loadCustom().forEach(c=>{ ELEMENTS[c.id]=c.def; });   // подмешиваем свои элементы
+Object.keys(shapeOverrides).forEach(k=>{ if(ELEMENTS[k]) Object.assign(ELEMENTS[k], shapeOverrides[k]); });   // правки формы и для своих элементов (они подмешались позже первого прохода)
+
+function elementsInSection(s){
+  const ks=Object.keys(ELEMENTS).filter(k=>ELEMENTS[k].section===s && !trashHas(k) && !hiddenKeys.includes(k));
+  const ord=elemOrder[s]||[];
+  return ks.sort((a,b)=>{ const ia=ord.indexOf(a), ib=ord.indexOf(b); return (ia<0?1e9:ia)-(ib<0?1e9:ib); });   // сохранённый порядок; новые — в конец
+}
+function repaintTabs(){ [...tabsEl.querySelectorAll('.gcard')].forEach(c=>c.classList.toggle('on', c.dataset.key===cur)); }
+function makeGalleryCard(k,i){
+  const card=document.createElement('div'); card.className='gcard'+(k===cur?' on':''); card.dataset.key=k;
+  card.innerHTML = miniProfileSVG(k,96,74,hemStateFor(k)) + `<div class="gname">${secShortLabel(k,i)}</div>`;
+  card.onclick=()=>{ if(suppressClick) return; cur=k; loadElement(); };
+  if(manageMode){
+    const x=document.createElement('button'); x.type='button'; x.className='gx'; x.textContent='×'; x.title='Удалить в корзину (хранится 7 дней)';
+    x.onclick=(e)=>{ e.stopPropagation(); trashElement(k); };
+    card.appendChild(x);
+  }
+  return card;
+}
+function renderTabs(){
+  tabsEl.className='gallery'+(manageMode?' manage-on':'');
+  tabsEl.innerHTML='';
+  elementsInSection(curSection).forEach((k,i)=> tabsEl.appendChild(makeGalleryCard(k,i)));
+  const plus=document.createElement('div'); plus.className='gcard plus'; plus.textContent='＋ Свой';
+  plus.onclick=()=>openBuilder();
+  tabsEl.appendChild(plus);
+  const sk=document.createElement('div'); sk.className='gcard plus'; sk.textContent='✍️ По эскизу';
+  sk.onclick=()=>newFromSketch();
+  tabsEl.appendChild(sk);
+  if(manageMode){
+    const tr=document.createElement('div'); tr.className='gcard trashcard'; tr.textContent=`🗑 Корзина (${trash.length})`;
+    tr.onclick=()=>openTrash();
+    tabsEl.appendChild(tr);
+  }
+}
+function renderSections(){
+  sectionsEl.innerHTML='';
+  Object.entries(SECTIONS).forEach(([s,label])=>{
+    const b=document.createElement('button'); b.type='button'; b.className='tab'+(s===curSection?' on':''); b.dataset.sec=s;
+    b.textContent=label;
+    b.onclick=()=>{ curSection=s; const first=elementsInSection(s)[0]; renderSections(); if(first){ cur=first; renderTabs(); loadElement(); } else { renderTabs(); clearElementView(); } };
+    sectionsEl.appendChild(b);
+  });
+}
+function clearElementView(){
+  document.getElementById('el-name').value='';
+  document.getElementById('el-desc').textContent='В этом разделе пока нет элементов. Нажмите «＋ Свой элемент», чтобы добавить.';
+  document.getElementById('el-del').style.display='none';
+  document.getElementById('copy-section').innerHTML='';
+  document.getElementById('profile').innerHTML='';
+  document.getElementById('side-fields').innerHTML='';
+  document.getElementById('angle-block').innerHTML='';
+  document.getElementById('razv-val').textContent='—';
+  document.getElementById('razv-formula').textContent='';
+  document.getElementById('flatsvg').innerHTML='';
+  document.getElementById('history').innerHTML='';
+}
+renderSections();
+renderTabs();
+
+// ── Толщина и завальцовка (глобально) ──
+const thickChips=document.getElementById('thick-chips');
+function paintThick(){ [...thickChips.children].forEach(c=>c.classList.toggle('on', parseFloat(c.dataset.th)===thickness)); }
+[...thickChips.children].forEach(c=> c.onclick=()=>{ thickness=parseFloat(c.dataset.th); paintThick(); render(); });
+paintThick();
+const hemChips=document.getElementById('hem-chips');
+const hemSideChips=document.getElementById('hemside-chips');
+function syncHems(){
+  hemLeft  = hemMode==='both' || (hemMode==='one' && hemSide==='left');
+  hemRight = hemMode==='both' || (hemMode==='one' && hemSide==='right');
+}
+function paintHem(){
+  [...hemChips.children].forEach(c=>c.classList.toggle('on', c.dataset.mode===hemMode));
+  hemSideChips.style.display = hemMode==='one' ? 'flex' : 'none';
+  [...hemSideChips.children].forEach(c=>c.classList.toggle('on', c.dataset.side===hemSide));
+  const rev=document.getElementById('hemrev-chips'); rev.style.display = hemMode==='none' ? 'none' : 'flex';
+  document.getElementById('hem-reverse').classList.toggle('on', hemReverse);
+}
+[...hemChips.children].forEach(c=> c.onclick=()=>{ hemMode=c.dataset.mode; syncHems(); saveHemPref(); paintHem(); render(); refreshCurrentCard(); });
+[...hemSideChips.children].forEach(c=> c.onclick=()=>{ hemSide=c.dataset.side; syncHems(); saveHemPref(); paintHem(); render(); refreshCurrentCard(); });
+document.getElementById('hem-reverse').onclick=()=>{ hemReverse=!hemReverse; saveHemPref(); paintHem(); render(); refreshCurrentCard(); };
+syncHems(); paintHem();
+
+// ── Цвет RAL (глобально, показывается у стрелки «цвет» на эскизе) ──
+const RAL_COLORS=[
+  {c:'9003', n:'Сигнально-белый', h:'#ECECE8'},
+  {c:'9016', n:'Транспортно-белый', h:'#F1F1EA'},
+  {c:'9006', n:'Бело-алюминиевый', h:'#A1A6A9'},
+  {c:'1014', n:'Слоновая кость', h:'#DDCBA4'},
+  {c:'1015', n:'Св. слоновая кость', h:'#E9D8B6'},
+  {c:'8017', n:'Шоколадно-коричневый', h:'#442F29'},
+  {c:'8019', n:'Серо-коричневый', h:'#3D3635'},
+  {c:'8004', n:'Медно-коричневый', h:'#894A2B'},
+  {c:'3005', n:'Винно-красный', h:'#5E2028'},
+  {c:'3011', n:'Коричнево-красный', h:'#792423'},
+  {c:'3009', n:'Оксидно-красный', h:'#68352E'},
+  {c:'6005', n:'Зелёный мох', h:'#114232'},
+  {c:'6020', n:'Хромовый зелёный', h:'#2E3B29'},
+  {c:'5005', n:'Сигнальный синий', h:'#1E466F'},
+  {c:'5021', n:'Водная синь', h:'#08787E'},
+  {c:'7004', n:'Сигнальный серый', h:'#9C9C9C'},
+  {c:'7016', n:'Антрацитово-серый', h:'#373F43'},
+  {c:'7024', n:'Графитовый серый', h:'#474A50'},
+  {c:'9005', n:'Чёрный янтарь', h:'#0E0E10'},
+];
+const RKEY='dianast_dobornye_ral_v1';
+let ral=''; try{ ral=localStorage.getItem(RKEY)||''; }catch(e){}   // '' | код RAL (строка)
+function saveRal(){ try{ localStorage.setItem(RKEY, ral||''); }catch(e){} }
+function ralHex(code){ const f=RAL_COLORS.find(r=>r.c===code); return f?f.h:'#8a8a8a'; }
+const ralSelect=document.getElementById('ral-select');
+const ralSwatch=document.getElementById('ral-swatch');
+const ralCustom=document.getElementById('ral-custom');
+function paintRal(){ ralSwatch.style.background = ral? ralHex(ral) : 'transparent'; ralSwatch.style.borderStyle = ral? 'solid':'dashed'; }
+(function initRal(){
+  let opts='<option value="">— без цвета —</option>';
+  RAL_COLORS.forEach(r=> opts+=`<option value="${r.c}">RAL ${r.c} — ${r.n}</option>`);
+  opts+='<option value="__custom">Другой номер RAL…</option>';
+  ralSelect.innerHTML=opts;
+  if(ral && RAL_COLORS.some(r=>r.c===ral)){ ralSelect.value=ral; }
+  else if(ral){ ralSelect.value='__custom'; ralCustom.style.display='block'; ralCustom.value=ral; }
+  else { ralSelect.value=''; }
+  paintRal();
+})();
+ralSelect.onchange=()=>{
+  if(ralSelect.value==='__custom'){ ralCustom.style.display='block'; ral=ralCustom.value.trim(); }
+  else { ralCustom.style.display='none'; ral=ralSelect.value; }
+  saveRal(); paintRal(); render();
+};
+ralCustom.oninput=()=>{ ral=ralCustom.value.trim(); saveRal(); paintRal(); render(); };
+// виджеты вида эскиза (отступ завальцовки / размер подписи RAL / размер стрелки)
+(function(){
+  const hg=document.getElementById('v-hemgap'), ls=document.getElementById('v-labelsize'), al=document.getElementById('v-arrowlen');
+  hg.value=view.hemGap; ls.value=view.labelSize; al.value=view.arrowLen;
+  hg.oninput=()=>{ view.hemGap=Math.max(0,parseFloat(hg.value)||0); saveView(); render(); };
+  ls.oninput=()=>{ view.labelSize=Math.max(6,parseFloat(ls.value)||14); saveView(); render(); };
+  al.oninput=()=>{ view.arrowLen=Math.max(6,parseFloat(al.value)||18); saveView(); render(); };
+})();
+
+function loadElement(){
+  const el=ELEMENTS[cur];
+  vals={}; el.segs.forEach(s=> vals[s.key]=segDefault(cur,s));   // сохранённый размер или черновой дефолт
+  angs={}; el.turns.forEach((t,i)=> angs[i]=t.mag);   // все углы инициализируем (90 по умолч.)
+  parts = partsByEl[cur] || (partsByEl[cur]=[{len:1, qty:1}]);   // список деталей (кэш на элемент)
+  partsMode = partsModeByEl[cur]||'lengths'; partsMeters = partsMetersByEl[cur]||'';   // режим деталей на элемент
+  const hp=hemPrefs[cur];
+  if(hp){       // сохранённая завальцовка ЭТОГО изделия — приоритет над дефолтом
+    hemMode=hp.mode||'both'; hemSide=hp.side||'left'; hemReverse=!!hp.reverse;
+    syncHems(); paintHem();
+  } else if(el.hem){   // завальцовка по умолчанию как на эскизе (общий переключатель тоже работает)
+    hemMode = el.hem==='none' ? 'none' : (el.hem==='both' ? 'both' : 'one');
+    if(el.hem==='left'||el.hem==='right') hemSide=el.hem;
+    hemReverse=false;   // умолчание: к грунту
+    syncHems(); paintHem();
+  }
+  const nameInp=document.getElementById('el-name');
+  nameInp.value=getName(cur);
+  nameInp.oninput=()=>{ nameOverrides[cur]=nameInp.value; saveNames();
+    const card=tabsEl.querySelector('.gcard[data-key="'+cur+'"]'); if(card){ const gn=card.querySelector('.gname'); if(gn){ const idx=elementsInSection(curSection).indexOf(cur); gn.textContent=nameInp.value||('№'+(idx+1)); } }
+    renderHistory(); };
+  document.getElementById('el-desc').textContent=el.desc;
+  const note=document.getElementById('draft-note');
+  note.style.display = el.draft?'block':'none';
+  note.textContent = 'Форма — черновая/стандартная. Впишите название, поправьте размеры и углы под свой профиль.';
+  document.getElementById('el-del').style.display = el.custom?'inline-block':'none';
+  renderCopySection();
+  repaintTabs();
+  buildFields();
+  buildParts();
+  paintPartsMode();
+  render();
+  renderHistory();
+}
+
+function renderCopySection(){
+  const box=document.getElementById('copy-section');
+  const others=Object.entries(SECTIONS).filter(([s])=>s!==ELEMENTS[cur].section);
+  box.innerHTML='<span class="cs-lbl">Копировать в раздел:</span> '+others.map(([s,label])=>`<button class="cs-btn" data-sec="${s}" type="button">${label} →</button>`).join(' ');
+  box.querySelectorAll('.cs-btn').forEach(b=> b.onclick=()=> copyToSection(b.dataset.sec));
+}
+function copyToSection(targetSec){
+  const src=ELEMENTS[cur];
+  const id='custom_'+Date.now();
+  const def={ name:getName(cur), desc:src.desc, section:targetSec, colorSide:src.colorSide, start:src.start, draft:false, custom:true,
+    hem: hemMode==='one' ? hemSide : hemMode,
+    segs: src.segs.map(s=>({key:s.key,label:s.label,def:Math.max(1, vals[s.key]||s.def)})),
+    turns: src.turns.map((t,i)=>({mag: anglesOn?(angs[i]??t.mag):t.mag, dir:t.dir, edit:t.edit, label:t.label})) };
+  ELEMENTS[id]=def;
+  const arr=loadCustom(); arr.push({id,def}); saveCustom(arr);
+  curSection=targetSec; cur=id; renderSections(); renderTabs(); loadElement();
+}
+// «Сохранить как…» — копия текущего состояния (форма+размеры+имя+завальцовка) в текущий раздел как новый элемент
+document.getElementById('save-as-new').onclick=()=>{ copyToSection(ELEMENTS[cur].section); };
+// «Сохранить» — сохранить текущий разработанный элемент на месте (форма+размеры+завальцовка → его новый вид)
+function saveCurrentElement(){
+  const el=ELEMENTS[cur]; if(!el) return;
+  const arr=[]; let dir=el.start;
+  el.segs.forEach((s,j)=>{
+    arr.push({ len: Math.max(1, vals[s.key]||segDefault(cur,s)||1), dir: normDir(dir), label: s.label });
+    if(j<el.turns.length){ const t=el.turns[j]; dir+=t.dir*(anglesOn?(angs[j]??t.mag):t.mag); }
+  });
+  const hem = hemMode==='one' ? hemSide : hemMode;
+  applySegments(arr, hem, el.colorSide);                 // запись в shapeOverrides+ELEMENTS, persist
+  if(el.custom){ const cs=loadCustom(); const it=cs.find(c=>c.id===cur); if(it){ it.def=ELEMENTS[cur]; saveCustom(cs); } }  // у своих обновляем и базовую копию
+  const b=document.getElementById('save-current'); const t=b.textContent;
+  b.textContent='✓ Сохранено'; b.disabled=true;
+  setTimeout(()=>{ b.textContent=t; b.disabled=false; }, 1200);
+}
+document.getElementById('save-current').onclick=saveCurrentElement;
+
+function buildFields(){
+  const el=ELEMENTS[cur];
+  const sf=document.getElementById('side-fields'); sf.innerHTML='';
+  el.segs.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='frow';
+    row.innerHTML=`<span class="swatch" style="background:${PALETTE[i%PALETTE.length]}"></span>
+      <label>${s.label}</label>
+      <input type="number" min="1" inputmode="numeric" data-seg="${s.key}" value="${vals[s.key]}">
+      ${el.segs.length>1?`<button class="fdel" type="button" data-fdel="${i}" title="Удалить полку">×</button>`:''}`;
+    sf.appendChild(row);
+  });
+  sf.querySelectorAll('[data-fdel]').forEach(b=> b.onclick=()=> deleteSegAt(+b.dataset.fdel));
+  sf.querySelectorAll('input').forEach(inp=> inp.oninput=()=>{
+    vals[inp.dataset.seg]=parseFloat(inp.value)||0;
+    (sizeOverrides[cur]=sizeOverrides[cur]||{})[inp.dataset.seg]=vals[inp.dataset.seg]; saveSizes();
+    render();
+    const card=tabsEl.querySelector('.gcard[data-key="'+cur+'"] svg'); if(card) card.outerHTML=miniProfileSVG(cur,96,74,hemStateFor(cur));
+  });
+
+  const ab=document.getElementById('angle-block'); ab.innerHTML='';
+  if(el.turns.length){
+    ab.innerHTML=`<div class="sep"></div><div class="mini-lbl">Углы загибов</div>
+      <div class="chips"><button class="chip${anglesOn?' on':''}" id="angles-tog" type="button">Задать углы вручную</button></div>`;
+    ab.querySelector('#angles-tog').onclick=()=>{ anglesOn=!anglesOn; buildFields(); render(); };
+    if(anglesOn){
+      const wrap=document.createElement('div'); wrap.style.marginTop='8px';
+      el.turns.forEach((t,i)=>{
+        const row=document.createElement('div'); row.className='frow ang';
+        row.innerHTML=`<span class="swatch" style="background:#cbd2d8"></span>
+          <label>${t.label||('Угол '+(i+1))} <span>90 = прямой</span></label>
+          <input type="number" min="1" max="179" inputmode="numeric" data-ang="${i}" value="${angs[i]??t.mag}">`;
+        wrap.appendChild(row);
+      });
+      ab.appendChild(wrap);
+      wrap.querySelectorAll('input').forEach(inp=> inp.oninput=()=>{ angs[inp.dataset.ang]=parseFloat(inp.value)||90; render(); });
+    }
+  }
+}
+
+// ── Геометрия (turtle) ──
+function points(){
+  const el=ELEMENTS[cur];
+  const L=el.segs.map(s=> Math.max(0, vals[s.key]||0));
+  let ang=el.start*Math.PI/180, x=0, y=0; const P=[{x,y}];
+  L.forEach((len,i)=>{
+    x+=len*Math.cos(ang); y+=len*Math.sin(ang); P.push({x,y});
+    if(i<el.turns.length){ const t=el.turns[i]; const mag=anglesOn?(angs[i]??t.mag):t.mag; ang+=t.dir*mag*Math.PI/180; }
+  });
+  return {P, L};
+}
+
+function hemInfo(){
+  const maxLenMm=Math.max(0, ...parts.map(p=>(parseFloat(p.len)||0)*1000));
+  const use11=(thickness===0.5)||(maxLenMm>2800);
+  return { use11, hemSize:use11?11:10, count:(hemLeft?1:0)+(hemRight?1:0),
+    reason: thickness===0.5?'металл 0,5 мм':(maxLenMm>2800?'длина > 2,8 м':'') };
+}
+function currentRazv(){ const {L}=points(); const H=hemInfo(); return L.reduce((a,b)=>a+b,0)+10*H.count; }
+
+// ── Разметка с двух сторон: какая линия загиба на какой стороне жести ──
+// Правило (владелец, 14.07.2026): метка на той стороне, В КОТОРУЮ закрывается загиб
+// (угол закрывается к цвету → метка по цвету/лицевой; к грунту → по грунту/тыльной).
+// Завальцовка — по стороне подгиба. templateFlip (кнопка ⇄) меняет стороны местами.
+const TFKEY='dianast_dobornye_tpl_flip_v1';
+let templateFlip=false; try{ templateFlip=localStorage.getItem(TFKEY)==='1'; }catch(e){}
+// главная кромка (от которой отсчёт позиций): по умолчанию ПРАВАЯ (правило владельца 14.07.2026)
+const TEKEY='dianast_dobornye_tpl_edge_v1';
+let tplFromRight=true; try{ tplFromRight=localStorage.getItem(TEKEY)!=='0'; }catch(e){}
+function colorDirVecFor(el){
+  const cs=(el&&el.colorSide)||'top';   // сторона «цвет» изделия (в координатах turtle: y вверх)
+  return cs==='top'?{x:0,y:1}:cs==='bottom'?{x:0,y:-1}:cs==='left'?{x:-1,y:0}:{x:1,y:0};
+}
+function colorDirVec(){ return colorDirVecFor(ELEMENTS[cur]); }
+// Цвет кроет одну НЕПРЕРЫВНУЮ сторону полосы. Определяем, слева или справа от пути P0→Pn
+// он лежит (по большинству длины полок против направления colorSide).
+function stripColorLeft(P,C){
+  let s=0;
+  for(let i=0;i<P.length-1;i++){
+    const dx=P[i+1].x-P[i].x, dy=P[i+1].y-P[i].y; const l=Math.hypot(dx,dy); if(!l) continue;
+    s += l*((-dy/l)*C.x + (dx/l)*C.y);
+  }
+  return s>=0;
+}
+// Нормаль завальцовки у края (turtle-координаты). ПРАВИЛО ЦЕХА (владелец, 14.07.2026):
+// завальцовка почти всегда (~95%) подгибается К ГРУНТУ — это и есть умолчание.
+// reverse (переключатель) — редкий случай подгиба к цвету.
+function hemNormalAt(P,endIdx,C,reverse){
+  const a=endIdx? P[P.length-2] : P[0];
+  const b=endIdx? P[P.length-1] : P[1];
+  let dx=b.x-a.x, dy=b.y-a.y; const l=Math.hypot(dx,dy)||1; dx/=l; dy/=l;
+  const left={x:-dy, y:dx};
+  let n = stripColorLeft(P,C)? {x:-left.x, y:-left.y} : left;   // сторона грунта
+  if(reverse){ n={x:-n.x, y:-n.y}; }
+  return n;
+}
+function markLayout(){
+  const {P,L}=points(); const H=hemInfo();
+  const C=colorDirVec();
+  const nrm=v=>{const l=Math.hypot(v.x,v.y)||1; return {x:v.x/l,y:v.y/l};};
+  // ячейки развёртки — ТА ЖЕ математика, что плоская заготовка (−1 у крайних при загибе 11)
+  const cells=[];
+  if(hemLeft) cells.push({len:H.hemSize, hem:true});
+  L.forEach((v,i)=>{ let vv=v;
+    if(H.use11 && hemLeft && i===0) vv-=1;
+    if(H.use11 && hemRight && i===L.length-1) vv-=1;
+    cells.push({len:vv, ci:i});
+  });
+  if(hemRight) cells.push({len:H.hemSize, hem:true});
+  // сторона загиба у вершины k (между полками k−1 и k): угол закрывается к цвету ⇔
+  // поворот идёт в сторону цвет-стороны ПОВЕРХНОСТИ (лево/право вдоль пути — stripColorLeft).
+  // Так правило устойчиво при любой ориентации полок (и вертикальных тоже).
+  const colorLeft=stripColorLeft(P,C);
+  const bendSide=k=>{
+    const u=nrm({x:P[k].x-P[k-1].x, y:P[k].y-P[k-1].y});
+    const v=nrm({x:P[k+1].x-P[k].x, y:P[k+1].y-P[k].y});
+    const cross=u.x*v.y-u.y*v.x;                 // >0 — поворот влево (внутренняя сторона слева)
+    if(Math.abs(cross)<1e-9) return 'back';
+    return ((cross>0)===colorLeft) ? 'face':'back';
+  };
+  // завальцовка: метка на стороне подгиба — по умолчанию грунт (правило цеха), hemReverse — цвет
+  const hemSideOf=()=> hemReverse? 'face':'back';
+  // линии разметки: позиция в мм от кромки А + сторона
+  const lines=[]; let acc=0;
+  cells.forEach((c,ci)=>{
+    acc+=c.len;
+    if(ci===cells.length-1) return;
+    let side, kind;
+    if(c.hem && ci===0){ side=hemSideOf(0); kind='hem'; }
+    else {
+      const next=cells[ci+1];
+      if(next.hem){ side=hemSideOf(1); kind='hem'; }
+      else { side=bendSide(next.ci); kind='bend'; }
+    }
+    if(templateFlip) side = (side==='face'?'back':'face');
+    lines.push({pos:acc, side, kind});
+  });
+  const W=cells.reduce((a,c)=>a+c.len,0);
+  return {cells, lines, W, H};
+}
+
+// правка размера прямо на чертеже: клик по цифре → поле ввода на месте
+function closeDimEditor(){ document.querySelector('.dim-input')?.remove(); }
+function openDimEditor(i, g){
+  closeDimEditor();
+  const el=ELEMENTS[cur]; const seg=el.segs[i]; if(!seg) return;
+  const wrap=document.querySelector('.draw-wrap');
+  const gr=g.getBoundingClientRect(), wr=wrap.getBoundingClientRect();
+  const inp=document.createElement('input');
+  inp.type='number'; inp.min='1'; inp.inputMode='numeric'; inp.className='dim-input';
+  inp.value=vals[seg.key]||'';
+  inp.style.left=(gr.left-wr.left+gr.width/2)+'px';
+  inp.style.top=(gr.top-wr.top+gr.height/2)+'px';
+  wrap.appendChild(inp);
+  inp.focus(); inp.select();
+  let done=false;
+  const commit=()=>{ if(done) return; done=true; const v=parseFloat(inp.value); inp.remove();
+    if(v>0 && v!==vals[seg.key]){ vals[seg.key]=v; (sizeOverrides[cur]=sizeOverrides[cur]||{})[seg.key]=v; saveSizes(); buildFields(); render(); } };
+  const cancel=()=>{ if(done) return; done=true; inp.remove(); };
+  inp.onkeydown=e=>{ if(e.key==='Enter') commit(); else if(e.key==='Escape') cancel(); };
+  inp.onblur=commit;
+}
+
+function render(){
+  const el=ELEMENTS[cur];
+  const {P,L}=points();
+  const sumSides=L.reduce((a,b)=>a+b,0);
+  const H=hemInfo();
+  const razv=sumSides + 10*H.count;   // всегда кратно 5 (завальцовка = 10 на край)
+
+  // ── профиль ──
+  const svg=document.getElementById('profile');
+  const VBW=400, VBH=280, base=34;
+  const cs=el.colorSide||'top';
+  const ALN=view.arrowLen||18, agp=9, F=view.labelSize||14, rectH=F*1.55;
+  const aMargin = agp + ALN + (8+rectH*0.6) + rectH/2 + 8;   // запас под стрелку «цвет» + подпись RAL со стороны colorSide
+  let minX=Math.min(...P.map(p=>p.x)), maxX=Math.max(...P.map(p=>p.x));
+  let minY=Math.min(...P.map(p=>p.y)), maxY=Math.max(...P.map(p=>p.y));
+  const bw=Math.max(1,maxX-minX), bh=Math.max(1,maxY-minY);
+  const padL=base+(cs==='left'?aMargin:0), padR=base+(cs==='right'?aMargin:0), padT=base+(cs==='top'?aMargin:0), padB=base+(cs==='bottom'?aMargin:0);
+  const aw=Math.max(1,VBW-padL-padR), ah=Math.max(1,VBH-padT-padB);
+  const sc=Math.min(aw/bw, ah/bh);
+  const leftS=padL+(aw-bw*sc)/2, topS=padT+(ah-bh*sc)/2;
+  const TX=p=>({ x: leftS+(p.x-minX)*sc, y: topS+(maxY-p.y)*sc });
+  const S=P.map(TX);
+  const cx=S.reduce((a,p)=>a+p.x,0)/S.length, cy=S.reduce((a,p)=>a+p.y,0)/S.length;
+
+  // цветные полки — в цвет свотчей из «Размеры сторон»
+  let segStroke='', segLabels='', dots='';
+  for(let i=0;i<S.length-1;i++){ segStroke += `<line x1="${S[i].x.toFixed(1)}" y1="${S[i].y.toFixed(1)}" x2="${S[i+1].x.toFixed(1)}" y2="${S[i+1].y.toFixed(1)}" stroke="#efe9e0" stroke-width="9" stroke-linecap="round"/>`; }
+  for(let i=0;i<S.length-1;i++){ segStroke += `<line x1="${S[i].x.toFixed(1)}" y1="${S[i].y.toFixed(1)}" x2="${S[i+1].x.toFixed(1)}" y2="${S[i+1].y.toFixed(1)}" stroke="${PALETTE[i%PALETTE.length]}" stroke-width="5.5" stroke-linecap="round"/>`; }
+  for(let i=0;i<S.length-1;i++){
+    const a=S[i], b=S[i+1]; const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+    let nx=-(b.y-a.y), ny=(b.x-a.x); const nl=Math.hypot(nx,ny)||1; nx/=nl; ny/=nl;
+    if((mx-cx)*nx+(my-cy)*ny < 0){ nx=-nx; ny=-ny; }
+    const lx=mx+nx*16, ly=my+ny*16;
+    const txt=fmt(L[i]); const bw=txt.length*8+16;   // кликабельная подушка по ширине цифры
+    segLabels += `<g class="dimlbl" data-di="${i}"><title>Нажми — изменить размер</title>
+      <rect x="${(lx-bw/2).toFixed(1)}" y="${(ly-11).toFixed(1)}" width="${bw}" height="20" rx="6" fill="transparent"/>
+      <text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="800" fill="${PALETTE[i%PALETTE.length]}">${txt}</text>
+    </g>`;
+  }
+  S.forEach(p=> dots += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#1A1A1A"/>`);
+
+  // завальцовка — подгиб края на 180° плотно вдоль крайней полки (К ГРУНТУ по умолчанию; hemReverse — к цвету).
+  // строим в экранных координатах (S) → стабильный вид на любом масштабе.
+  let hooks='';
+  const CH=colorDirVec();
+  const hemN=e=>{ const n=hemNormalAt(P,e,CH,hemReverse); return {x:n.x, y:-n.y}; };  // turtle→экран: y зеркалится
+  const drawHook=(E,Nb,nH)=>{                                  // E=конец профиля, Nb=соседняя точка (экранные)
+    let tx=Nb.x-E.x, ty=Nb.y-E.y; const segPx=Math.hypot(tx,ty)||1; tx/=segPx; ty/=segPx;   // вдоль полки внутрь
+    let nx=nH.x, ny=nH.y;                                                           // сторона подгиба (грунт/цвет)
+    const gap=(view.hemGap||0)*sc;                                                  // отступ завальцовки от стороны (мм × масштаб) — настраивается
+    let len=H.hemSize*sc;                                                           // длина подгиба = 10–11 мм в масштабе чертежа
+    len=Math.max(11, Math.min(len, segPx*0.45));                                    // видимо, но не длиннее ~половины полки
+    const p1={x:E.x+nx*gap,               y:E.y+ny*gap};                            // сложенный слой у самого края
+    const p2={x:p1.x+tx*len,              y:p1.y+ty*len};                           // сложенный слой вглубь вдоль полки
+    const tip={x:E.x+nx*gap*0.5-tx*gap*1.05, y:E.y+ny*gap*0.5-ty*gap*1.05};         // округлый разворот на 180° у края
+    return `<path d="M${p2.x.toFixed(1)} ${p2.y.toFixed(1)} L${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q${tip.x.toFixed(1)} ${tip.y.toFixed(1)} ${E.x.toFixed(1)} ${E.y.toFixed(1)}" fill="none" stroke="#c1440e" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+  };
+  if(hemLeft && S.length>1) hooks+=drawHook(S[0], S[1], hemN(0));
+  if(hemRight && S.length>1){ const n=S.length-1; hooks+=drawHook(S[n], S[n-1], hemN(1)); }
+
+  // стрелка «сторона цвета» — перетаскивается (тело двигает, кружок на кончике вращает)
+  const sMinX=Math.min(...S.map(p=>p.x)), sMaxX=Math.max(...S.map(p=>p.x)), sMinY=Math.min(...S.map(p=>p.y)), sMaxY=Math.max(...S.map(p=>p.y));
+  const scx=(sMinX+sMaxX)/2, scy=(sMinY+sMaxY)/2;
+  let av=arrowOverrides[cur];
+  if(!av){
+    if(cs==='bottom') av={x:scx, y:sMaxY+agp+ALN, ang:-90};
+    else if(cs==='left') av={x:sMinX-agp-ALN, y:scy, ang:0};
+    else if(cs==='right') av={x:sMaxX+agp+ALN, y:scy, ang:180};
+    else av={x:scx, y:sMinY-agp-ALN, ang:90};
+  }
+  curArrow={x:av.x, y:av.y, ang:av.ang};
+  const la=curArrow.ang*Math.PI/180;
+  const labelTxt = ral? ('RAL '+ral) : 'цвет';
+  const tipR=Math.max(6, ALN*0.4);
+  const bg = ral? ralHex(ral) : null;                  // фон подписи = цвет RAL
+  const txtFill = ral? contrastText(bg) : '#C1440E';   // текст авто-контрастный к фону
+  const rectW = labelTxt.length*F*0.62 + F;
+  const labelDist = 8 + rectH*0.6;
+  const lx = curArrow.x - labelDist*Math.cos(la), ly = curArrow.y - labelDist*Math.sin(la);
+  const labelInner = (bg
+      ? `<rect x="${(-rectW/2).toFixed(1)}" y="${(-rectH/2).toFixed(1)}" width="${rectW.toFixed(1)}" height="${rectH.toFixed(1)}" rx="${(rectH*0.3).toFixed(1)}" fill="${bg}" stroke="rgba(0,0,0,.22)" stroke-width="0.7"/>`
+      : '')
+    + `<text x="0" y="${(F*0.35).toFixed(1)}" text-anchor="middle" font-size="${F}" font-weight="800" fill="${txtFill}"${bg?'':' stroke="#fbfaf8" stroke-width="2.4" paint-order="stroke" style="paint-order:stroke"'}>${labelTxt}</text>`;
+  const colorArrow = `<g id="carrow">
+      <g id="carrow-inner" transform="translate(${curArrow.x.toFixed(1)},${curArrow.y.toFixed(1)}) rotate(${curArrow.ang.toFixed(1)})" style="cursor:move">
+        <line x1="0" y1="0" x2="${ALN}" y2="0" stroke="transparent" stroke-width="16"/>
+        <line x1="0" y1="0" x2="${ALN}" y2="0" stroke="#C1440E" stroke-width="2.2" marker-end="url(#carr)"/>
+        <circle id="carrow-tip" cx="${ALN}" cy="0" r="${tipR.toFixed(1)}" fill="#C1440E" fill-opacity="0.18" stroke="#C1440E" stroke-width="1" style="cursor:crosshair"/>
+      </g>
+      <g id="carrow-label" transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})">${labelInner}</g>
+    </g>`;
+
+  svg.innerHTML = `
+    <defs><marker id="carr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#C1440E"/></marker></defs>
+    ${segStroke}${hooks}${dots}${segLabels}${colorArrow}`;
+  svg.querySelectorAll('.dimlbl').forEach(g=> g.onclick=()=> openDimEditor(+g.dataset.di, g));   // клик по цифре — правка размера на чертеже
+
+  // ── развёртка ──
+  document.getElementById('razv-val').textContent = fmt(razv);
+  document.getElementById('razv-formula').textContent =
+    el.segs.map(s=>fmt(vals[s.key]||0)).join(' + ') + (H.count?` + завальц. 10×${H.count}`:'') + ' = ' + fmt(razv) + ' мм';
+  const hn=document.getElementById('hem-note');
+  if(!H.count) hn.textContent='Завальцовка выключена.';
+  else if(H.use11) hn.textContent=`Загиб 11 мм (${H.reason}): у краёв соседняя сторона −1 мм в разметке, развёртка остаётся ${fmt(razv)} мм (кратно 5).`;
+  else hn.textContent=`Загиб 10 мм. Развёртка ${fmt(razv)} мм.`;
+
+  // ── плоская заготовка: разметка с двух сторон (верх — лицо/цвет, низ — грунт) ──
+  const ML=markLayout();
+  const f=document.getElementById('flatsvg');
+  const FW=400, fp=6, usable=FW-2*fp, barH=26;
+  const s2=ML.W>0? usable/ML.W : 0;
+  const bars=[
+    {y:26, side:'face', title:'ЛИЦЕВАЯ — ПО ЦВЕТУ'+(ral?` (RAL ${escHtml(ral)})`:'')},
+    {y:92, side:'back', title:'ТЫЛЬНАЯ — ПО ГРУНТУ'}
+  ];
+  let fOut='';
+  bars.forEach(b=>{
+    fOut+=`<text x="${fp}" y="${b.y-6}" font-size="10" font-weight="800" fill="#4a4a4a">${b.title}</text>`;
+    let acc2=0;
+    ML.cells.forEach(c=>{
+      const x0=fp+acc2*s2, w=c.len*s2;
+      const fill=c.hem? '#7f8a93' : PALETTE[c.ci%PALETTE.length];
+      fOut+=`<rect x="${x0.toFixed(1)}" y="${b.y}" width="${Math.max(0,w).toFixed(1)}" height="${barH}" fill="${fill}" opacity="${c.hem?0.9:0.5}"/>`;
+      if(w>13) fOut+=`<text x="${(x0+w/2).toFixed(1)}" y="${b.y+barH/2+3.5}" text-anchor="middle" font-size="9.5" font-weight="800" fill="#1a1a1a">${c.hem?ML.H.hemSize:fmt(c.len)}</text>`;
+      acc2+=c.len;
+    });
+    fOut+=`<rect x="${fp}" y="${b.y}" width="${usable}" height="${barH}" fill="none" stroke="#c9c2b7" stroke-width="1"/>`;
+    const bl=ML.lines.filter(l=>l.side===b.side);
+    bl.forEach(l=>{ const mx=fp+l.pos*s2;
+      fOut+=`<line x1="${mx.toFixed(1)}" y1="${b.y-4}" x2="${mx.toFixed(1)}" y2="${b.y+barH+4}" stroke="#1A1A1A" stroke-width="1.6" stroke-dasharray="4 2.4"/>`;
+    });
+    if(!bl.length) fOut+=`<text x="${fp+usable/2}" y="${b.y+barH+14}" text-anchor="middle" font-size="9" fill="#9a938a">нет линий разметки на этой стороне</text>`;
+  });
+  fOut+=`<text x="${fp}" y="146" font-size="10" fill="#8a8a8a">пунктир — линии загиба на этой стороне · серое — завальцовка · развёртка ${fmt(razv)} мм${templateFlip?' · стороны обменяны ⇄':''}</text>`;
+  f.innerHTML=fOut;
+
+  // проверка по станку: мин. полка
+  const mw=document.getElementById('m-warn');
+  const small = machine.minPolka>0 ? L.filter(v=>v>0 && v<machine.minPolka-1e-9) : [];
+  if(small.length){ mw.textContent=`⚠ Станок не согнёт полку меньше ${fmt(machine.minPolka)} мм. Сейчас: ${small.map(v=>fmt(v)).join(', ')} мм.`; mw.style.display='block'; }
+  else { mw.style.display='none'; }
+
+  updateParts(razv);
+}
+
+// ── Печатный шаблон разметки (A4 альбомная, 1:1, перегиб по горизонтали) ──
+// Верхний блок — лицевая (по цвету), нижний — по грунту. Перегнул по пунктиру,
+// надел на торец заготовки, совместил с кромкой А — метки на обеих сторонах на местах.
+const tplOverlay=document.getElementById('tpl-overlay');
+function buildTemplate(){
+  const ML=markLayout();
+  const W=ML.W;
+  const PW=277, PH=190;                 // рабочее поле листа в мм (A4 альбомная, поля принтера 10)
+  const x0=12;                          // от левого края поля до кромки А
+  const usableW=PW-x0-10;               // мм развёртки на одном листе
+  const step=usableW-15;                // сдвиг между листами (15 мм перехлёст на склейку)
+  const nPages=Math.max(1, Math.ceil((W-usableW)/step)+1);
+  const foldY=100, blockH=62;
+  const dateStr=new Date().toLocaleDateString('ru-RU');
+  const title=getName(cur)||'Профиль';
+  const hemTxt = hemMode==='both'?'завальцовка с двух сторон':(hemMode==='one'?('завальцовка '+(hemSide==='left'?'слева':'справа')):'без завальцовки');
+  const meta=`развёртка ${fmt(W)} мм · металл ${fmt(thickness,2)} мм · ${hemTxt}${ML.H.count?` (загиб ${ML.H.hemSize} мм)`:''}${ral?` · RAL ${escHtml(ral)}`:''} · отсчёт от ${tplFromRight?'правой':'левой'} кромки${templateFlip?' · стороны обменяны ⇄':''}`;
+  let pagesHtml='';
+  for(let pg=0; pg<nPages; pg++){
+    const xs=pg*step;                              // мировые мм в левом краю рабочей зоны листа
+    const xe=Math.min(W, xs+usableW);
+    const mmx=v=>x0+(v-xs);
+    let g='';
+    // шапка
+    g+=`<text x="${x0}" y="10" font-size="5.4" font-weight="800" fill="#1a1a1a">ШАБЛОН РАЗМЕТКИ · ${escHtml(title)}</text>`;
+    g+=`<text x="${x0}" y="16.6" font-size="3.6" fill="#4a4a4a">${meta} · ${dateStr}${nPages>1?` · лист ${pg+1} из ${nPages}`:''}</text>`;
+    // заголовки блоков
+    g+=`<text x="${x0}" y="${foldY-blockH-3}" font-size="4.2" font-weight="800" fill="#1a1a1a">ЛИЦЕВАЯ СТОРОНА — ПО ЦВЕТУ${ral?` (RAL ${escHtml(ral)})`:''}</text>`;
+    g+=`<text x="${x0}" y="${foldY+blockH+7}" font-size="4.2" font-weight="800" fill="#1a1a1a">ТЫЛЬНАЯ СТОРОНА — ПО ГРУНТУ</text>`;
+    // рамки блоков и линия перегиба
+    g+=`<rect x="${mmx(xs)}" y="${foldY-blockH}" width="${(xe-xs).toFixed(2)}" height="${blockH}" fill="none" stroke="#999" stroke-width="0.25"/>`;
+    g+=`<rect x="${mmx(xs)}" y="${foldY}" width="${(xe-xs).toFixed(2)}" height="${blockH}" fill="none" stroke="#999" stroke-width="0.25"/>`;
+    g+=`<line x1="${mmx(xs)-5}" y1="${foldY}" x2="${mmx(xe)+5}" y2="${foldY}" stroke="#1a1a1a" stroke-width="0.5" stroke-dasharray="6 3"/>`;
+    // зоны завальцовки (в обоих блоках, серым)
+    ML.cells.reduce((acc,c)=>{ const a=acc, b=acc+c.len;
+      if(c.hem && b>xs+0.01 && a<xe-0.01){
+        const ca=Math.max(a,xs), cb=Math.min(b,xe);
+        g+=`<rect x="${mmx(ca)}" y="${foldY-blockH}" width="${(cb-ca).toFixed(2)}" height="${blockH}" fill="#7f8a93" opacity="0.14"/>`;
+        g+=`<rect x="${mmx(ca)}" y="${foldY}" width="${(cb-ca).toFixed(2)}" height="${blockH}" fill="#7f8a93" opacity="0.14"/>`;
+      } return b; },0);
+    // линии загиба: каждая в своём блоке, подпись — позиция от кромки А
+    ML.lines.forEach(l=>{
+      if(l.pos<xs-0.01||l.pos>xe+0.01) return;
+      const lx=mmx(l.pos);
+      const top=(l.side==='face');
+      g+=`<line x1="${lx.toFixed(2)}" y1="${top?foldY-blockH:foldY}" x2="${lx.toFixed(2)}" y2="${top?foldY:foldY+blockH}" stroke="#1a1a1a" stroke-width="0.45"/>`;
+      const posLbl = tplFromRight? fmt(W-l.pos) : fmt(l.pos);   // расстояние от главной кромки
+      g+=`<text x="${(tplFromRight? lx+1.4 : lx-1.4).toFixed(2)}" y="${top?foldY-blockH+5.2:foldY+blockH-2}" font-size="3.4" font-weight="700" fill="#1a1a1a" text-anchor="${tplFromRight?'start':'end'}">${posLbl}</text>`;
+    });
+    // размеры у перегиба: расстояния между СОСЕДНИМИ линиями СВОЕЙ стороны (вкл. кромки).
+    // Между линиями всегда ОДНО число — полки в пролёте складываются в сумму (правило владельца).
+    const sideGaps=side=>{
+      const bs=[0, ...ML.lines.filter(l=>l.side===side).map(l=>l.pos), W];
+      const out=[]; for(let i=0;i<bs.length-1;i++){ if(bs[i+1]-bs[i]>0.01) out.push({a:bs[i], b:bs[i+1], len:bs[i+1]-bs[i]}); }
+      return out;
+    };
+    [['face',foldY-2.2],['back',foldY+5.4]].forEach(([sd,ly])=>{
+      sideGaps(sd).forEach(gp=>{
+        const ca=Math.max(gp.a,xs), cb=Math.min(gp.b,xe);
+        if(cb-ca>7){
+          g+=`<text x="${mmx((ca+cb)/2).toFixed(2)}" y="${ly}" font-size="4.8" font-weight="800" fill="#1a1a1a" text-anchor="middle">${fmt(gp.len)}</text>`;
+        }
+      });
+    });
+    // главная КРОМКА А (опорная, отсчёт) — по переключателю tplFromRight; КРОМКА Б — противоположная
+    const lblA='КРОМКА А — РЕЗАТЬ ЗДЕСЬ, приложить к краю заготовки', lblB=`КРОМКА Б (${fmt(W)} мм)`;
+    if(pg===0){
+      g+=`<line x1="${x0}" y1="${foldY-blockH-1}" x2="${x0}" y2="${foldY+blockH+1}" stroke="#C1440E" stroke-width="0.8"/>`;
+      g+=`<text x="${x0-1.6}" y="${foldY+blockH}" font-size="3.4" font-weight="800" fill="#C1440E" transform="rotate(-90 ${x0-1.6} ${foldY+blockH})">${tplFromRight? lblB : lblA}</text>`;
+    }
+    if(pg===nPages-1){
+      g+=`<line x1="${mmx(W).toFixed(2)}" y1="${foldY-blockH-1}" x2="${mmx(W).toFixed(2)}" y2="${foldY+blockH+1}" stroke="#C1440E" stroke-width="0.8"/>`;
+      g+=`<text x="${(mmx(W)+3.4).toFixed(2)}" y="${foldY+blockH}" font-size="3.4" font-weight="800" fill="#C1440E" transform="rotate(-90 ${(mmx(W)+3.4).toFixed(2)} ${foldY+blockH})">${tplFromRight? lblA : lblB}</text>`;
+    }
+    // линии склейки между листами
+    if(pg<nPages-1){
+      g+=`<line x1="${mmx(xe).toFixed(2)}" y1="${foldY-blockH-4}" x2="${mmx(xe).toFixed(2)}" y2="${foldY+blockH+4}" stroke="#1a1a1a" stroke-width="0.35" stroke-dasharray="2 1.4 0.4 1.4"/>`;
+      g+=`<text x="${(mmx(xe)-1.4).toFixed(2)}" y="${foldY-blockH-5.5}" font-size="3" fill="#4a4a4a" text-anchor="end">СКЛЕЙКА — совместить с линией листа ${pg+2}</text>`;
+    }
+    if(pg>0){
+      const jx=xs+15;
+      g+=`<line x1="${mmx(jx).toFixed(2)}" y1="${foldY-blockH-4}" x2="${mmx(jx).toFixed(2)}" y2="${foldY+blockH+4}" stroke="#1a1a1a" stroke-width="0.35" stroke-dasharray="2 1.4 0.4 1.4"/>`;
+      g+=`<text x="${(mmx(jx)+1.4).toFixed(2)}" y="${foldY-blockH-5.5}" font-size="3" fill="#4a4a4a">линия склейки с листом ${pg}</text>`;
+    }
+    // контроль масштаба 100 мм + инструкция
+    g+=`<line x1="${x0}" y1="178" x2="${x0+100}" y2="178" stroke="#1a1a1a" stroke-width="0.5"/>`;
+    [0,50,100].forEach(t=>{ g+=`<line x1="${x0+t}" y1="176" x2="${x0+t}" y2="180" stroke="#1a1a1a" stroke-width="0.5"/>`; });
+    g+=`<text x="${x0+104}" y="179.4" font-size="3.4" fill="#1a1a1a">контроль масштаба: этот отрезок = ровно 100 мм (печать 100%, без «вписать в страницу»)</text>`;
+    g+=`<text x="${x0}" y="186.6" font-size="3.4" fill="#4a4a4a">Отрежьте по линии «Кромка А» (${tplFromRight?'справа':'слева'}), перегните по пунктиру и наденьте на торец заготовки: верх — лицевая (цвет), низ — грунт. Совместите край с кромкой А; цифры у линий — расстояние от кромки А.</text>`;
+    pagesHtml+=`<div class="tpl-page"><svg viewBox="0 0 ${PW} ${PH}" xmlns="http://www.w3.org/2000/svg">${g}</svg></div>`;
+  }
+  document.getElementById('tpl-sheets').innerHTML=pagesHtml;
+}
+// ── Буфер шаблонов разметки: собираем профили → печатаем компактно несколько на A4 ──
+const TPLBUF='dianast_dobornye_tplbuf_v1';
+let tplBuf=[]; try{ tplBuf=JSON.parse(localStorage.getItem(TPLBUF)||'[]'); }catch(e){}
+function saveTplBuf(){ try{ localStorage.setItem(TPLBUF, JSON.stringify(tplBuf)); }catch(e){} }
+function updateTplCount(){ const b=document.getElementById('tpl-open'); if(b) b.textContent=`🗂 Шаблоны на печать (${tplBuf.length})`; }
+function snapshotTemplate(){                       // снимок текущего профиля (форма/завальцовка/RAL) в буфер
+  const ML=markLayout();
+  return { name:getName(cur)||'Профиль', W:ML.W, cells:ML.cells, lines:ML.lines,
+    thickness, ral: ral||'', hemMode, hemSide, fromRight:tplFromRight, ts:Date.now() };
+}
+document.getElementById('tpl-btn').onclick=()=>{
+  tplBuf.push(snapshotTemplate()); saveTplBuf(); updateTplCount();
+  const b=document.getElementById('tpl-btn'), t=b.textContent; b.textContent='Добавлено в шаблоны ✓';
+  setTimeout(()=>b.textContent=t, 1100);
+};
+document.getElementById('tpl-open').onclick=()=>{ document.getElementById('tpl-clear').style.display=''; renderTplBuf(); tplOverlay.classList.add('show'); };
+document.getElementById('tpl-close').onclick=()=> tplOverlay.classList.remove('show');
+document.getElementById('tpl-clear').onclick=()=>{ if(!tplBuf.length) return; if(!confirm('Очистить все шаблоны из буфера?')) return; tplBuf=[]; saveTplBuf(); updateTplCount(); renderTplBuf(); };
+document.getElementById('tpl-print').onclick=()=>{ if(document.querySelector('#tpl-sheets .tpl-page')) window.print(); };
+
+// компактный «бэнд» шаблона (ширина 1:1, малая высота), локальные мм 0..TPL_BAND_H
+const TPL_BAND_H=44, TPL_USABLE_W=180, TPL_PAGE_H=277;
+function tplBandSlices(item){                      // широкий профиль дробится по ширине на слайсы ≤ листа (склейка 15 мм)
+  const W=item.W, step=TPL_USABLE_W-15;
+  const n = W<=TPL_USABLE_W+0.01 ? 1 : Math.ceil((W-TPL_USABLE_W)/step)+1;
+  const slices=[]; for(let i=0;i<n;i++){ const xs=i*step, xe=Math.min(W, xs+TPL_USABLE_W); slices.push({xs,xe,i,n}); }
+  return slices;
+}
+function tplBandSvg(item, sl, posNum){
+  const x0=6, foldY=22, blockH=13, fromRight=item.fromRight, W=item.W, xs=sl.xs, xe=sl.xe;
+  const mmx=v=>x0+(v-xs);
+  const hemTxt = item.hemMode==='both'?'зав. 2 края':(item.hemMode==='one'?('зав. '+(item.hemSide==='left'?'слева':'справа')):'без зав.');
+  const sliceLbl = sl.n>1 ? ` · лист ${sl.i+1}/${sl.n} (склейка 15 мм)` : '';
+  let g='';
+  g+=`<text x="${x0}" y="4" font-size="3.6" font-weight="800" fill="#1a1a1a">№${posNum} · ${escHtml(item.name)} · развёртка ${fmt(W)} мм · ${hemTxt}${item.ral?` · RAL ${escHtml(item.ral)}`:''}${sliceLbl}</text>`;
+  g+=`<text x="${x0}" y="${foldY-blockH-0.8}" font-size="2.7" font-weight="700" fill="#666">лицо (по цвету)</text>`;
+  g+=`<text x="${x0}" y="${foldY+blockH+3.2}" font-size="2.7" font-weight="700" fill="#666">грунт</text>`;
+  g+=`<rect x="${mmx(xs).toFixed(2)}" y="${foldY-blockH}" width="${(xe-xs).toFixed(2)}" height="${blockH}" fill="none" stroke="#999" stroke-width="0.25"/>`;
+  g+=`<rect x="${mmx(xs).toFixed(2)}" y="${foldY}" width="${(xe-xs).toFixed(2)}" height="${blockH}" fill="none" stroke="#999" stroke-width="0.25"/>`;
+  g+=`<line x1="${(mmx(xs)-4).toFixed(2)}" y1="${foldY}" x2="${(mmx(xe)+4).toFixed(2)}" y2="${foldY}" stroke="#1a1a1a" stroke-width="0.4" stroke-dasharray="5 2.5"/>`;
+  let acc=0; item.cells.forEach(c=>{ const a=acc,b=acc+c.len; if(c.hem && b>xs+0.01 && a<xe-0.01){ const ca=Math.max(a,xs),cb=Math.min(b,xe);
+    g+=`<rect x="${mmx(ca).toFixed(2)}" y="${foldY-blockH}" width="${(cb-ca).toFixed(2)}" height="${blockH}" fill="#7f8a93" opacity="0.14"/>`;
+    g+=`<rect x="${mmx(ca).toFixed(2)}" y="${foldY}" width="${(cb-ca).toFixed(2)}" height="${blockH}" fill="#7f8a93" opacity="0.14"/>`;
+  } acc=b; });
+  item.lines.forEach(l=>{ if(l.pos<xs-0.01||l.pos>xe+0.01) return; const lx=mmx(l.pos), top=(l.side==='face');
+    g+=`<line x1="${lx.toFixed(2)}" y1="${top?foldY-blockH:foldY}" x2="${lx.toFixed(2)}" y2="${top?foldY:foldY+blockH}" stroke="#1a1a1a" stroke-width="0.4"/>`;
+    const posLbl = fromRight? fmt(W-l.pos) : fmt(l.pos);
+    g+=`<text x="${(fromRight? lx+1 : lx-1).toFixed(2)}" y="${top?foldY-blockH+3.2:foldY+blockH-1}" font-size="2.5" font-weight="700" fill="#1a1a1a" text-anchor="${fromRight?'start':'end'}">${posLbl}</text>`;
+  });
+  const sideGaps=side=>{ const bs=[0,...item.lines.filter(l=>l.side===side).map(l=>l.pos),W]; const out=[]; for(let i=0;i<bs.length-1;i++){ if(bs[i+1]-bs[i]>0.01) out.push({a:bs[i],b:bs[i+1],len:bs[i+1]-bs[i]}); } return out; };
+  [['face',foldY-1.8],['back',foldY+3.2]].forEach(([sd,ly])=>{ sideGaps(sd).forEach(gp=>{ const ca=Math.max(gp.a,xs),cb=Math.min(gp.b,xe); if(cb-ca>7){ g+=`<text x="${mmx((ca+cb)/2).toFixed(2)}" y="${ly}" font-size="3.6" font-weight="800" fill="#1a1a1a" text-anchor="middle">${fmt(gp.len)}</text>`; } }); });
+  if(!fromRight && sl.i===0){ g+=`<line x1="${x0}" y1="${foldY-blockH-1}" x2="${x0}" y2="${foldY+blockH+1}" stroke="#C1440E" stroke-width="0.8"/>`; g+=`<text x="${x0+0.8}" y="${foldY-blockH-0.8}" font-size="2.7" font-weight="800" fill="#C1440E">кромка А →</text>`; }
+  if(fromRight && sl.i===sl.n-1){ const rx=mmx(W); g+=`<line x1="${rx.toFixed(2)}" y1="${foldY-blockH-1}" x2="${rx.toFixed(2)}" y2="${foldY+blockH+1}" stroke="#C1440E" stroke-width="0.8"/>`; g+=`<text x="${(rx-0.8).toFixed(2)}" y="${foldY-blockH-0.8}" font-size="2.7" font-weight="800" fill="#C1440E" text-anchor="end">← кромка А</text>`; }
+  return g;
+}
+// компактные страницы A4-портрет из массива шаблонов (общее для буфера и печати из заказа)
+function tplPagesHtml(items){
+  const pages=[]; let pageBands=[], y=0; const gap=6;
+  items.forEach((it,idx)=>{ tplBandSlices(it).forEach(sl=>{
+    if(y+TPL_BAND_H > TPL_PAGE_H && pageBands.length){ pages.push(pageBands); pageBands=[]; y=0; }
+    pageBands.push(`<g transform="translate(0 ${y.toFixed(2)})">${tplBandSvg(it, sl, idx+1)}</g>`);
+    y += TPL_BAND_H + gap;
+  }); });
+  if(pageBands.length) pages.push(pageBands);
+  return pages.map(bands=>
+    `<div class="tpl-page"><svg viewBox="0 0 190 277" xmlns="http://www.w3.org/2000/svg">${bands.join('')}<line x1="6" y1="272" x2="106" y2="272" stroke="#1a1a1a" stroke-width="0.4"/>${[0,50,100].map(t=>`<line x1="${6+t}" y1="270.5" x2="${6+t}" y2="273.5" stroke="#1a1a1a" stroke-width="0.4"/>`).join('')}<text x="110" y="273.2" font-size="2.7" fill="#666">контроль масштаба: 100 мм (печать 100%, без «вписать в страницу»)</text></svg></div>`
+  ).join('');
+}
+function renderTplBuf(){
+  updateTplCount();
+  const list=document.getElementById('tpl-list');
+  if(!tplBuf.length){ list.innerHTML='<div class="tpl-empty">Буфер пуст. На нужном профиле нажми «📐 ＋ в шаблоны разметки» — он добавится сюда, потом напечатаешь несколько на один A4.</div>'; document.getElementById('tpl-sheets').innerHTML=''; return; }
+  list.innerHTML=`<h3>Шаблоны на печать</h3><div class="tpl-sub">Ширина 1:1 (реальный размер — обводить на металле). На один A4 стекается несколько по высоте. Отрежь по «кромке А», перегни по пунктиру, надень на торец: верх — лицо (цвет), низ — грунт.</div>`+
+    tplBuf.map((it,i)=>`<div class="tplrow"><span class="tn">${i+1}</span><div class="tm"><b>${escHtml(it.name)}</b> <span>· развёртка ${fmt(it.W)} мм · ${fmt(it.thickness,2)} мм${it.ral?` · RAL ${escHtml(it.ral)}`:''}</span></div><button class="tdel" data-tdel="${i}" title="Удалить">×</button></div>`).join('');
+  list.querySelectorAll('[data-tdel]').forEach(b=> b.onclick=()=>{ tplBuf.splice(+b.dataset.tdel,1); saveTplBuf(); renderTplBuf(); });
+  document.getElementById('tpl-sheets').innerHTML = tplPagesHtml(tplBuf);
+}
+// печать шаблонов разметки для отмеченных галочкой позиций заказа
+function openOrderTemplates(){
+  const items=order.filter(it=>it.tplOn && it.tplGeom).map(it=>({
+    name: it.name||'Профиль', W: it.tplGeom.W, cells: it.tplGeom.cells, lines: it.tplGeom.lines,
+    thickness: it.thickness, ral: it.ral||'', hemMode: it.tplGeom.hemMode, hemSide: it.tplGeom.hemSide, fromRight: it.tplGeom.fromRight
+  }));
+  if(!items.length) return;
+  const list=document.getElementById('tpl-list');
+  list.innerHTML=`<h3>Шаблоны разметки — из заказа (${items.length})</h3><div class="tpl-sub">Ширина 1:1 (реальный размер — обводить на металле). Несколько на A4 по высоте. Отрежь по «кромке А», перегни по пунктиру, надень на торец: верх — лицо (цвет), низ — грунт.</div>`+
+    items.map((it,i)=>`<div class="tplrow"><span class="tn">${i+1}</span><div class="tm"><b>${escHtml(it.name)}</b> <span>· развёртка ${fmt(it.W)} мм · ${fmt(it.thickness,2)} мм${it.ral?` · RAL ${escHtml(it.ral)}`:''}</span></div></div>`).join('');
+  document.getElementById('tpl-sheets').innerHTML = tplPagesHtml(items);
+  document.getElementById('tpl-clear').style.display='none';
+  tplOverlay.classList.add('show');
+}
+updateTplCount();
+
+// ── Список деталей профиля (строки длина×кол-во, развёртка общая на профиль) ──
+const partsList=document.getElementById('parts-list');
+function buildParts(){
+  partsList.innerHTML = parts.map((p,i)=>`
+    <div class="part-row">
+      <input class="pin" type="number" data-p="${i}" data-f="len" value="${p.len}" min="0.01" max="${machine.maxLen}" step="0.01" inputmode="decimal"><span class="pu">м ×</span>
+      <input class="pin" type="number" data-p="${i}" data-f="qty" value="${p.qty}" min="1" step="1" inputmode="numeric"><span class="pu">шт</span>
+      <span class="peq" data-eq="${i}"></span>
+      ${parts.length>1?`<button class="pdel" data-del="${i}" type="button" title="Удалить строку">×</button>`:''}
+      <div class="part-warn" data-warn="${i}" style="display:none"></div>
+    </div>`).join('');
+  partsList.querySelectorAll('.pin').forEach(inp=> inp.oninput=()=>{ parts[+inp.dataset.p][inp.dataset.f]=inp.value; render(); });
+  partsList.querySelectorAll('.pdel').forEach(b=> b.onclick=()=>{ parts.splice(+b.dataset.del,1); buildParts(); render(); });
+}
+function paintPartsMode(){
+  document.querySelectorAll('#parts-mode button').forEach(b=> b.classList.toggle('on', b.dataset.pm===partsMode));
+  const meters = partsMode==='meters';
+  document.getElementById('parts-list').style.display = meters?'none':'';
+  document.getElementById('parts-add').style.display = meters?'none':'';
+  document.getElementById('parts-meters-wrap').style.display = meters?'flex':'none';
+  document.getElementById('parts-meters-note').style.display = meters?'block':'none';
+  const mi=document.getElementById('parts-meters'); if(mi && mi.value!==partsMeters) mi.value=partsMeters;
+  updateParts(currentRazv());
+}
+function updateParts(razv){
+  document.getElementById('parts-razv').textContent='развёртка '+fmt(razv)+' мм';
+  if(partsMode==='meters'){
+    const m=parseFloat(partsMeters)||0;
+    const nSheets = m>0 ? Math.ceil(m/machine.maxLen) : 0;
+    document.getElementById('parts-sum').innerHTML = m>0
+      ? `Итого: <b>≈ ${fmt(m,2)}</b> пог. м «по метражу» · программа нарежет на куски ≤ ${fmt(machine.maxLen,2)} м (примерно ${nSheets} ${plural(nSheets,'лист','листа','листов')})`
+      : `Введите общий метраж.`;
+    const cb=document.getElementById('parts-copy'), bn=document.getElementById('parts-block');
+    cb.disabled = !(m>0); cb.classList.toggle('disabled', !(m>0));
+    bn.style.display='none';
+    return;
+  }
+  let totQty=0, totM=0, anyOver=false;
+  parts.forEach((p,i)=>{
+    const len=parseFloat(p.len)||0, qty=parseInt(p.qty,10)||0;
+    totQty+=qty; totM+=len*qty;
+    const over=len>machine.maxLen+1e-9; anyOver=anyOver||over;
+    const eq=partsList.querySelector('[data-eq="'+i+'"]');
+    if(eq) eq.textContent=(len>0&&qty>0)?`${fmt(razv)}×${fmt(len,2)}м×${qty}шт`:'—';
+    const w=partsList.querySelector('[data-warn="'+i+'"]');
+    if(w){ w.style.display=over?'block':'none'; if(over) w.textContent=`⚠ длина > ${fmt(machine.maxLen,2)} м (макс. лист станка)`; }
+  });
+  document.getElementById('parts-sum').innerHTML =
+    `Итого: <b>${parts.length}</b> ${plural(parts.length,'строка','строки','строк')} · <b>${totQty}</b> ${plural(totQty,'деталь','детали','деталей')} · <b>${fmt(totM,2)}</b> пог. м`;
+  // запрет копирования, пока есть строки длиннее макс. листа станка
+  const cb=document.getElementById('parts-copy'), bn=document.getElementById('parts-block');
+  cb.disabled=anyOver; cb.classList.toggle('disabled', anyOver);
+  bn.style.display=anyOver?'block':'none';
+  if(anyOver) bn.textContent=`⚠ Убери или укороти строки длиннее ${fmt(machine.maxLen,2)} м — пока они есть, скопировать для раскроя нельзя.`;
+}
+document.getElementById('parts-add').onclick=()=>{ const last=parts[parts.length-1]; parts.push({len:(last&&last.len)||1, qty:1}); buildParts(); render(); };
+document.querySelectorAll('#parts-mode button').forEach(b=> b.onclick=()=>{ partsMode=b.dataset.pm; partsModeByEl[cur]=partsMode; paintPartsMode(); });
+document.getElementById('parts-meters').oninput=(e)=>{ partsMeters=e.target.value; partsMetersByEl[cur]=partsMeters; updateParts(currentRazv()); };
+document.getElementById('parts-copy').onclick=()=>{
+  const razvM=currentRazv();
+  if(partsMode==='meters'){
+    const m=parseFloat(partsMeters)||0; if(!(m>0)) return;
+    navigator.clipboard?.writeText(`${fmt(razvM)}×${fmt(m,2)}пог.м (по метражу)`).then(()=>{
+      const b=document.getElementById('parts-copy'), t=b.textContent; b.textContent='Скопировано ✓';
+      setTimeout(()=>b.textContent=t,1300);
+    });
+    return;
+  }
+  const maxLen=machine.maxLen;
+  if(parts.some(p=>(parseFloat(p.len)||0)>maxLen+1e-9)) return;   // запрет: есть строки длиннее макс. листа
+  const razv=currentRazv();
+  const lines=parts.map(p=>{ const len=parseFloat(p.len)||0, qty=parseInt(p.qty,10)||0; return (len>0&&qty>0)?`${fmt(razv)}×${fmt(len,2)}м×${qty}шт`:null; }).filter(Boolean);
+  if(!lines.length) return;
+  navigator.clipboard?.writeText(lines.join('\n')).then(()=>{
+    const b=document.getElementById('parts-copy'), t=b.textContent; b.textContent=`Скопировано ✓ (${lines.length})`;
+    setTimeout(()=>b.textContent=t,1300);
+  });
+  pushHistory();
+};
+
+// ── История копирования (localStorage, по каждому элементу) ──
+const HKEY='dianast_dobornye_history_v1';
+function loadHist(){ try{ return JSON.parse(localStorage.getItem(HKEY)||'[]'); }catch(e){ return []; } }
+function saveHist(){ try{ localStorage.setItem(HKEY, JSON.stringify(copyHist)); }catch(e){} }
+let copyHist = loadHist();
+function histSig(e){ return [e.el, JSON.stringify(e.vals), JSON.stringify(e.angs), e.hemMode, e.hemSide, e.hemReverse?1:0, e.thickness, e.ral||''].join('|'); }
+
+function pushHistory(){
+  const razv=currentRazv();
+  const entry={ el:cur, name:getName(cur), vals:{...vals}, angs:{...angs}, anglesOn, thickness, hemMode, hemSide, hemReverse, ral,
+    parts: parts.map(p=>({len:parseFloat(p.len)||0, qty:parseInt(p.qty,10)||0})).filter(p=>p.len>0&&p.qty>0),
+    razv, ts:Date.now() };
+  if(!entry.parts.length) return;   // нечего сохранять
+  const s=histSig(entry);
+  copyHist = copyHist.filter(e=> histSig(e)!==s);   // дедуп по профилю (без длин/кол-ва — храним последние)
+  copyHist.unshift(entry);
+  if(copyHist.length>40) copyHist.length=40;
+  saveHist(); renderHistory();
+}
+function histRows(e){ return (e.parts&&e.parts.length? e.parts : [{len:e.len,qty:e.qty}]).filter(p=>p&&p.len>0&&p.qty>0); }
+function histCopyStr(e){ return histRows(e).map(p=>`${fmt(e.razv)}×${fmt(p.len,2)}м×${p.qty}шт`).join('\n'); }
+// эскиз заготовки в строке истории — по сохранённым сторонам/углам/завальцовке записи
+function histMiniSVG(e){ return miniProfileSVG(e.el, 56, 44, {vals:e.vals, angs:e.angs, anglesOn:e.anglesOn, hemMode:e.hemMode, hemSide:e.hemSide, hemReverse:e.hemReverse, pad:8, sw:2.4}); }
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// имя для строки истории: своё имя записи (если переименовали) → иначе актуальное имя элемента → сохранённое
+function histName(e){ return e.customName || getName(e.el) || e.name || ''; }
+// подпись RAL для истории: '7024' → 'RAL 7024' (custom-текст с «RAL» не задваивает)
+function ralLabel(code){ if(!code) return ''; const c=String(code).replace(/^\s*RAL\s*/i,'').trim(); return c?('RAL '+c):''; }
+
+let renameHistTs=null;   // ts записи истории в режиме переименования
+function renderHistory(){
+  const box=document.getElementById('history');
+  const items=copyHist.filter(e=>e.el===cur);
+  if(!items.length){ box.innerHTML=`<div class="hist-empty">Пусто. Нажми «Скопировать для раскроя» — вариант сохранится сюда, чтобы потом повторить в один клик.</div>`; return; }
+  const el=ELEMENTS[cur];
+  box.innerHTML = items.map((e,i)=>{
+    const sides=el.segs.map(s=>fmt(e.vals[s.key]||0)).join(' / ');
+    const hemTxt = e.hemMode==='both'?'зав. 2 края':(e.hemMode==='one'?('зав. 1 '+(e.hemSide==='left'?'слева':'справа')):'без зав.');
+    const rows=histRows(e); const totQty=rows.reduce((a,p)=>a+p.qty,0);
+    const partsTxt = rows.length===0 ? '—'
+      : rows.length===1 ? `${fmt(rows[0].len,2)}м × ${rows[0].qty}шт`
+      : `${rows.length} ${plural(rows.length,'строка','строки','строк')} · ${totQty} ${plural(totQty,'деталь','детали','деталей')}`;
+    const mini=histMiniSVG(e);
+    const nm=histName(e);
+    const ralT=ralLabel(e.ral);
+    const namePart = renameHistTs===e.ts
+      ? `<input class="hist-name-inp" value="${escHtml(nm)}">`
+      : `<span class="hist-name-txt" data-ts="${e.ts}" title="Переименовать запись">${escHtml(nm||'Без названия')} <span class="hist-edit">✎</span></span>`;
+    return `<div class="hist-row">
+      ${mini?`<div class="hist-mini">${mini}</div>`:''}
+      <div class="hist-main">
+        <div class="hist-name">${namePart}${ralT?` <span style="color:var(--текст2);font-weight:400">· ${escHtml(ralT)}</span>`:''}</div>
+        <div class="hist-sides">${sides} <span class="hist-razv">→ ${fmt(e.razv)} мм</span></div>
+        <div class="hist-meta">${hemTxt} · ${fmt(e.thickness,2)} мм · ${partsTxt}</div>
+      </div>
+      <div class="hist-btns">
+        <button class="hist-b load" data-i="${i}" title="Загрузить в поля">↺</button>
+        <button class="hist-b copy" data-i="${i}" title="Скопировать строку">⧉</button>
+        <button class="hist-b del" data-i="${i}" title="Удалить">×</button>
+      </div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.load').forEach(b=> b.onclick=()=> restoreEntry(items[+b.dataset.i]));
+  box.querySelectorAll('.copy').forEach(b=> b.onclick=()=>{ const e=items[+b.dataset.i]; navigator.clipboard?.writeText(histCopyStr(e)); const t=b.textContent; b.textContent='✓'; setTimeout(()=>b.textContent=t,900); });
+  box.querySelectorAll('.del').forEach(b=> b.onclick=()=>{ const e=items[+b.dataset.i]; copyHist=copyHist.filter(x=>x!==e); saveHist(); renderHistory(); });
+  box.querySelectorAll('.hist-name-txt[data-ts]').forEach(s=> s.onclick=()=>{ renameHistTs=+s.dataset.ts; renderHistory(); });
+  const hinp=box.querySelector('.hist-name-inp');
+  if(hinp){ hinp.focus(); hinp.select();
+    const commit=()=>{ const e=copyHist.find(x=>x.ts===renameHistTs); if(e) e.customName=hinp.value.trim(); renameHistTs=null; saveHist(); renderHistory(); };
+    hinp.onblur=commit;
+    hinp.onkeydown=ev=>{ if(ev.key==='Enter')commit(); else if(ev.key==='Escape'){ renameHistTs=null; renderHistory(); } };
+  }
+}
+function restoreEntry(e){
+  vals={...e.vals}; angs={...e.angs}; anglesOn=!!e.anglesOn;
+  thickness=e.thickness; paintThick();
+  hemMode=e.hemMode; hemSide=e.hemSide; hemReverse=!!e.hemReverse; syncHems(); saveHemPref(); paintHem();
+  if(e.ral!==undefined){                       // восстановить цвет RAL записи
+    ral=e.ral||'';
+    if(ral && RAL_COLORS.some(r=>r.c===ral)){ ralSelect.value=ral; ralCustom.style.display='none'; }
+    else if(ral){ ralSelect.value='__custom'; ralCustom.style.display='block'; ralCustom.value=ral; }
+    else { ralSelect.value=''; ralCustom.style.display='none'; }
+    saveRal(); paintRal();
+  }
+  const rows=histRows(e);
+  parts = rows.length? rows.map(p=>({len:p.len, qty:p.qty})) : [{len:1, qty:1}];
+  partsByEl[cur]=parts;
+  buildFields(); buildParts(); render();
+}
+document.getElementById('hist-clear').onclick=()=>{ copyHist=copyHist.filter(e=>e.el!==cur); saveHist(); renderHistory(); };
+
+// ── Конструктор «Свой элемент» ──
+let builder={ name:'', segs:[50,50], bends:[{dir:1,ang:90}] };
+const bOverlay=document.getElementById('builder-overlay');
+function openBuilder(){ builder={ name:'', segs:[50,50], bends:[{dir:1,ang:90}] }; document.getElementById('b-name').value=''; document.getElementById('b-error').textContent=''; renderBuilder(); bOverlay.classList.add('show'); }
+function closeBuilder(){ bOverlay.classList.remove('show'); }
+
+function renderBuilder(){
+  const box=document.getElementById('b-segs');
+  box.innerHTML = builder.segs.map((len,i)=>`
+    <div class="b-seg">
+      <div class="b-seg-head">
+        <span class="b-seg-n">Полка ${i+1}</span>
+        <input type="number" class="b-len" data-len="${i}" value="${len}" min="1" inputmode="numeric">
+        <span class="b-mm">мм</span>
+        ${builder.segs.length>2?`<button class="b-del" data-delseg="${i}" title="Удалить полку">×</button>`:''}
+      </div>
+      ${i<builder.segs.length-1?`
+      <div class="b-bend">
+        <span>затем загиб:</span>
+        <button class="b-dir${builder.bends[i].dir>0?' on':''}" data-dir="${i}" data-v="1">↺ влево</button>
+        <button class="b-dir${builder.bends[i].dir<0?' on':''}" data-dir="${i}" data-v="-1">вправо ↻</button>
+        <span>угол</span>
+        <input type="number" class="b-ang" data-bang="${i}" value="${builder.bends[i].ang}" min="1" max="179" inputmode="numeric">
+        <span class="b-mm">°</span>
+      </div>`:''}
+    </div>`).join('');
+  box.querySelectorAll('[data-len]').forEach(inp=> inp.oninput=()=>{ builder.segs[+inp.dataset.len]=parseFloat(inp.value)||0; drawBuilderPreview(); });
+  box.querySelectorAll('[data-delseg]').forEach(b=> b.onclick=()=>{ const i=+b.dataset.delseg; builder.segs.splice(i,1); builder.bends.splice(Math.min(i,builder.bends.length-1),1); renderBuilder(); });
+  box.querySelectorAll('[data-dir]').forEach(b=> b.onclick=()=>{ builder.bends[+b.dataset.dir].dir=parseInt(b.dataset.v,10); renderBuilder(); });
+  box.querySelectorAll('[data-bang]').forEach(inp=> inp.oninput=()=>{ builder.bends[+inp.dataset.bang].ang=parseFloat(inp.value)||90; drawBuilderPreview(); });
+  drawBuilderPreview();
+}
+
+function drawBuilderPreview(){
+  const svg=document.getElementById('b-preview');
+  const segs=builder.segs.map(v=>Math.max(0,v||0));
+  let ang=0, x=0, y=0; const P=[{x,y}];
+  segs.forEach((len,i)=>{ x+=len*Math.cos(ang); y+=len*Math.sin(ang); P.push({x,y}); if(i<builder.bends.length){ ang+=builder.bends[i].dir*(builder.bends[i].ang||90)*Math.PI/180; } });
+  const VBW=360,VBH=220,pad=34;
+  const minX=Math.min(...P.map(p=>p.x)),maxX=Math.max(...P.map(p=>p.x)),minY=Math.min(...P.map(p=>p.y)),maxY=Math.max(...P.map(p=>p.y));
+  const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY);
+  const sc=Math.min((VBW-2*pad)/bw,(VBH-2*pad)/bh);
+  const offX=(VBW-bw*sc)/2-minX*sc, offY=(VBH-bh*sc)/2-minY*sc;
+  const TX=p=>({x:offX+p.x*sc, y:VBH-(offY+p.y*sc)});
+  const S=P.map(TX);
+  const cx=S.reduce((a,p)=>a+p.x,0)/S.length, cy=S.reduce((a,p)=>a+p.y,0)/S.length;
+  let path='',labels='',dots='';
+  S.forEach((p,i)=>{ path+=(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' '; dots+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#1A1A1A"/>`; });
+  for(let i=0;i<S.length-1;i++){ const a=S[i],b=S[i+1],mx=(a.x+b.x)/2,my=(a.y+b.y)/2; let nx=-(b.y-a.y),ny=(b.x-a.x); const nl=Math.hypot(nx,ny)||1; nx/=nl;ny/=nl; if((mx-cx)*nx+(my-cy)*ny<0){nx=-nx;ny=-ny;} labels+=`<text x="${(mx+nx*16).toFixed(1)}" y="${(my+ny*16+4).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="800" fill="${PALETTE[i%PALETTE.length]}">${fmt(segs[i])}</text>`; }
+  svg.innerHTML=`<path d="${path}" fill="none" stroke="#c9c2b7" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path d="${path}" fill="none" stroke="#7f8a93" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}`;
+  document.getElementById('b-razv').innerHTML=`Развёртка (без завальцовки): <b>${fmt(segs.reduce((a,b)=>a+b,0))} мм</b>`;
+}
+
+function saveBuilder(){
+  const name=document.getElementById('b-name').value.trim();
+  const err=document.getElementById('b-error');
+  if(!name){ err.textContent='Впишите название.'; return; }
+  if(builder.segs.length<2){ err.textContent='Нужно минимум 2 полки.'; return; }
+  if(builder.segs.some(v=>!(v>0))){ err.textContent='У всех полок должна быть длина больше 0.'; return; }
+  err.textContent='';
+  const id='custom_'+Date.now();
+  const def={ name, desc:'Свой элемент.', section:curSection, colorSide:'top', start:0, draft:false, custom:true,
+    segs: builder.segs.map((len,i)=>({key:'S'+i, label:'Полка '+(i+1), def:len})),
+    turns: builder.bends.map((b,i)=>({mag:b.ang, dir:b.dir, edit:false, label:'Угол '+(i+1)})) };
+  ELEMENTS[id]=def;
+  const arr=loadCustom(); arr.push({id, def}); saveCustom(arr);
+  closeBuilder();
+  cur=id; renderTabs(); loadElement();
+}
+document.getElementById('b-add').onclick=()=>{ builder.segs.push(50); builder.bends.push({dir:-1,ang:90}); renderBuilder(); };
+document.getElementById('b-cancel').onclick=closeBuilder;
+document.getElementById('b-save').onclick=saveBuilder;
+bOverlay.onclick=(e)=>{ if(e.target===bOverlay) closeBuilder(); };
+
+document.getElementById('el-del').onclick=()=>{
+  const el=ELEMENTS[cur]; if(!el||!el.custom) return;
+  if(!confirm('Удалить элемент «'+(getName(cur)||'без названия')+'»? История по нему тоже удалится.')) return;
+  saveCustom(loadCustom().filter(c=>c.id!==cur));
+  copyHist=copyHist.filter(e=>e.el!==cur); saveHist();
+  delete nameOverrides[cur]; saveNames();
+  delete arrowOverrides[cur]; saveArrows();
+  const sec=el.section; delete ELEMENTS[cur];
+  renderTabs();
+  const first=elementsInSection(sec)[0];
+  if(first){ cur=first; loadElement(); } else { clearElementView(); }
+};
+
+// ── Корзина / заказ-лист (localStorage, мост в раскрой) ──
+const OKEY='dianast_order_v1';
+let order=[]; try{ order=JSON.parse(localStorage.getItem(OKEY)||'[]'); }catch(e){ order=[]; }
+function saveOrder(){ try{ localStorage.setItem(OKEY, JSON.stringify(order)); }catch(e){} }
+function renderCartCount(){ document.getElementById('cart-count').textContent=order.length; }
+function addToOrder(){
+  const razv=currentRazv();
+  const svg=miniProfileSVG(cur, 58, 46, {vals, angs, anglesOn, hemMode, hemSide, hemReverse, pad:8, sw:2.4});   // эскиз профиля на момент добавления (с разворотом завальцовки)
+  const sides=ELEMENTS[cur].segs.map(s=>vals[s.key]||0);      // размеры сторон на момент добавления (для цветных чипов)
+  const _ML=markLayout();                                     // геометрия для шаблона разметки (галочка в заказе)
+  const tplGeom={ W:_ML.W, cells:_ML.cells, lines:_ML.lines, hemMode, hemSide, fromRight:tplFromRight };
+  if(partsMode==='meters'){                                   // «по метражу» — резиновая заготовка
+    const m=parseFloat(partsMeters)||0; if(!(m>0)) return false;
+    order.push({ name:getName(cur)||'Без названия', razv, thickness, ral: ral||'', flex:true, meters:m, rows:[], svg, sides, tplGeom, tplOn:false, ts:Date.now() });
+    saveOrder(); renderCartCount(); return true;
+  }
+  const rows=parts.map(p=>({len:parseFloat(p.len)||0, qty:parseInt(p.qty,10)||0}))
+                  .filter(p=>p.len>0 && p.qty>0 && p.len<=machine.maxLen+1e-9);
+  if(!rows.length) return false;
+  order.push({ name:getName(cur)||'Без названия', razv, thickness, ral: ral||'', rows, svg, sides, tplGeom, tplOn:false, ts:Date.now() });
+  saveOrder(); renderCartCount(); return true;
+}
+// строка размеров сторон в карточке заказа: цветные чипы в цвет полок с чертежа (PALETTE)
+function sideChip(v,i){
+  const col=PALETTE[i%PALETTE.length]; const [r,g,b]=hexRgb(col);
+  const bg=`rgba(${r},${g},${b},0.16)`, tx=`rgb(${Math.round(r*0.5)},${Math.round(g*0.5)},${Math.round(b*0.5)})`;
+  return `<span class="oside-chip" style="background:${bg};color:${tx}">${fmt(v)}</span>`;
+}
+function sidesLine(it){
+  const s=it.sides; if(!s||!s.length) return '';
+  return `<div class="oitem-sides">${s.map(sideChip).join('')}<span class="oside-mm">мм</span></div>`;
+}
+let renameOrderIdx=null;   // индекс позиции заказа в режиме переименования
+function renderOrder(){
+  const box=document.getElementById('order-list');
+  const toR=document.getElementById('order-to-raskroy');
+  const toInv=document.getElementById('order-invoice');
+  if(!order.length){
+    box.innerHTML='<div class="order-empty">Заказ пуст.<br>На нужном профиле задай детали и нажми «🛒 Добавить профиль в заказ» — он появится здесь.</div>';
+    document.getElementById('order-total').textContent=''; toR.disabled=true; if(toInv) toInv.disabled=true; return;
+  }
+  toR.disabled=false; if(toInv) toInv.disabled=false;
+  box.innerHTML = order.map((it,i)=>{
+    const chips = it.flex
+      ? `<span class="chip-r" style="background:#fdf1ea;color:var(--терракота)">≈ ${fmt(it.meters,2)} пог. м · по метражу</span>`
+      : it.rows.map(r=>`<span class="chip-r">${fmt(r.len,2)}м×${r.qty}шт</span>`).join('');
+    const totQty=it.rows.reduce((a,r)=>a+r.qty,0);
+    const countTxt = it.flex ? 'по метражу' : `${totQty} ${plural(totQty,'деталь','детали','деталей')}`;
+    const ralTxt = it.ral? ('RAL '+it.ral) : 'без цвета';
+    const nameHtml = renameOrderIdx===i
+      ? `<input class="oitem-name-inp" value="${escHtml(it.name)}">`
+      : `<span class="oitem-name" data-nm="${i}" title="Переименовать позицию">${escHtml(it.name)} <span class="oitem-edit">✎</span></span>`;
+    return `<div class="oitem">
+      <span class="oitem-num">${i+1}</span>
+      ${it.svg?`<div class="oitem-mini">${it.svg}</div>`:''}
+      <div class="oitem-body">
+        <div class="oitem-head">${nameHtml}<span class="oitem-razv">разв. ${fmt(it.razv)} мм</span></div>
+        <div class="oitem-meta">${fmt(it.thickness,2)} мм · ${ralTxt} · ${countTxt}</div>
+        ${sidesLine(it)}
+        <div class="oitem-rows">${chips}<button class="oitem-del" data-del="${i}" title="Убрать профиль">×</button></div>
+        <label class="oitem-tpl"><input type="checkbox" data-tpl="${i}" ${it.tplOn?'checked':''} ${it.tplGeom?'':'disabled'}>📐 печатать шаблон разметки${it.tplGeom?'':' (пере-добавь позицию)'}</label>
+      </div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.oitem-del').forEach(b=> b.onclick=()=>{ order.splice(+b.dataset.del,1); saveOrder(); renderOrder(); renderCartCount(); });
+  box.querySelectorAll('[data-tpl]').forEach(cb=> cb.onchange=()=>{ const it=order[+cb.dataset.tpl]; if(it){ it.tplOn=cb.checked; saveOrder(); updateOrderTplBtn(); } });
+  box.querySelectorAll('.oitem-name[data-nm]').forEach(s=> s.onclick=()=>{ renameOrderIdx=+s.dataset.nm; renderOrder(); });
+  const oinp=box.querySelector('.oitem-name-inp');
+  if(oinp){ oinp.focus(); oinp.select();
+    const commit=()=>{ const v=oinp.value.trim(); if(v && order[renameOrderIdx]) order[renameOrderIdx].name=v; renameOrderIdx=null; saveOrder(); renderOrder(); };
+    oinp.onblur=commit;
+    oinp.onkeydown=e=>{ if(e.key==='Enter')commit(); else if(e.key==='Escape'){ renameOrderIdx=null; renderOrder(); } };
+  }
+  const profiles=order.length, deta=order.reduce((a,it)=>a+(it.rows||[]).reduce((s,r)=>s+r.qty,0),0);
+  const pogm=order.reduce((a,it)=>a+(it.flex?(parseFloat(it.meters)||0):(it.rows||[]).reduce((s,r)=>s+r.len*r.qty,0)),0);
+  document.getElementById('order-total').innerHTML=`Итого: <b>${profiles}</b> ${plural(profiles,'профиль','профиля','профилей')} · <b>${deta}</b> ${plural(deta,'деталь','детали','деталей')} · <b>${fmt(pogm,2)}</b> пог. м`;
+  updateOrderTplBtn();
+}
+function updateOrderTplBtn(){
+  const n=order.filter(it=>it.tplOn && it.tplGeom).length;
+  const b=document.getElementById('order-tpl-print'); if(!b) return;
+  b.textContent=`🗂 Печать шаблонов разметки (${n})`; b.disabled=n===0;
+}
+const orderOverlay=document.getElementById('order-overlay');
+function openOrder(){ renderOrder(); orderOverlay.classList.add('show'); }
+function closeOrder(){ orderOverlay.classList.remove('show'); }
+document.getElementById('cart-fab').onclick=openOrder;
+document.getElementById('order-x').onclick=closeOrder;
+orderOverlay.onclick=(e)=>{ if(e.target===orderOverlay) closeOrder(); };
+document.getElementById('order-tpl-print').onclick=openOrderTemplates;
+document.getElementById('order-clear').onclick=()=>{ if(!order.length) return; if(!confirm('Очистить весь заказ?')) return; order=[]; saveOrder(); renderOrder(); renderCartCount(); };
+document.getElementById('order-to-raskroy').onclick=()=>{
+  const items=[];
+  order.forEach(it=>{
+    if(it.flex) items.push({ w:String(it.razv), meters:String(it.meters), flex:true });
+    else (it.rows||[]).forEach(r=> items.push({ w:String(it.razv), l:String(r.len), qty:String(r.qty) }));
+  });
+  if(!items.length) return;
+  try{ localStorage.setItem('dianast_raskroy_handoff_v1', JSON.stringify(items)); }catch(e){}
+  location.href='../raskroy/index.html';
+};
+document.getElementById('parts-order').onclick=()=>{
+  if(addToOrder()){
+    const f=document.getElementById('order-flash'); f.style.display='block';
+    const b=document.getElementById('parts-order'), t=b.textContent; b.textContent='В заказе ✓';
+    setTimeout(()=>{ f.style.display='none'; b.textContent=t; }, 1400);
+  }
+};
+renderCartCount();
+
+// ── Визуальный редактор формы (правка болванки под эскиз, абсолютные направления полок) ──
+let editSeg=[];               // [{len, dir}] dir = абсолютный угол° (0=вправо,90=вверх,180=влево,270=вниз)
+let editHem='both', editColor='top';
+const DIRS=[ {a:135,s:'↖'},{a:90,s:'↑'},{a:45,s:'↗'}, {a:180,s:'←'},null,{a:0,s:'→'}, {a:225,s:'↙'},{a:270,s:'↓'},{a:315,s:'↘'} ];
+const normDir=a=>((a%360)+360)%360;
+function elementToSegments(key){
+  const el=ELEMENTS[key]; const segs=[]; let dir=el.start;
+  el.segs.forEach((s,i)=>{ segs.push({ len:segDefault(key,s), dir:normDir(dir) }); if(i<el.turns.length){ const t=el.turns[i]; dir+=t.dir*t.mag; } });
+  return segs;
+}
+function openShapeEditor(){
+  resetSketchUI();
+  editSeg=elementToSegments(cur);
+  editHem=ELEMENTS[cur].hem||'both'; editColor=ELEMENTS[cur].colorSide||'top';
+  renderSegList(); paintEditHemColor(); drawShapePreview();
+  document.getElementById('shape-overlay').classList.add('show');
+}
+function closeShapeEditor(){ document.getElementById('shape-overlay').classList.remove('show'); resetSketchUI(); dropPendingSketch(); }
+function renderSegList(){
+  const box=document.getElementById('seg-list');
+  box.innerHTML=editSeg.map((s,i)=>{
+    const cd=normDir(s.dir);
+    const pad=DIRS.map(d=> d? `<button type="button" data-seg="${i}" data-dir="${d.a}" class="${normDir(d.a)===cd?'on':''}">${d.s}</button>` : `<button type="button" class="mid" disabled></button>`).join('');
+    return `<div class="seg">
+      <span class="seg-n">${i+1}</span>
+      <div class="dpad">${pad}</div>
+      <div class="seg-f len"><label>длина, мм</label><input type="number" data-len="${i}" value="${Math.round(s.len)}" min="1" inputmode="numeric"></div>
+      <div class="seg-f ang"><label>угол°</label><input type="number" data-ang="${i}" value="${Math.round(cd)}" min="0" max="359" inputmode="numeric"></div>
+      ${editSeg.length>1?`<button class="seg-del" type="button" data-delseg="${i}" title="Удалить полку">×</button>`:''}
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.dpad button[data-dir]').forEach(b=> b.onclick=()=>{ editSeg[+b.dataset.seg].dir=+b.dataset.dir; renderSegList(); drawShapePreview(); });
+  box.querySelectorAll('[data-len]').forEach(inp=> inp.oninput=()=>{ editSeg[+inp.dataset.len].len=parseFloat(inp.value)||0; drawShapePreview(); });
+  box.querySelectorAll('[data-ang]').forEach(inp=> inp.oninput=()=>{ editSeg[+inp.dataset.ang].dir=parseFloat(inp.value)||0; drawShapePreview(); });
+  box.querySelectorAll('[data-delseg]').forEach(b=> b.onclick=()=>{ editSeg.splice(+b.dataset.delseg,1); renderSegList(); drawShapePreview(); });
+}
+function paintEditHemColor(){
+  document.querySelectorAll('#edit-hem button').forEach(b=>b.classList.toggle('on', b.dataset.h===editHem));
+  document.querySelectorAll('#edit-color button').forEach(b=>b.classList.toggle('on', b.dataset.c===editColor));
+}
+function drawShapePreview(){
+  const svg=document.getElementById('shape-preview');
+  const W=560,H=300,pad=56;
+  let x=0,y=0; const P=[{x,y}];
+  editSeg.forEach(s=>{ const a=(s.dir||0)*Math.PI/180, len=Math.max(0,s.len||0); x+=len*Math.cos(a); y+=len*Math.sin(a); P.push({x,y}); });
+  const mnX=Math.min(...P.map(p=>p.x)),mxX=Math.max(...P.map(p=>p.x)),mnY=Math.min(...P.map(p=>p.y)),mxY=Math.max(...P.map(p=>p.y));
+  const bw=Math.max(1,mxX-mnX),bh=Math.max(1,mxY-mnY);
+  const sc=Math.min((W-2*pad)/bw,(H-2*pad)/bh);
+  const oX=(W-bw*sc)/2-mnX*sc,oY=(H-bh*sc)/2-mnY*sc;
+  const TX=p=>({x:oX+p.x*sc,y:H-(oY+p.y*sc)});
+  const S=P.map(TX);
+  const cx=S.reduce((a,p)=>a+p.x,0)/S.length,cy=S.reduce((a,p)=>a+p.y,0)/S.length;
+  let d=''; S.forEach((p,i)=>d+=(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' ');
+  let dots=''; S.forEach(p=>dots+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#1A1A1A"/>`);
+  const hl=editHem==='both'||editHem==='left', hr=editHem==='both'||editHem==='right';
+  const hook=(E,N)=>{ let tx=N.x-E.x,ty=N.y-E.y;const tl=Math.hypot(tx,ty)||1;tx/=tl;ty/=tl;let nx=-ty,ny=tx;if((cx-E.x)*nx+(cy-E.y)*ny<0){nx=-nx;ny=-ny;}const g=Math.max(2,(view.hemGap||0)*sc),ln=Math.min(30,tl*0.45);const p1={x:E.x+nx*g,y:E.y+ny*g},p2={x:p1.x+tx*ln,y:p1.y+ty*ln},tp={x:E.x+nx*g*0.5-tx*g,y:E.y+ny*g*0.5-ty*g};return `<path d="M${p2.x.toFixed(1)} ${p2.y.toFixed(1)} L${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q${tp.x.toFixed(1)} ${tp.y.toFixed(1)} ${E.x.toFixed(1)} ${E.y.toFixed(1)}" fill="none" stroke="#c1440e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`; };
+  let hooks=''; if(hl&&S.length>1)hooks+=hook(S[0],S[1]); if(hr&&S.length>1){const n=S.length-1;hooks+=hook(S[n],S[n-1]);}
+  const sx0=Math.min(...S.map(p=>p.x)),sx1=Math.max(...S.map(p=>p.x)),sy0=Math.min(...S.map(p=>p.y)),sy1=Math.max(...S.map(p=>p.y));
+  const mx=(sx0+sx1)/2,my=(sy0+sy1)/2; let A;
+  if(editColor==='bottom')A=[mx,sy1+30,mx,sy1+8]; else if(editColor==='left')A=[sx0-30,my,sx0-8,my]; else if(editColor==='right')A=[sx1+30,my,sx1+8,my]; else A=[mx,sy0-30,mx,sy0-8];
+  const arrow=`<line x1="${A[0]}" y1="${A[1]}" x2="${A[2]}" y2="${A[3]}" stroke="#C1440E" stroke-width="2" marker-end="url(#sm)"/>`;
+  svg.innerHTML=`<defs><marker id="sm" markerWidth="7" markerHeight="7" refX="4.5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#C1440E"/></marker></defs><path d="${d}" fill="none" stroke="#7f8a93" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>${hooks}${dots}${arrow}`;
+}
+// применить новый набор полок [{len,dir,label?}] к текущему элементу — общее для редактора формы и удаления полки
+function applySegments(segsArr, hem, colorSide){
+  const start=normDir(segsArr[0].dir);
+  const turns=[]; for(let i=0;i<segsArr.length-1;i++){ let dd=segsArr[i+1].dir-segsArr[i].dir; while(dd>180)dd-=360; while(dd<=-180)dd+=360; turns.push({mag:Math.abs(dd), dir:dd>=0?1:-1, edit:false, label:'Угол '+(i+1)}); }
+  const oldSegs=ELEMENTS[cur].segs||[];
+  const segs=segsArr.map((s,i)=>({ key:'S'+i, label:s.label||(oldSegs[i]&&oldSegs[i].label)||('Полка '+(i+1)), def:Math.max(1,Math.round(s.len)) }));
+  const ov={ start, segs, turns };
+  if(hem!==undefined) ov.hem=hem;
+  if(colorSide!==undefined) ov.colorSide=colorSide;
+  shapeOverrides[cur]=Object.assign({}, shapeOverrides[cur], ov);
+  Object.assign(ELEMENTS[cur], ov);
+  saveShapes();
+  delete sizeOverrides[cur]; saveSizes();     // текущие длины становятся новыми дефолтами
+  renderTabs();      // обновить миниатюру в галерее
+  loadElement();     // перерисовать редактор/развёртку/детали
+}
+function saveShapeEditor(){
+  if(!editSeg.length) return;
+  sketchNewPending=null;          // изделие с эскиза сохранено — пустышку не удалять
+  applySegments(editSeg, editHem, editColor);
+  closeShapeEditor();
+}
+// удалить полку прямо из «Размеров сторон» на главной (крестик у строки)
+function deleteSegAt(i){
+  const el=ELEMENTS[cur];
+  if((el.segs||[]).length<=1) return;   // последнюю полку не удаляем
+  const lbl=el.segs[i].label||('Полка '+(i+1));
+  if(!confirm('Удалить «'+lbl+'» ('+fmt(vals[el.segs[i].key]||0)+' мм)? Профиль перестроится.')) return;
+  const arr=[]; let dir=el.start;
+  el.segs.forEach((s,j)=>{
+    arr.push({ len: Math.max(1, vals[s.key]||segDefault(cur,s)||1), dir: normDir(dir), label: s.label });
+    if(j<el.turns.length){ const t=el.turns[j]; dir+=t.dir*(anglesOn?(angs[j]??t.mag):t.mag); }
+  });
+  arr.splice(i,1);
+  applySegments(arr);
+}
+document.getElementById('edit-shape-btn').onclick=openShapeEditor;
+document.getElementById('seg-add').onclick=()=>{ const last=editSeg[editSeg.length-1]; editSeg.push({len:40, dir:last?last.dir:0}); renderSegList(); drawShapePreview(); };
+document.querySelectorAll('#edit-hem button').forEach(b=> b.onclick=()=>{ editHem=b.dataset.h; paintEditHemColor(); drawShapePreview(); });
+document.querySelectorAll('#edit-color button').forEach(b=> b.onclick=()=>{ editColor=b.dataset.c; paintEditHemColor(); drawShapePreview(); });
+document.getElementById('shape-save').onclick=saveShapeEditor;
+document.getElementById('shape-cancel').onclick=closeShapeEditor;
+document.getElementById('shape-x').onclick=closeShapeEditor;
+document.getElementById('shape-overlay').onclick=(e)=>{ if(e.target.id==='shape-overlay') closeShapeEditor(); };
+
+// ── Эскиз от руки: рисуешь одной линией → программа выпрямляет углы и раскладывает на полки ──
+let sketchMode=false, sketchDrawing=false, sketchPts=null;
+const sketchBtn=document.getElementById('sketch-btn');
+const shapePrevSvg=document.getElementById('shape-preview');
+const SKETCH_BTN_TEXT='✍️ Нарисовать от руки (эскиз одной линией)';
+function svgPoint(e){ const pt=shapePrevSvg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY; const m=shapePrevSvg.getScreenCTM(); return m? pt.matrixTransform(m.inverse()) : {x:0,y:0}; }
+function sketchMsg(txt,color){ shapePrevSvg.innerHTML=`<text x="280" y="150" text-anchor="middle" fill="${color||'#b5aca0'}" font-size="15" font-weight="700">${txt}</text>`; }
+function enterSketch(){
+  sketchMode=true; sketchDrawing=false; sketchPts=null;
+  sketchBtn.classList.add('on'); sketchBtn.textContent='✍️ Режим рисования — клик сюда, чтобы выйти без изменений';
+  document.getElementById('sketch-hint').style.display='block';
+  shapePrevSvg.classList.add('sketching');
+  sketchMsg('Нарисуй профиль одной линией — не отрывая');
+}
+function resetSketchUI(){
+  sketchMode=false; sketchDrawing=false; sketchPts=null;
+  sketchBtn.classList.remove('on'); sketchBtn.textContent=SKETCH_BTN_TEXT;
+  document.getElementById('sketch-hint').style.display='none';
+  shapePrevSvg.classList.remove('sketching');
+}
+sketchBtn.onclick=()=>{ if(sketchMode){ resetSketchUI(); drawShapePreview(); } else enterSketch(); };
+
+// упрощение линии (Рамер—Дуглас—Пекер)
+function rdp(pts,eps){
+  if(pts.length<3) return pts.slice();
+  const dist=(p,a,b)=>{ const dx=b.x-a.x,dy=b.y-a.y; const L2=dx*dx+dy*dy||1e-9; let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/L2; t=Math.max(0,Math.min(1,t)); return Math.hypot(a.x+t*dx-p.x, a.y+t*dy-p.y); };
+  let maxD=0, idx=0;
+  for(let i=1;i<pts.length-1;i++){ const d=dist(pts[i],pts[0],pts[pts.length-1]); if(d>maxD){ maxD=d; idx=i; } }
+  if(maxD<=eps) return [pts[0], pts[pts.length-1]];
+  const L=rdp(pts.slice(0,idx+1),eps), R=rdp(pts.slice(idx),eps);
+  return L.slice(0,-1).concat(R);
+}
+function recognizeSketch(raw){
+  const pts=[]; (raw||[]).forEach(p=>{ const l=pts[pts.length-1]; if(!l || Math.hypot(p.x-l.x,p.y-l.y)>=2) pts.push(p); });
+  if(pts.length<4) return null;
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const diag=Math.hypot(Math.max(...xs)-Math.min(...xs), Math.max(...ys)-Math.min(...ys));
+  if(diag<40) return null;                                     // слишком мелкий штрих
+  let eps=diag*0.045, verts=rdp(pts,eps), guard=0;
+  while(verts.length-1>8 && guard<6){ eps*=1.5; verts=rdp(pts,eps); guard++; }  // дрожащая рука → грубее допуск
+  const segs=[];
+  for(let i=0;i<verts.length-1;i++){
+    const dx=verts[i+1].x-verts[i].x, dy=-(verts[i+1].y-verts[i].y);   // y экрана вниз → в математический
+    const len=Math.hypot(dx,dy); if(len<diag*0.05) continue;           // микрополки-дрожь отбрасываем
+    let ang=normDir(Math.atan2(dy,dx)*180/Math.PI);
+    const snap=normDir(Math.round(ang/45)*45);                         // привязка к сетке 45°
+    const diff=((ang-snap+540)%360)-180;
+    if(Math.abs(diff)<=17) ang=snap;                                   // близко к сетке → выпрямляем
+    segs.push({len, dir:ang});
+  }
+  const merged=[]; segs.forEach(s=>{ const l=merged[merged.length-1]; if(l && l.dir===s.dir) l.len+=s.len; else merged.push({len:s.len, dir:s.dir}); });
+  if(!merged.length || merged.length>8) return null;
+  const maxL=Math.max(...merged.map(s=>s.len));
+  return merged.map(s=>({ len: Math.max(10, Math.round(s.len/maxL*100/5)*5), dir: s.dir }));  // масштаб: макс. полка = 100 мм, кратно 5
+}
+shapePrevSvg.addEventListener('pointerdown', e=>{ if(!sketchMode) return; e.preventDefault();
+  sketchDrawing=true; sketchPts=[svgPoint(e)];
+  try{ shapePrevSvg.setPointerCapture(e.pointerId); }catch(_){}
+  shapePrevSvg.innerHTML='<polyline id="sk-line" fill="none" stroke="#D4521E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points=""/>'; });
+shapePrevSvg.addEventListener('pointermove', e=>{ if(!sketchMode||!sketchDrawing) return; e.preventDefault();
+  sketchPts.push(svgPoint(e));
+  const pl=document.getElementById('sk-line'); if(pl) pl.setAttribute('points', sketchPts.map(q=>q.x.toFixed(1)+','+q.y.toFixed(1)).join(' ')); });
+shapePrevSvg.addEventListener('pointerup', e=>{ if(!sketchMode||!sketchDrawing) return; sketchDrawing=false;
+  const rec=recognizeSketch(sketchPts); sketchPts=null;
+  if(!rec){ sketchMsg('Не разобрал — нарисуй крупнее, одной линией','#c1440e'); return; }
+  editSeg=rec; resetSketchUI(); renderSegList(); drawShapePreview(); });
+
+// новое изделие сразу с эскиза (карточка «✍️ По эскизу» в галерее)
+let sketchNewPending=null;
+function newFromSketch(){
+  const id='custom_'+Date.now();
+  const def={ name:'', desc:'Изделие по эскизу от руки.', section:curSection, colorSide:'top', start:90, draft:false, custom:true, hem:'both',
+    segs:[{key:'S0',label:'Полка 1',def:50},{key:'S1',label:'Полка 2',def:50}], turns:[{mag:90,dir:-1,edit:false,label:'Угол 1'}] };
+  ELEMENTS[id]=def;
+  const arr=loadCustom(); arr.push({id,def}); saveCustom(arr);
+  cur=id; renderTabs(); loadElement();
+  sketchNewPending=id;                      // закроют без сохранения — пустышку уберём
+  openShapeEditor(); enterSketch();
+}
+function dropPendingSketch(){
+  if(!sketchNewPending) return;
+  const id=sketchNewPending; sketchNewPending=null;
+  delete ELEMENTS[id];
+  saveCustom(loadCustom().filter(c=>c.id!==id));
+  copyHist=copyHist.filter(e=>e.el!==id); saveHist();
+  if(cur===id){ cur=elementsInSection(curSection)[0]; }
+  renderTabs(); if(cur) loadElement();
+}
+
+// ── Настройка галереи: удаление изделий в корзину (хранение 7 дней, потом стирание) ──
+function purgeTrash(){   // всё, что пролежало больше недели, стираем насовсем
+  const now=Date.now(); const dead=trash.filter(t=> now-t.deletedAt>TRASH_TTL);
+  if(!dead.length) return;
+  dead.forEach(t=>{
+    if(t.def){   // свой элемент: подчистить все хвосты
+      delete nameOverrides[t.key]; delete shapeOverrides[t.key]; delete sizeOverrides[t.key];
+      copyHist=copyHist.filter(e=>e.el!==t.key);
+    } else {     // встроенная болванка: скрыта навсегда
+      if(!hiddenKeys.includes(t.key)) hiddenKeys.push(t.key);
+    }
+  });
+  trash=trash.filter(t=> now-t.deletedAt<=TRASH_TTL);
+  saveTrash(); saveHidden(); saveNames(); saveShapes(); saveSizes(); saveHist();
+}
+function trashElement(k){
+  const el=ELEMENTS[k]; if(!el) return;
+  const entry={ key:k, def: el.custom? el : null, deletedAt: Date.now(),
+    name: getName(k)||'', section: el.section, svg: miniProfileSVG(k,56,44,hemStateFor(k)) };
+  trash.unshift(entry); saveTrash();
+  if(el.custom){ delete ELEMENTS[k]; saveCustom(loadCustom().filter(c=>c.id!==k)); }
+  if(cur===k){ cur=elementsInSection(curSection)[0]||null; }
+  renderTabs(); if(cur) loadElement(); else clearElementView();
+}
+function openTrash(){ renderTrash(); document.getElementById('trash-overlay').classList.add('show'); }
+function closeTrash(){ document.getElementById('trash-overlay').classList.remove('show'); }
+function renderTrash(){
+  const box=document.getElementById('trash-list');
+  if(!trash.length){ box.innerHTML='<div class="hist-empty">Корзина пуста. Крестик на карточке изделия (в режиме «⚙ Настройка») отправляет его сюда.</div>'; return; }
+  box.innerHTML=trash.map((t,i)=>{
+    const daysLeft=Math.max(1, Math.ceil((t.deletedAt+TRASH_TTL-Date.now())/86400000));
+    return `<div class="hist-row">
+      <div class="hist-mini">${t.svg||''}</div>
+      <div class="hist-main">
+        <div class="hist-sides" style="font-size:13px">${escHtml(t.name||'Без названия')}</div>
+        <div class="hist-meta">${SECTIONS[t.section]||''} · сотрётся через ${daysLeft} ${plural(daysLeft,'день','дня','дней')}</div>
+      </div>
+      <div class="hist-btns"><button class="hist-b load" data-i="${i}" title="Вернуть в библиотеку">↩</button></div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.load').forEach(b=> b.onclick=()=> restoreFromTrash(+b.dataset.i));
+}
+function restoreFromTrash(i){
+  const t=trash[i]; if(!t) return;
+  if(t.def){ ELEMENTS[t.key]=t.def; const arr=loadCustom(); arr.push({id:t.key, def:t.def}); saveCustom(arr); }
+  trash.splice(i,1); saveTrash();
+  renderTabs(); renderTrash();
+}
+document.getElementById('manage-btn').onclick=()=>{
+  manageMode=!manageMode;
+  const b=document.getElementById('manage-btn');
+  b.classList.toggle('on', manageMode);
+  b.textContent = manageMode ? '✓ Готово' : '⚙ Настройка';
+  renderTabs();
+};
+document.getElementById('trash-x').onclick=closeTrash;
+document.getElementById('trash-overlay').onclick=(e)=>{ if(e.target.id==='trash-overlay') closeTrash(); };
+
+// перетаскивание карточек в режиме настройки — изменение порядка (как на iPhone)
+let suppressClick=false;
+let drag=null;   // {key, card, sx, sy, w, moved, clone}
+tabsEl.addEventListener('pointerdown', e=>{
+  if(!manageMode || e.button!==0) return;
+  if(e.target.closest('.gx')) return;                       // крестик — не перенос
+  const card=e.target.closest('.gcard');
+  if(!card || !card.dataset.key) return;                    // «+ Свой»/«По эскизу»/корзину не таскаем
+  e.preventDefault();
+  const r=card.getBoundingClientRect();
+  drag={ key:card.dataset.key, card, sx:e.clientX, sy:e.clientY, w:r.width, moved:false, clone:null };
+});
+window.addEventListener('pointermove', e=>{
+  if(!drag) return;
+  if(!drag.moved){
+    if(Math.hypot(e.clientX-drag.sx, e.clientY-drag.sy)<6) return;   // ещё не перенос — может, просто клик
+    drag.moved=true;
+    drag.clone=drag.card.cloneNode(true);
+    drag.clone.classList.add('dragclone');
+    drag.clone.style.width=drag.w+'px';
+    document.body.appendChild(drag.clone);
+    drag.card.classList.add('dragging');
+  }
+  drag.clone.style.left=e.clientX+'px';
+  drag.clone.style.top=e.clientY+'px';
+  const over=document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.gcard');
+  if(over && over!==drag.card && over.dataset.key && over.parentElement===tabsEl){
+    const or=over.getBoundingClientRect();
+    const before=e.clientX < or.left+or.width/2;
+    tabsEl.insertBefore(drag.card, before? over : over.nextSibling);   // карточки раздвигаются на лету
+  }
+});
+window.addEventListener('pointerup', ()=>{
+  if(!drag) return;
+  const moved=drag.moved;
+  if(drag.clone) drag.clone.remove();
+  drag.card.classList.remove('dragging');
+  if(moved){
+    elemOrder[curSection]=[...tabsEl.querySelectorAll('.gcard')].map(c=>c.dataset.key).filter(Boolean);
+    saveElemOrder();
+    suppressClick=true; setTimeout(()=>{ suppressClick=false; }, 0);   // после переноса клик не выбирает элемент
+  }
+  drag=null;
+});
+
+purgeTrash();
+if(trashHas(cur)||hiddenKeys.includes(cur)){ cur=elementsInSection(curSection)[0]||cur; }
+renderTabs();   // перерисовать галерею с учётом корзины
+
+setupArrowDrag();
+loadElement();
+
+// ── Заявка бухгалтеру: позиции заказа → счёт (форма в ../../заявка-бухгалтеру.js) ──
+// Цену модуль считает сам: цена за пог. м = развёртка (м) × тариф (руб/м² без НДС).
+function позицииДляЗаявки(){
+  return order.map(it=>({
+    base:      it.name || 'Позиция',
+    razv:      it.razv,
+    thickness: it.thickness,
+    ral:       it.ral || '',
+    unit:      'пог.м',
+    pogm:      it.flex ? (parseFloat(it.meters)||0) : (it.rows||[]).reduce((s,r)=>s+r.len*r.qty, 0),
+    pcs:       it.flex ? 0 : (it.rows||[]).reduce((s,r)=>s+r.qty, 0)
+  }));
+}
+document.getElementById('order-invoice').onclick=()=>{
+  ЗаявкаБухгалтеру.открыть({ источник:позицииДляЗаявки, ключЧерновика:'dianast_invoice_v1', тариф:true });
+};
+</script>
+</body>
+</html>

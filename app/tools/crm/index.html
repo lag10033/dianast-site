@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DIANAST — Сделки и КП</title>
+<meta name="theme-color" content="#C1440E">
+<style>
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+:root{
+  --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A;
+  --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B; --жесть:#7f8a93;
+}
+body{ font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--фон); color:var(--чёрный); line-height:1.5; -webkit-font-smoothing:antialiased; }
+button,input,select,textarea{ font-family:inherit; }
+button{ cursor:pointer; }
+img{ display:block; max-width:100%; }
+.hidden{ display:none !important; }
+
+header{ background:#fff; border-bottom:1px solid var(--рамка); padding:11px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; position:sticky; top:0; z-index:20; }
+.brand{ display:flex; align-items:center; gap:11px; }
+.brand img{ height:36px; }
+.bn{ font-size:18px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:8px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.back{ border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:999px; font-size:12.5px; font-weight:700; padding:7px 14px; text-decoration:none; }
+.back:hover{ border-color:var(--терракота); color:var(--терракота); }
+
+.wrap{ padding:16px; max-width:1400px; margin:0 auto; }
+.pagehead{ display:flex; align-items:flex-end; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+.pagehead h1{ font-size:clamp(20px,4vw,26px); font-weight:800; }
+.pagehead h1 em{ font-style:normal; color:var(--терракота); }
+.pagehead p{ font-size:13px; color:var(--текст2); margin-top:2px; }
+.newbtn{ background:var(--терракота); color:#fff; border:none; border-radius:11px; font-size:14.5px; font-weight:800; padding:11px 18px; white-space:nowrap; }
+.newbtn:hover{ background:var(--кирпич); }
+
+/* ── Сводка воронки ── */
+.summary{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:16px; }
+.scard{ background:#fff; border:1px solid var(--рамка); border-radius:13px; padding:11px 13px; }
+.scard .lbl{ font-size:11px; font-weight:700; color:var(--текст2); text-transform:uppercase; letter-spacing:.4px; }
+.scard .big{ font-size:22px; font-weight:900; margin-top:3px; line-height:1; }
+.scard .sub{ font-size:11.5px; color:var(--жесть); margin-top:4px; }
+
+/* ── Фильтры ── */
+.filters{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.filters input,.filters select{ font-size:13px; padding:8px 11px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; }
+.filters input:focus-visible,.filters select:focus-visible{ outline:none; border-color:var(--терракота); }
+.filters .search{ flex:1; min-width:160px; }
+.filters .clr{ border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:9px; font-size:12.5px; font-weight:700; padding:8px 12px; }
+.filters .clr:hover{ border-color:var(--терракота); color:var(--терракота); }
+
+/* ── Канбан ── */
+.board{ display:flex; gap:12px; overflow-x:auto; padding-bottom:14px; align-items:flex-start; }
+.col{ flex:0 0 264px; background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:10px; min-height:120px; }
+.col.drag-over{ border-color:var(--терракота); box-shadow:0 0 0 2px rgba(212,82,30,.15); }
+.col-head{ display:flex; align-items:center; gap:8px; padding:2px 4px 10px; }
+.col-dot{ width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
+.col-name{ font-size:13.5px; font-weight:800; }
+.col-meta{ margin-left:auto; font-size:11.5px; color:var(--жесть); font-weight:700; text-align:right; }
+.col-body{ display:flex; flex-direction:column; gap:9px; min-height:40px; }
+.col-empty{ font-size:12px; color:#b3aca2; text-align:center; padding:16px 6px; border:1.5px dashed var(--рамка); border-radius:10px; }
+
+.card{ background:#fff; border:1px solid var(--рамка); border-left:4px solid var(--жесть); border-radius:11px; padding:11px 12px; cursor:pointer; transition:box-shadow .12s, transform .12s; position:relative; }
+.card:hover{ box-shadow:0 6px 18px rgba(60,40,20,.09); transform:translateY(-1px); }
+.card.hot{ border-left-color:var(--терракота); background:linear-gradient(180deg,#fff6f1,#fff); }
+.card .cli{ font-size:14px; font-weight:800; line-height:1.25; padding-right:20px; }
+.card .sum{ font-size:14px; font-weight:900; color:var(--кирпич); margin-top:5px; }
+.card .tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tag{ font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px; background:#f2ede6; color:var(--текст2); }
+.tag.ch{ background:#eef4fb; color:#3b6fa0; }
+.tag.pr{ background:#eef7f0; color:#4d8b5f; }
+.tag.tp{ background:#f6eefb; color:#7d55a8; }
+.card .fire{ position:absolute; top:9px; right:10px; font-size:15px; }
+.card .kpline{ font-size:11px; color:var(--жесть); margin-top:7px; display:flex; align-items:center; gap:5px; }
+.card .kpline b{ color:var(--терракота); }
+.card.dragging{ opacity:.4; }
+
+/* ── Модалка сделки ── */
+.overlay{ position:fixed; inset:0; background:rgba(26,20,15,.5); display:none; align-items:flex-start; justify-content:center; padding:24px 14px; z-index:50; overflow-y:auto; }
+.overlay.show{ display:flex; }
+.modal{ background:#fff; border-radius:18px; width:100%; max-width:560px; box-shadow:0 20px 70px rgba(40,20,10,.3); }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid var(--рамка); position:sticky; top:0; background:#fff; border-radius:18px 18px 0 0; }
+.modal-head h2{ font-size:17px; font-weight:800; }
+.xbtn{ border:none; background:#f2ede6; width:32px; height:32px; border-radius:50%; font-size:18px; color:var(--текст2); line-height:1; }
+.xbtn:hover{ background:#e6ded3; }
+.modal-body{ padding:18px 20px 22px; }
+.fld{ margin-bottom:13px; }
+.fld label{ display:block; font-size:12px; font-weight:700; color:var(--текст2); margin-bottom:5px; }
+.fld input,.fld select,.fld textarea{ width:100%; font-size:15px; padding:10px 12px; border:1.5px solid var(--рамка); border-radius:10px; background:#fff; }
+.fld input:focus-visible,.fld select:focus-visible,.fld textarea:focus-visible{ outline:none; border-color:var(--терракота); }
+.fld textarea{ min-height:62px; resize:vertical; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* стадии-степпер */
+.stages{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+.stbtn{ border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:999px; font-size:12px; font-weight:700; padding:6px 11px; }
+.stbtn.on{ color:#fff; border-color:transparent; }
+.stbtn.lost.on{ background:#c0392b; }
+
+/* КП-ссылка */
+.kpbox{ background:#faf8f5; border:1px solid var(--рамка); border-radius:12px; padding:13px; margin:6px 0 14px; }
+.kpbox .t{ font-size:12.5px; font-weight:800; margin-bottom:7px; display:flex; align-items:center; gap:7px; }
+.kpurl{ display:flex; gap:7px; }
+.kpurl input{ flex:1; font-size:12.5px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--текст2); }
+.kpurl button{ border:none; background:var(--терракота); color:#fff; border-radius:9px; font-size:12.5px; font-weight:800; padding:0 14px; white-space:nowrap; }
+.kpurl button:hover{ background:var(--кирпич); }
+.kphint{ font-size:11px; color:var(--жесть); margin-top:7px; line-height:1.45; }
+
+/* таймлайн */
+.tl{ margin-top:4px; }
+.tl-item{ display:flex; gap:9px; font-size:12.5px; padding:5px 0; border-bottom:1px dashed #eee; }
+.tl-item:last-child{ border-bottom:none; }
+.tl-ico{ flex:0 0 auto; }
+.tl-txt b{ font-weight:700; }
+.tl-when{ color:var(--жесть); font-size:11px; }
+.tl-empty{ font-size:12px; color:#b3aca2; padding:6px 0; }
+
+.modal-foot{ display:flex; gap:10px; padding:14px 20px 20px; }
+.savebtn{ flex:1; background:var(--терракота); color:#fff; border:none; border-radius:11px; font-size:15px; font-weight:800; padding:12px; }
+.savebtn:hover{ background:var(--кирпич); }
+.delbtn{ border:1.5px solid #e3c4c0; background:#fff; color:#c0392b; border-radius:11px; font-size:13px; font-weight:700; padding:12px 16px; }
+.delbtn:hover{ background:#fdf1ef; }
+
+.empty-all{ text-align:center; padding:50px 20px; color:var(--текст2); }
+.empty-all .big{ font-size:40px; }
+.empty-all h3{ font-size:18px; font-weight:800; margin:8px 0 4px; }
+.empty-all p{ font-size:13.5px; }
+</style>
+<script src="../../вход.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="DIANAST" onerror="this.style.display='none'">
+    <div>
+      <div class="bn"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+      <div class="bs">СДЕЛКИ И КП</div>
+    </div>
+  </div>
+  <a class="back" href="../../index.html">← В меню</a>
+</header>
+
+<div class="wrap">
+  <div class="pagehead">
+    <div>
+      <h1>Воронка <em>сделок</em></h1>
+      <p>Работаем по сделкам, а не по контрагентам. Клиент открыл КП — сделка сама встаёт в «🔥 КП открыто».</p>
+    </div>
+    <button class="newbtn" id="newDeal">+ Новая сделка</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="filters">
+    <input class="search" id="fSearch" type="search" placeholder="Поиск: клиент, контакт, телефон…">
+    <select id="fChannel"><option value="">Все каналы</option></select>
+    <select id="fProduct"><option value="">Все продукты</option></select>
+    <select id="fType"><option value="">Новые + текущие</option><option value="новый">Новые</option><option value="текущий">Текущие</option></select>
+    <button class="clr" id="fClear">Сброс</button>
+  </div>
+
+  <div class="board" id="board"></div>
+  <div class="empty-all hidden" id="emptyAll">
+    <div class="big">📇</div>
+    <h3>Пока нет ни одной сделки</h3>
+    <p>Нажмите «+ Новая сделка» или создайте её из калькулятора отливов при отправке КП.</p>
+  </div>
+</div>
+
+<!-- Модалка сделки -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="mTitle">Сделка</h2>
+      <button class="xbtn" id="mClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fld">
+        <label>Стадия</label>
+        <div class="stages" id="mStages"></div>
+      </div>
+
+      <div class="kpbox">
+        <div class="t">🔗 Персональная ссылка на КП</div>
+        <div class="kpurl">
+          <input id="mKpUrl" readonly>
+          <button id="mKpCopy">Копировать</button>
+        </div>
+        <div class="kphint" id="mKpHint"></div>
+      </div>
+
+      <div class="fld">
+        <label>Клиент (компания)</label>
+        <input id="mClient" placeholder="ООО «Окна Бреста»">
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Контактное лицо</label><input id="mContact" placeholder="Иван"></div>
+        <div class="fld"><label>Телефон</label><input id="mPhone" placeholder="+375 …"></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Канал прихода</label><select id="mChannel"></select></div>
+        <div class="fld"><label>Продукт</label><select id="mProduct"></select></div>
+      </div>
+      <div class="row2">
+        <div class="fld"><label>Тип клиента</label><select id="mType"><option value="новый">Новый</option><option value="текущий">Текущий</option></select></div>
+        <div class="fld"><label>Сумma сделки, руб</label><input id="mSum" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <div class="fld"><label>№ КП / счёта</label><input id="mKpNum" placeholder="ОТЛ-…"></div>
+      <div class="fld"><label>Заметка</label><textarea id="mNote" placeholder="Договорённости, что смотрел, когда перезвонить…"></textarea></div>
+
+      <div class="fld" style="margin-bottom:4px"><label>Хронология</label></div>
+      <div class="tl" id="mTimeline"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="savebtn" id="mSave">Сохранить</button>
+      <button class="delbtn" id="mDelete">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT_URL и реквизиты берём из общего конфига приложения -->
+<script src="../../цены.js" onerror=""></script>
+<script>
+/* ============================================================
+   Мини-CRM DIANAST — сделки и трек-ссылки КП. Данные локально.
+   Ключ localStorage: dianast_crm_deals_v1
+   ============================================================ */
+const LS_KEY = 'dianast_crm_deals_v1';
+const SCRIPT = (typeof SCRIPT_URL !== 'undefined' && SCRIPT_URL) ? SCRIPT_URL : '';
+
+// Стадии воронки (порядок = движение слева направо). lost — отдельная.
+const STAGES = [
+  { id:'new',        name:'Новая',          dot:'#7f8a93' },
+  { id:'sent',       name:'КП отправлено',  dot:'#4a90d9' },
+  { id:'opened',     name:'🔥 КП открыто',  dot:'#D4521E' },
+  { id:'invoice',    name:'Счёт выставлен', dot:'#E0A82E' },
+  { id:'paid',       name:'Оплачено',       dot:'#5aa469' },
+  { id:'production', name:'Производство',   dot:'#C1440E' },
+  { id:'done',       name:'Отгружено',      dot:'#2f8f5b' },
+  { id:'lost',       name:'Проиграно',      dot:'#c0392b' },
+];
+const stageById = id => STAGES.find(s => s.id === id) || STAGES[0];
+
+const CHANNELS = ['Звонок','Аутрич (база оконщиков)','Сайт','Рассылка КП','Сарафан / заезд','Другое'];
+const PRODUCTS = ['Отливы','Доборные элементы','Плоский лист','Кровля / фасад','Другое'];
+
+// ── Хранилище ──
+function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function save(list){ try{ localStorage.setItem(LS_KEY, JSON.stringify(list)); }catch(e){} }
+let deals = load();
+
+const uid = p => p + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4);
+const now = () => Date.now();
+const fmtSum = n => (Math.round((+n||0)*100)/100).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2});
+function fmtWhen(ts){
+  const d = new Date(ts), p = x => String(x).padStart(2,'0');
+  return `${p(d.getDate())}.${p(d.getMonth()+1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function kpUrl(token){ return SCRIPT ? `${SCRIPT}?kp=${token}` : `(ссылка появится после подключения сервера) токен: ${token}`; }
+
+function newDeal(seed){
+  seed = seed || {};
+  return {
+    id: uid('d_'), token: uid('t_'),
+    client: seed.client||'', contact: seed.contact||'', phone: seed.phone||'',
+    channel: seed.channel||CHANNELS[0], product: seed.product||PRODUCTS[0],
+    type: seed.type||'новый', sum: +seed.sum||0, kpNum: seed.kpNum||'',
+    stage: seed.stage||'new', note: seed.note||'',
+    createdAt: now(), updatedAt: now(),
+    events: [{ type:'created', at: now() }]
+  };
+}
+
+// ── Фильтры селекты ──
+function fillSelect(sel, arr, allLabel){
+  sel.innerHTML = (allLabel ? `<option value="">${allLabel}</option>` : '') +
+    arr.map(v=>`<option value="${v}">${v}</option>`).join('');
+}
+fillSelect(fChannel, CHANNELS, 'Все каналы');
+fillSelect(fProduct, PRODUCTS, 'Все продукты');
+fillSelect(mChannel, CHANNELS, null);
+fillSelect(mProduct, PRODUCTS, null);
+
+// ── Рендер сводки ──
+function renderSummary(){
+  const active = deals.filter(d=>d.stage!=='lost' && d.stage!=='done');
+  const hot = deals.filter(d=>d.stage==='opened');
+  const won = deals.filter(d=>d.stage==='done');
+  const pipeSum = active.reduce((s,d)=>s+(+d.sum||0),0);
+  const wonSum = won.reduce((s,d)=>s+(+d.sum||0),0);
+  const sent = deals.filter(d=>['sent','opened','invoice','paid','production','done'].includes(d.stage)).length;
+  const openedEver = deals.filter(d=>d.events.some(e=>e.type==='opened')).length;
+  const conv = sent ? Math.round(openedEver/sent*100) : 0;
+  const cards = [
+    { lbl:'В работе', big: active.length, sub: `${fmtSum(pipeSum)} руб в воронке` },
+    { lbl:'🔥 Открыли КП', big: hot.length, sub: 'ждут звонка сейчас' },
+    { lbl:'Открываемость КП', big: conv+'%', sub: `${openedEver} из ${sent} отправленных` },
+    { lbl:'Выиграно', big: won.length, sub: `${fmtSum(wonSum)} руб отгружено` },
+  ];
+  summary.innerHTML = cards.map(c=>`<div class="scard"><div class="lbl">${c.lbl}</div><div class="big">${c.big}</div><div class="sub">${c.sub}</div></div>`).join('');
+}
+
+// ── Фильтрация ──
+function visibleDeals(){
+  const q = fSearch.value.trim().toLowerCase();
+  const ch = fChannel.value, pr = fProduct.value, tp = fType.value;
+  return deals.filter(d=>{
+    if(ch && d.channel!==ch) return false;
+    if(pr && d.product!==pr) return false;
+    if(tp && d.type!==tp) return false;
+    if(q){
+      const hay = `${d.client} ${d.contact} ${d.phone} ${d.kpNum} ${d.note}`.toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+// ── Рендер доски ──
+function cardHtml(d){
+  const hot = d.stage==='opened';
+  const opened = d.events.some(e=>e.type==='opened');
+  const lastOpen = [...d.events].reverse().find(e=>e.type==='opened');
+  return `<div class="card ${hot?'hot':''}" draggable="true" data-id="${d.id}" style="border-left-color:${stageById(d.stage).dot}">
+    ${hot?'<span class="fire">🔥</span>':''}
+    <div class="cli">${esc(d.client)||'<span style="color:#b3aca2">Без названия</span>'}</div>
+    ${+d.sum?`<div class="sum">${fmtSum(d.sum)} руб</div>`:''}
+    <div class="tags">
+      ${d.channel?`<span class="tag ch">${esc(d.channel)}</span>`:''}
+      ${d.product?`<span class="tag pr">${esc(d.product)}</span>`:''}
+      <span class="tag tp">${d.type==='текущий'?'текущий':'новый'}</span>
+    </div>
+    ${opened?`<div class="kpline">✅ КП открыт${lastOpen?` <b>${fmtWhen(lastOpen.at)}</b>`:''}</div>`:
+      (['sent'].includes(d.stage)?`<div class="kpline">📤 КП отправлен, ждём открытия</div>`:'')}
+  </div>`;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function render(){
+  const vis = visibleDeals();
+  emptyAll.classList.toggle('hidden', deals.length>0);
+  board.classList.toggle('hidden', deals.length===0);
+  renderSummary();
+  board.innerHTML = STAGES.map(st=>{
+    const items = vis.filter(d=>d.stage===st.id);
+    const sum = items.reduce((s,d)=>s+(+d.sum||0),0);
+    return `<div class="col" data-stage="${st.id}">
+      <div class="col-head">
+        <span class="col-dot" style="background:${st.dot}"></span>
+        <span class="col-name">${st.name}</span>
+        <span class="col-meta">${items.length}${sum?`<br>${fmtSum(sum)}`:''}</span>
+      </div>
+      <div class="col-body">${items.map(cardHtml).join('') || '<div class="col-empty">пусто</div>'}</div>
+    </div>`;
+  }).join('');
+  wireCards();
+}
+
+// ── Drag & drop между стадиями ──
+let dragId = null;
+function wireCards(){
+  board.querySelectorAll('.card').forEach(c=>{
+    c.addEventListener('click', ()=>openDeal(c.dataset.id));
+    c.addEventListener('dragstart', e=>{ dragId=c.dataset.id; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    c.addEventListener('dragend', ()=>{ dragId=null; c.classList.remove('dragging'); });
+  });
+  board.querySelectorAll('.col').forEach(col=>{
+    col.addEventListener('dragover', e=>{ e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', ()=>col.classList.remove('drag-over'));
+    col.addEventListener('drop', e=>{
+      e.preventDefault(); col.classList.remove('drag-over');
+      if(!dragId) return;
+      moveStage(dragId, col.dataset.stage);
+    });
+  });
+}
+function moveStage(id, stage){
+  const d = deals.find(x=>x.id===id); if(!d || d.stage===stage) return;
+  d.stage = stage; d.updatedAt = now();
+  d.events.push({ type:'stage', at: now(), to: stage });
+  save(deals); render();
+}
+
+// ── Модалка ──
+let editId = null;
+function renderStages(cur){
+  mStages.innerHTML = STAGES.map(s=>{
+    const on = s.id===cur;
+    return `<button type="button" class="stbtn ${s.id==='lost'?'lost':''} ${on?'on':''}" data-st="${s.id}"
+      style="${on&&s.id!=='lost'?`background:${s.dot}`:''}">${s.name}</button>`;
+  }).join('');
+  mStages.querySelectorAll('.stbtn').forEach(b=>b.onclick=()=>renderStages(b.dataset.st));
+  mStages.dataset.cur = cur;
+}
+function renderTimeline(d){
+  const ico = { created:'🆕', sent:'📤', opened:'🔥', stage:'➡️', invoice:'🧾', paid:'💰', question:'✍️' };
+  const label = e=>{
+    if(e.type==='created') return 'Сделка создана';
+    if(e.type==='sent') return 'КП отправлено клиенту';
+    if(e.type==='opened') return 'Клиент <b>открыл КП</b>'+(e.dur?` · смотрел ${Math.round(e.dur/60)} мин`:'');
+    if(e.type==='question') return 'Вопрос с КП: <b>'+esc(e.q||'')+'</b>'+(e.phone?' · тел. '+esc(e.phone):'');
+    if(e.type==='stage') return 'Стадия → <b>'+stageById(e.to).name+'</b>';
+    return e.type;
+  };
+  const evs = [...(d.events||[])].sort((a,b)=>b.at-a.at);
+  mTimeline.innerHTML = evs.length ? evs.map(e=>
+    `<div class="tl-item"><span class="tl-ico">${ico[e.type]||'•'}</span>
+      <div class="tl-txt">${label(e)}<div class="tl-when">${fmtWhen(e.at)}</div></div></div>`
+  ).join('') : '<div class="tl-empty">Событий пока нет</div>';
+}
+function openDeal(id){
+  const d = deals.find(x=>x.id===id); if(!d) return;
+  editId = id;
+  mTitle.textContent = d.client ? d.client : 'Сделка';
+  mClient.value=d.client; mContact.value=d.contact; mPhone.value=d.phone;
+  mChannel.value=d.channel; mProduct.value=d.product; mType.value=d.type;
+  mSum.value=d.sum||''; mKpNum.value=d.kpNum; mNote.value=d.note;
+  mKpUrl.value = kpUrl(d.token);
+  mKpHint.textContent = SCRIPT
+    ? 'Отправьте эту ссылку клиенту (Telegram/Viber/почта). Как только он её откроет — сделка встанет в «🔥 КП открыто» и придёт уведомление. (Уведомления подключаются на Шаге 3.)'
+    : 'Ссылка станет рабочей после подключения серверного слоя (Шаг 2). Токен уже закреплён за сделкой.';
+  renderStages(d.stage);
+  renderTimeline(d);
+  overlay.classList.add('show');
+}
+function closeModal(){ overlay.classList.remove('show'); editId=null; }
+
+function saveModal(){
+  if(!editId) return;
+  const d = deals.find(x=>x.id===editId); if(!d) return;
+  const prevStage = d.stage;
+  d.client=mClient.value.trim(); d.contact=mContact.value.trim(); d.phone=mPhone.value.trim();
+  d.channel=mChannel.value; d.product=mProduct.value; d.type=mType.value;
+  d.sum=+mSum.value||0; d.kpNum=mKpNum.value.trim(); d.note=mNote.value.trim();
+  const newStage = mStages.dataset.cur || d.stage;
+  if(newStage!==prevStage){ d.stage=newStage; d.events.push({ type:'stage', at:now(), to:newStage }); }
+  d.updatedAt=now();
+  save(deals); registerKP(d); render(); closeModal();
+}
+
+// ── Сервер: регистрация КП (чтобы страница знала клиента) ──
+function registerKP(d){
+  if(!SCRIPT || !d.token) return;
+  try{
+    fetch(SCRIPT, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ action:'register', token:d.token, type:'kp', client:d.client, kpNum:d.kpNum, sum:d.sum }) });
+  }catch(e){}
+}
+
+// ── Сервер: опрос открытий → авто-стадия «🔥 КП открыто» ──
+async function pollStatus(){
+  if(!SCRIPT) return;
+  let data;
+  try{
+    const r = await fetch(SCRIPT + '?status=1');
+    data = await r.json();
+  }catch(e){ return; }
+  if(!data || !data.events) return;
+  let changed = false;
+  for(const ev of data.events){
+    if(ev.event!=='open' && ev.event!=='question') continue;
+    const d = deals.find(x=>x.token===ev.token);
+    if(!d) continue;
+    if(d.events.some(x=>x.srvAt===ev.at)) continue;         // уже учтено
+    if(ev.event==='open'){
+      d.events.push({ type:'opened', at: ev.at||now(), srvAt: ev.at });
+      if(d.stage==='new' || d.stage==='sent'){ d.stage='opened'; d.events.push({ type:'stage', at:now(), to:'opened' }); }
+    }else{
+      d.events.push({ type:'question', at: ev.at||now(), srvAt: ev.at, q: ev.q, phone: ev.phone });
+    }
+    d.updatedAt = now(); changed = true;
+  }
+  if(changed){ save(deals); render(); }
+}
+pollStatus();
+setInterval(pollStatus, 60000);
+function deleteModal(){
+  if(!editId) return;
+  const d = deals.find(x=>x.id===editId);
+  if(!confirm(`Удалить сделку «${d&&d.client||'без названия'}»? Это действие необратимо.`)) return;
+  deals = deals.filter(x=>x.id!==editId);
+  save(deals); render(); closeModal();
+}
+
+// ── События ──
+newDeal_btn();
+function newDeal_btn(){}
+document.getElementById('newDeal').onclick = ()=>{
+  const d = newDeal(); deals.unshift(d); save(deals); render(); openDeal(d.id);
+};
+mClose.onclick = closeModal;
+overlay.onclick = e=>{ if(e.target===overlay) closeModal(); };
+mSave.onclick = saveModal;
+mDelete.onclick = deleteModal;
+mKpCopy.onclick = async ()=>{
+  try{ await navigator.clipboard.writeText(mKpUrl.value); }
+  catch(e){ mKpUrl.select(); document.execCommand('copy'); }
+  mKpCopy.textContent='Скопировано ✓'; setTimeout(()=>mKpCopy.textContent='Копировать',1500);
+};
+[fSearch,fChannel,fProduct,fType].forEach(el=>el.addEventListener('input',render));
+fClear.onclick = ()=>{ fSearch.value=''; fChannel.value=''; fProduct.value=''; fType.value=''; render(); };
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+// ── Импорт сделки из калькулятора отливов (мост через localStorage) ──
+// Ключ dianast_crm_new_deal_v1 = {client, phone, sum, kpNum, product, note, stage}
+(function importFromCalc(){
+  try{
+    const raw = localStorage.getItem('dianast_crm_new_deal_v1');
+    if(!raw) return;
+    localStorage.removeItem('dianast_crm_new_deal_v1');
+    const seed = JSON.parse(raw);
+    const d = newDeal(Object.assign({ product:'Отливы', channel:'Рассылка КП', stage:'sent' }, seed));
+    if(seed.stage==='sent') d.events.push({ type:'sent', at:now() });
+    deals.unshift(d); save(deals);
+  }catch(e){}
+})();
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор отливов — DIANAST</title>
+<meta name="description" content="Смета и счёт на отливы и изделия из жести за минуту: позиции, цвета RAL и «под дерево», срочность. Производство DIANAST, Кобрин.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A;
+  --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B;
+}
+html{ scroll-behavior:smooth; }
+body{
+  font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--фон); color:var(--чёрный); line-height:1.5; min-height:100vh;
+}
+img{ max-width:100%; display:block; }
+button{ cursor:pointer; font-family:inherit; }
+
+header{
+  background:#fff; border-bottom:1px solid var(--рамка);
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand img{ height:44px; }
+.bn{ font-size:22px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:9px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.phone{ text-align:right; }
+.phone a{ font-size:16px; font-weight:800; color:var(--чёрный); text-decoration:none; }
+.phone div{ font-size:11px; color:var(--текст2); }
+
+main{ max-width:680px; margin:0 auto; padding:20px 16px 40px; }
+h1{ font-size:clamp(20px,5vw,26px); line-height:1.25; font-weight:800; margin:6px 0 4px; }
+h1 em{ font-style:normal; color:var(--терракота); }
+.sub{ font-size:13.5px; color:var(--текст2); margin-bottom:16px; }
+
+.item{
+  background:#fff; border:1px solid var(--рамка); border-radius:14px;
+  padding:14px 14px 16px; margin-bottom:12px; position:relative;
+}
+.item .num{
+  position:absolute; top:-9px; left:14px; background:var(--терракота); color:#fff;
+  font-size:11px; font-weight:800; border-radius:999px; padding:2px 10px;
+}
+.item .del{
+  position:absolute; top:8px; right:10px; background:none; border:none;
+  font-size:20px; line-height:1; color:#b5aca0; padding:4px;
+}
+.item .del:hover{ color:var(--кирпич); }
+label.f{ display:block; font-size:12.5px; font-weight:700; margin:11px 0 5px; }
+label.f span{ font-weight:400; color:var(--текст2); }
+select, input[type=number], input[type=text], input[type=email], textarea{
+  width:100%; font-size:16px; padding:10px 11px; border:1.5px solid var(--рамка);
+  border-radius:10px; background:#fff; color:var(--чёрный); font-family:inherit;
+  transition:border-color .15s;
+}
+select:focus-visible, input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--терракота); }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.other-wrap{ display:none; }
+.other-wrap.show{ display:grid; grid-template-columns:1.4fr 1fr; gap:10px; }
+.zag-wrap{ display:none; margin-top:11px; background:#fdf1ea; border:1px solid #f0c8ae; border-radius:10px; padding:10px 12px; }
+.zag-wrap.show{ display:block; }
+.zag-wrap .f{ margin-top:0; }
+.geo{ display:none; margin-top:9px; font-size:12px; color:#7a5c00; background:#fdf6df; border:1px solid #ead9a0; border-radius:8px; padding:8px 10px; line-height:1.45; }
+.geo.show{ display:block; }
+.mode-row{ display:flex; gap:8px; margin-top:12px; }
+.mode-row .chip.on{ background:#1A1A1A; border-color:#1A1A1A; }
+.cutline{ font-size:12.5px; color:#1a1a1a; background:#fdf1ea; border:1px solid #f0c8ae; border-radius:8px; padding:8px 10px; margin-top:11px; line-height:1.45; display:none; }
+.cutline.show{ display:block; }
+.lap-check{ display:none; align-items:flex-start; gap:9px; margin-top:9px; font-size:12.5px; cursor:pointer; user-select:none; line-height:1.35; }
+.lap-check input{ width:18px; height:18px; accent-color:#D4521E; cursor:pointer; flex:0 0 auto; margin-top:1px; }
+.lap-check.show{ display:flex; }
+.warn{ display:none; margin-top:8px; font-size:12.5px; font-weight:700; color:#b3261e; line-height:1.4; }
+.warn.show{ display:block; }
+.hintline{ font-size:11.5px; color:var(--текст2); margin-top:6px; }
+.auto15{ display:none; margin-top:8px; font-size:12px; color:var(--терракота); font-weight:700; }
+.auto15.show{ display:block; }
+.item-sum{
+  margin-top:12px; padding-top:10px; border-top:1px dashed var(--рамка);
+  display:flex; justify-content:space-between; align-items:baseline; font-size:13px; color:var(--текст2); gap:10px; flex-wrap:wrap;
+}
+.item-sum b{ font-size:16px; color:var(--чёрный); }
+
+.add{
+  width:100%; background:#fff; border:1.5px dashed var(--терракота); color:var(--терракота);
+  border-radius:12px; font-size:14.5px; font-weight:800; padding:12px; margin-bottom:14px;
+  transition:background .15s;
+}
+.add:hover{ background:#fdf1ea; }
+
+.card{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; margin-bottom:14px; }
+.card h2{ font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--терракота); margin-bottom:4px; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.chip{
+  border:1.5px solid var(--рамка); background:#fff; border-radius:999px;
+  font-size:12.5px; padding:7px 12px; transition:all .15s; color:var(--текст2);
+}
+.chip.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; font-weight:700; }
+.file-lbl{
+  display:flex; align-items:center; gap:10px; border:1.5px dashed var(--рамка); border-radius:10px;
+  padding:11px 12px; font-size:13.5px; color:var(--текст2); cursor:pointer; margin-top:5px;
+}
+.file-lbl:hover{ border-color:var(--терракота); color:var(--терракота); }
+.file-lbl input{ display:none; }
+
+.result{ background:var(--чёрный); color:#fff; border-radius:14px; padding:18px 16px; margin-bottom:14px; }
+.result .t{ font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:#9a9a9a; margin-bottom:6px; }
+table.res{ width:100%; border-collapse:collapse; font-size:12.5px; }
+table.res td{ padding:7px 4px; border-bottom:1px solid #2e2e2e; vertical-align:top; }
+table.res td.r{ text-align:right; white-space:nowrap; font-weight:700; }
+table.res .d{ color:#9a9a9a; font-size:11px; }
+.res-row{ display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; }
+.res-row .l{ font-size:13.5px; color:#cfcfcf; }
+.res-row .v{ font-size:16px; font-weight:700; white-space:nowrap; }
+.res-row.big{ margin-top:8px; padding-top:12px; }
+.res-row.big .l{ font-size:14.5px; color:#fff; font-weight:700; }
+.res-row.big .v{ font-size:23px; font-weight:900; color:var(--акцент); }
+.res-note{ font-size:11.5px; color:#9a9a9a; margin-top:10px; line-height:1.45; }
+.btns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+#zayavka-btn{ grid-column:1 / -1; }   /* заявка бухгалтеру — во всю ширину под первыми двумя */
+.btn{
+  border:none; border-radius:10px; font-size:14.5px; font-weight:800; padding:13px; transition:all .15s;
+}
+.btn.primary{ background:var(--терракота); color:#fff; }
+.btn.primary:hover{ background:var(--кирпич); }
+.btn.ghost{ background:#333; color:#fff; }
+.btn.ghost:hover{ background:#444; }
+.btn.ok{ background:#2e7d32 !important; }
+.send-status{ font-size:12px; margin-top:8px; color:#9a9a9a; display:none; }
+.send-status.show{ display:block; }
+
+.guarantee{
+  background:var(--терракота); color:#fff; border-radius:14px; padding:13px 16px;
+  font-size:13.5px; font-weight:600; line-height:1.4;
+}
+footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18px 16px 30px; }
+footer a{ color:var(--терракота); font-weight:700; text-decoration:none; }
+@media (max-width:420px){ .phone{ display:none; } .row3{ grid-template-columns:1fr; } .btns{ grid-template-columns:1fr; } }
+
+/* ── Счёт (превью + печать) ── */
+#invoice-overlay{
+  display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:50;
+  overflow:auto; padding:20px 10px;
+}
+#invoice-overlay.show{ display:block; }
+#invoice-box{ max-width:800px; margin:0 auto; }
+#invoice-actions{ display:flex; gap:10px; justify-content:flex-end; margin-bottom:10px; flex-wrap:wrap; }
+#invoice-actions .btn{ padding:10px 16px; font-size:13.5px; }
+#invoice{ background:#fff; color:#1a1a1a; padding:34px 38px; border-radius:6px; font-size:13px; line-height:1.45; }
+@media print{
+  body > *{ display:none !important; }
+  #invoice-overlay{ display:block !important; position:static; background:#fff; padding:0; }
+  #invoice-actions{ display:none !important; }
+  #invoice{ border-radius:0; padding:0; }
+}
+</style>
+<script src="../../вход.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="DIANAST">
+    <div>
+      <div class="bn"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+      <div class="bs">ОТЛИВЫ ОТ ПРОИЗВОДИТЕЛЯ И НЕ ТОЛЬКО!</div>
+    </div>
+  </div>
+  <div class="phone">
+    <a href="tel:+375297974362">+375 29 797-43-62</a>
+    <div>звонок · Viber</div>
+  </div>
+</header>
+
+<main>
+  <h1>Калькулятор изделий из жести — <em>смета и счёт за минуту</em></h1>
+  <div class="sub">Добавьте позиции заказа, укажите данные — получите смету, готовый счёт и отправьте заказ нам в один клик.</div>
+
+  <div id="items"></div>
+  <button class="add" id="add" type="button">+ Добавить позицию</button>
+
+  <div class="card">
+    <h2>Коэффициенты заказа</h2>
+    <div class="row2">
+      <div>
+        <label class="f" for="urgency" style="margin-top:6px">Срочность <span>— 1 = обычный срок</span></label>
+        <input type="number" id="urgency" value="1" min="1" max="5" step="0.05" inputmode="decimal">
+      </div>
+      <div>
+        <label class="f" for="markup" style="margin-top:6px">Повышающий коэф. <span>— 1 = без наценки</span></label>
+        <input type="number" id="markup" value="1" min="0.5" max="5" step="0.05" inputmode="decimal">
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card">
+    <h2>Данные для счёта и связи</h2>
+    <label class="f">Организация или ФИО <span>(попадёт в счёт)</span></label>
+    <input type="text" id="client" placeholder="ООО «Окна Плюс» / Иванов Иван Иванович">
+    <div class="row2" style="margin-top:2px">
+      <div>
+        <label class="f">Email <span>(пришлём счёт)</span></label>
+        <input type="email" id="client-email" placeholder="pochta@example.com">
+      </div>
+      <div>
+        <label class="f">Телефон <span>(звонок/Viber)</span></label>
+        <input type="text" id="client-phone" placeholder="+375 29 …">
+      </div>
+    </div>
+    <label class="f">Файл к заказу <span>(эскиз, чертёж, заявка — по желанию)</span></label>
+    <label class="file-lbl"><input type="file" id="client-file"><span id="file-name">Прикрепить файл…</span></label>
+    <label class="f">Комментарий к заказу</label>
+    <textarea id="client-note" rows="2" placeholder="Пожелания, адрес доставки, сроки…"></textarea>
+  </div>
+
+  <div class="result">
+    <div class="t">Смета</div>
+    <table class="res"><tbody id="res-body"></tbody></table>
+    <div class="res-row"><div class="l">Итого без НДС</div><div class="v" id="total">—</div></div>
+    <div class="res-row"><div class="l">НДС 20%</div><div class="v" id="total-vat">—</div></div>
+    <div class="res-row big"><div class="l">Всего с НДС</div><div class="v" id="total-nds">—</div></div>
+    <div class="res-note" id="note"></div>
+    <div class="btns">
+      <button class="btn ghost" id="copy" type="button">Скопировать смету</button>
+      <button class="btn primary" id="invoice-btn" type="button">Сформировать счёт</button>
+      <button class="btn ghost" id="zayavka-btn" type="button">📋 Заявка бухгалтеру</button>
+    </div>
+    <div class="send-status" id="send-status"></div>
+  </div>
+
+  <div class="guarantee">Гарантия цены: нашли отливы дешевле — покажите цену, гарантированно предложим ещё выгоднее.</div>
+</main>
+
+<footer>
+  ЧПТУП «Дианаст», г. Кобрин · заказ: <a href="tel:+375297974362">+375 29 797-43-62</a> · <a href="mailto:otlivy@bk.ru">otlivy@bk.ru</a><br>
+  Изготовление 1–3 дня · доставка по всей Беларуси
+</footer>
+
+<div id="invoice-overlay">
+  <div id="invoice-box">
+    <div id="invoice-actions">
+      <button class="btn ghost" id="inv-close" type="button">Закрыть</button>
+      <button class="btn ghost" id="inv-print" type="button">Скачать PDF / печать</button>
+      <button class="btn primary" id="inv-send" type="button">Отправить заказ в Дианаст</button>
+    </div>
+    <div id="invoice"></div>
+  </div>
+</div>
+
+<!-- цены.js — единый конфиг цен приложения (лежит в корне DIANAST-app, один на все инструменты) -->
+<script src="../../цены.js"></script>
+<!-- заявка-бухгалтеру.js — общая форма заявки на счёт (та же, что в калькуляторе доборных) -->
+<script src="../../заявка-бухгалтеру.js?v=2026-07-22b"></script>
+<script src="app.js"></script>
+</body>
+</html>

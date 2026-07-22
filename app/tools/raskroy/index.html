@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор раскроя жести — DIANAST</title>
+<meta name="description" content="Раскладка рулона жести на заготовки: сколько метров рулона нужно, редактируемая карта раскроя, печать A4, процент отхода. Производство DIANAST, Кобрин.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A;
+  --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B;
+  --отход:#e46a4a;
+}
+html{ scroll-behavior:smooth; }
+body{
+  font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--фон); color:var(--чёрный); line-height:1.5; min-height:100vh;
+}
+img{ max-width:100%; display:block; }
+button{ cursor:pointer; font-family:inherit; }
+
+header{
+  background:#fff; border-bottom:1px solid var(--рамка);
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand img{ height:44px; }
+.bn{ font-size:22px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:9px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.phone{ text-align:right; }
+.phone a{ font-size:16px; font-weight:800; color:var(--чёрный); text-decoration:none; }
+.phone div{ font-size:11px; color:var(--текст2); }
+
+main{ max-width:760px; margin:0 auto; padding:20px 16px 40px; }
+h1{ font-size:clamp(20px,5vw,26px); line-height:1.25; font-weight:800; margin:6px 0 4px; }
+h1 em{ font-style:normal; color:var(--терракота); }
+.sub{ font-size:13.5px; color:var(--текст2); margin-bottom:16px; }
+
+.card{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; margin-bottom:14px; }
+.card h2{ font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--терракота); margin-bottom:8px; }
+label.f{ display:block; font-size:12.5px; font-weight:700; margin:11px 0 5px; }
+label.f span{ font-weight:400; color:var(--текст2); }
+input[type=number], input[type=text]{
+  width:100%; font-size:16px; padding:10px 11px; border:1.5px solid var(--рамка);
+  border-radius:10px; background:#fff; color:var(--чёрный); font-family:inherit; transition:border-color .15s;
+}
+input:focus-visible{ outline:none; border-color:var(--терракота); }
+
+.chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip{
+  border:1.5px solid var(--рамка); background:#fff; border-radius:999px;
+  font-size:13px; padding:8px 14px; transition:all .15s; color:var(--текст2); font-weight:600;
+}
+.chip.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; font-weight:800; }
+.lbl-small{ font-size:12.5px; font-weight:700; margin:0 0 6px; }
+.hintline{ font-size:11.5px; color:var(--текст2); margin-top:8px; line-height:1.4; }
+
+.item{
+  background:#fff; border:1px solid var(--рамка); border-radius:14px;
+  padding:16px 14px 14px; margin-bottom:12px; position:relative;
+}
+.item .num{
+  position:absolute; top:-9px; left:14px; background:var(--терракота); color:#fff;
+  font-size:11px; font-weight:800; border-radius:999px; padding:2px 10px;
+}
+.item .del{
+  position:absolute; top:8px; right:10px; background:none; border:none;
+  font-size:20px; line-height:1; color:#b5aca0; padding:4px;
+}
+.item .del:hover{ color:var(--кирпич); }
+.row3{ display:grid; grid-template-columns:1.2fr 1fr 0.8fr; gap:10px; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.imode{ display:flex; background:#f1ede7; border-radius:8px; padding:3px; margin-bottom:10px; }
+.imode button{ flex:1; border:none; background:none; font-size:12px; font-weight:800; color:var(--текст2); padding:6px; border-radius:6px; }
+.imode button.on{ background:#fff; color:var(--терракота); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.warn{ display:none; margin-top:8px; font-size:12.5px; font-weight:700; color:#b3261e; line-height:1.4; }
+.warn.show{ display:block; }
+
+.add{
+  width:100%; background:#fff; border:1.5px dashed var(--терракота); color:var(--терракота);
+  border-radius:12px; font-size:14.5px; font-weight:800; padding:12px; margin-bottom:14px; transition:background .15s;
+}
+.add:hover{ background:#fdf1ea; }
+
+.result{ background:var(--чёрный); color:#fff; border-radius:14px; padding:18px 16px; margin-bottom:14px; }
+.result .t{ font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:#9a9a9a; margin-bottom:10px; }
+.res-row{ display:flex; justify-content:space-between; align-items:baseline; padding:6px 0; gap:10px; }
+.res-row .l{ font-size:13.5px; color:#cfcfcf; }
+.res-row .v{ font-size:16px; font-weight:700; white-space:nowrap; }
+.res-row.big{ margin-top:8px; padding-top:12px; border-top:1px solid #2e2e2e; }
+.res-row.big .l{ font-size:14.5px; color:#fff; font-weight:700; }
+.res-row.big .v{ font-size:23px; font-weight:900; color:var(--акцент); }
+.res-note{ font-size:11.5px; color:#9a9a9a; margin-top:12px; line-height:1.5; }
+.res-empty{ color:#9a9a9a; font-size:14px; }
+.res-alert{ background:#7a1f16; color:#ffd9cf; border-radius:9px; padding:9px 11px; margin-top:10px; font-size:12.5px; font-weight:700; line-height:1.4; }
+.badge-hand{ display:inline-block; background:var(--терракота); color:#fff; font-size:10.5px; font-weight:800; border-radius:999px; padding:2px 9px; letter-spacing:.4px; vertical-align:middle; margin-left:8px; }
+
+/* заголовок схемы + переключатель вид/правка + печать */
+.scheme-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+.seg{ display:flex; gap:0; border:1.5px solid var(--рамка); border-radius:999px; overflow:hidden; }
+.seg button{ border:none; background:#fff; color:var(--текст2); font-size:12.5px; font-weight:700; padding:7px 15px; }
+.seg button.on{ background:var(--терракота); color:#fff; }
+.tool-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+.tbtn{ border:1.5px solid var(--рамка); background:#fff; color:var(--чёрный); border-radius:9px; font-size:12.5px; font-weight:700; padding:7px 12px; }
+.tbtn:hover{ border-color:var(--терракота); color:var(--терракота); }
+.tbtn.print{ background:var(--терракота); color:#fff; border-color:var(--терракота); }
+.tbtn.print:hover{ background:var(--кирпич); color:#fff; }
+.tbtn.approve{ background:#2e7d32; color:#fff; border-color:#2e7d32; }
+.tbtn.approve:hover{ background:#276b2b; color:#fff; }
+.appr-badge{ display:inline-flex; align-items:center; gap:5px; background:#e6f2e6; color:#2e7d32; font-weight:800; font-size:12.5px; border-radius:9px; padding:7px 12px; border:1.5px solid #b9dbb9; }
+.grp-info{ font-size:12.5px; color:#2e7d32; background:#eef6ee; border:1px solid #cfe6cf; border-radius:9px; padding:9px 11px; margin-bottom:12px; line-height:1.45; }
+.sheet-head .cnt{ display:inline-block; background:var(--терракота); color:#fff; font-size:11.5px; font-weight:800; border-radius:999px; padding:2px 9px; margin-left:6px; }
+
+.legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--текст2); margin:2px 0 14px; }
+.legend span{ display:inline-flex; align-items:center; gap:5px; }
+.legend i{ width:13px; height:13px; border-radius:3px; display:inline-block; }
+
+.sheet{ background:#fff; border:1px solid var(--рамка); border-radius:12px; padding:12px 12px 8px; margin-bottom:12px; }
+.sheet-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+.sheet-head .st{ font-size:14px; font-weight:800; }
+.sheet-head .sm{ font-size:12px; color:var(--текст2); }
+.sheet-head .load{ font-size:12px; font-weight:800; }
+.sheet-head .load.full{ color:#2e7d32; }
+.sheet-head .load.mid{ color:var(--терракота); }
+.sheet-head .load.low{ color:#b3261e; }
+.roll-sep{ display:flex; align-items:center; gap:10px; margin:16px 0 10px; }
+.roll-sep .ln{ flex:1; height:1px; background:var(--рамка); }
+.roll-sep .tx{ font-size:12px; font-weight:800; color:var(--терракота); letter-spacing:.5px; }
+svg.diag{ width:100%; height:auto; display:block; }
+
+/* ── редактор карты раскроя ── */
+.edit-hint{ font-size:12.5px; color:#7a5c00; background:#fdf6df; border:1px solid #ead9a0; border-radius:9px; padding:9px 11px; margin-bottom:12px; line-height:1.45; }
+.edit-hint.pick{ color:#fff; background:var(--терракота); border-color:var(--терракота); font-weight:700; }
+.bsheet{ border:1.5px solid var(--рамка); border-radius:12px; padding:10px; margin-bottom:10px; background:#fff; transition:border-color .12s, background .12s; }
+.bsheet.drop{ border-color:var(--терракота); background:#fdf1ea; }
+.bsheet.over{ border-color:#b3261e; }
+.bsheet-h{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.bsheet-h .n{ font-size:13.5px; font-weight:800; }
+.bsheet-h .meta{ font-size:12px; color:var(--текст2); font-weight:600; }
+.wsel{ font-size:12px; font-weight:700; border:1.5px solid var(--рамка); border-radius:8px; padding:3px 6px; background:#fff; color:var(--чёрный); font-family:inherit; margin-left:auto; }
+.wsel:focus-visible{ outline:none; border-color:var(--терракота); }
+.bsheet-h .meta.bad{ color:#b3261e; }
+.bsheet-h .rm{ border:none; background:none; color:#b5aca0; font-size:18px; line-height:1; padding:2px 4px; }
+.bsheet-h .rm:hover{ color:var(--кирпич); }
+.brow{ display:flex; gap:4px; align-items:stretch; min-height:46px; overflow-x:auto; padding-bottom:2px; }
+.blk{
+  color:#fff; border-radius:7px; padding:6px 4px; font-size:12px; font-weight:800; text-align:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  cursor:grab; user-select:none; min-width:52px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+}
+.blk small{ font-size:10px; font-weight:600; opacity:.92; white-space:nowrap; }
+.blk .pn{ font-size:9px; font-weight:800; opacity:.8; }
+.blk.sel{ outline:3px solid #1A1A1A; outline-offset:1px; }
+.blk:active{ cursor:grabbing; }
+.bfree{ flex:0 0 auto; border:1.5px dashed var(--рамка); border-radius:7px; color:#b5aca0; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; min-width:40px; }
+.bfree.bad{ border-color:#b3261e; color:#b3261e; }
+.tray{ border:1.5px dashed #b3261e; border-radius:12px; padding:10px; margin-bottom:10px; background:#fff5f3; }
+.tray.drop{ background:#ffe7e0; }
+.tray .th{ font-size:12.5px; font-weight:800; color:#b3261e; margin-bottom:8px; }
+.newsheet{ border:1.5px dashed var(--терракота); color:var(--терракота); background:#fff; border-radius:12px; font-size:13.5px; font-weight:800; padding:12px; width:100%; transition:background .12s; }
+.newsheet.drop, .newsheet:hover{ background:#fdf1ea; }
+
+footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18px 16px 30px; }
+footer a{ color:var(--терракота); font-weight:700; text-decoration:none; }
+@media (max-width:440px){ .phone{ display:none; } .row3{ grid-template-columns:1fr 1fr; } }
+
+/* ── печать A4 ── */
+#print-root{ display:none; }
+@media print{
+  @page{ size:A4 portrait; margin:12mm; }
+  body{ background:#fff; }
+  body > *{ display:none !important; }
+  #print-root{ display:block !important; }
+  .p-sheet{ break-inside:avoid; page-break-inside:avoid; }
+  .p-head{ break-after:avoid; }
+}
+#print-root .p-head{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--терракота); padding-bottom:10px; margin-bottom:12px; }
+#print-root .p-brand{ font-size:22px; font-weight:900; letter-spacing:2px; color:var(--кирпич); }
+#print-root .p-brand .a{ color:#2B2B2B; }
+#print-root .p-title{ font-size:15px; font-weight:800; margin-top:2px; }
+#print-root .p-meta{ font-size:11px; color:#555; text-align:right; line-height:1.5; }
+#print-root .p-tot{ font-size:12px; margin:0 0 14px; line-height:1.7; }
+#print-root .p-tot b{ font-size:13px; }
+#print-root .p-sheet{ border:1px solid #ccc; border-radius:8px; padding:10px 12px; margin-bottom:12px; }
+#print-root .p-sheet .psh{ font-size:13px; font-weight:800; margin-bottom:2px; }
+#print-root .p-sheet .psm{ font-size:11px; color:#555; margin-bottom:6px; }
+</style>
+<script src="../../вход.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="DIANAST">
+    <div>
+      <div class="bn"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+      <div class="bs">ОТЛИВЫ ОТ ПРОИЗВОДИТЕЛЯ И НЕ ТОЛЬКО!</div>
+    </div>
+  </div>
+  <div class="phone">
+    <a href="tel:+375297974362">+375 29 797-43-62</a>
+    <div>звонок · Viber</div>
+  </div>
+</header>
+
+<main>
+  <h1>Калькулятор раскроя жести — <em>раскладка рулона на заготовки</em></h1>
+  <div class="sub">Выберите ширину рулона, добавьте заготовки — получите карту раскроя. Карту можно править вручную и распечатать на A4.</div>
+
+  <div class="card">
+    <h2>Рулон</h2>
+    <div class="lbl-small">Ширина рулона, мм <span style="font-weight:600;color:var(--текст2)">— можно выбрать несколько</span></div>
+    <div class="chips" id="width-chips"></div>
+    <div class="lbl-small" style="margin-top:14px">Длина рулона</div>
+    <div class="chips" id="mode-chips">
+      <button class="chip" data-mode="12" type="button">12 м (стандартный рулон)</button>
+      <button class="chip" data-mode="inf" type="button">Без ограничения (∞)</button>
+    </div>
+    <div class="lbl-small" style="margin-top:14px">Приоритет авто-раскроя</div>
+    <div class="chips" id="auto-chips">
+      <button class="chip" data-auto="maps" type="button">Меньше карт</button>
+      <button class="chip" data-auto="waste" type="button">Меньше отход</button>
+    </div>
+    <div class="hintline" id="auto-hint"></div>
+    <div class="lbl-small" style="margin-top:14px">Укладка на листе (где остаётся отход)</div>
+    <div class="chips" id="align-chips">
+      <button class="chip" data-align="left" type="button">Слева направо (отход справа)</button>
+      <button class="chip" data-align="right" type="button">Справа налево (отход слева)</button>
+    </div>
+    <div class="hintline">Лист (отрез из рулона) — максимум 3,18 м. Рез и кромка приняты за 0 (режем впритык). Отход = незаполненная ширина листа.</div>
+  </div>
+
+  <div id="items"></div>
+  <button class="add" id="add" type="button">+ Добавить заготовку</button>
+
+  <div class="result">
+    <div class="t">Результат раскроя</div>
+    <div id="res-main"></div>
+  </div>
+
+  <div id="scheme"></div>
+
+</main>
+
+<footer>
+  ЧПТУП «Дианаст», г. Кобрин · заказ: <a href="tel:+375297974362">+375 29 797-43-62</a> · <a href="mailto:otlivy@bk.ru">otlivy@bk.ru</a><br>
+  Раскрой рулонной жести · изготовление 1–3 дня
+</footer>
+
+<div id="print-root"></div>
+
+<script>
+const ROLL_WIDTHS = [752, 785, 876, 913, 1160, 1250];
+const MAX_SHEET_LEN = 3.18;   // м — макс. длина листа (отрез из рулона)
+const ROLL_12 = 12;           // м — стандартный рулон
+const RULER_OFFSET = 40;      // мм — линейка разметки: метка = нарастающая ширина − 40
+
+const state = {
+  rollWidths: [752],          // выбранные ширины рулонов (мультивыбор)
+  rollWidth: 752,             // «эффективная» ширина (до этапа 2.2 — самая широкая из выбранных)
+  mode: '12',                 // '12' | 'inf'
+  autoMode: 'maps',           // 'maps' = меньше типов карт | 'waste' = меньше отход
+  align: 'left',              // 'left' = заготовки от левого края (отход справа) | 'right' = наоборот
+  items: [ {w:'', l:'', qty:''} ],
+};
+
+// ── Память раскроя: заготовки и настройки переживают перезагрузку (F5) ──
+const RSKEY='dianast_raskroy_state_v1';
+function saveRState(){ try{ localStorage.setItem(RSKEY, JSON.stringify({items:state.items, rollWidths:state.rollWidths, mode:state.mode, autoMode:state.autoMode, align:state.align})); }catch(e){} }
+function loadRState(){ try{ const s=JSON.parse(localStorage.getItem(RSKEY)||'null'); if(!s) return;
+  if(Array.isArray(s.items)&&s.items.length) state.items=s.items.map(it=>({w:String(it.w||''),l:String(it.l||''),qty:String(it.qty||'')}));
+  if(Array.isArray(s.rollWidths)&&s.rollWidths.length) state.rollWidths=s.rollWidths.slice();
+  if(s.mode) state.mode=s.mode;
+  if(s.autoMode) state.autoMode=s.autoMode;
+  if(s.align) state.align=s.align;
+}catch(e){} }
+loadRState();
+// ru-плюрализация «позиция/позиции/позиций» и т.п.
+function plu(n,a,b,c){ n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20)return c; if(n1>1&&n1<5)return b; if(n1===1)return a; return c; }
+
+// редактируемая карта раскроя
+let layout = { sheets: [], unplaced: [], errors: [], hasInput:false };
+let viewMode = 'view';        // 'view' | 'edit'
+let editedManually = false;
+let approved = false;         // раскрой утверждён → группируем одинаковые листы
+let selectedId = null;        // выбранная заготовка (клик-перенос)
+let pieceSeq = 0;
+const nid = ()=> ++pieceSeq;
+
+const fmt = (n,d=2)=> (Math.round(n*10**d)/10**d).toLocaleString('ru-RU');
+
+// ── UI: ширина рулона ──
+const widthChips = document.getElementById('width-chips');
+function syncRollWidth(){ state.rollWidths.sort((a,b)=>a-b); state.rollWidth=Math.max(...state.rollWidths); }  // до 2.2: раскладка на самой широкой
+function paintWidths(){ [...widthChips.children].forEach(c=>c.classList.toggle('on', state.rollWidths.includes(+c.textContent))); }
+ROLL_WIDTHS.forEach(w=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='chip'+(state.rollWidths.includes(w)?' on':''); b.textContent=w;
+  b.onclick=()=>{
+    const i=state.rollWidths.indexOf(w);
+    if(i>=0){ if(state.rollWidths.length>1) state.rollWidths.splice(i,1); }   // последнюю ширину снять нельзя
+    else state.rollWidths.push(w);
+    syncRollWidth(); paintWidths(); computeAuto(); renderAll(); saveRState();
+  };
+  widthChips.appendChild(b);
+});
+syncRollWidth();
+
+// ── UI: режим длины ──
+const modeChips = document.getElementById('mode-chips');
+function paintMode(){ [...modeChips.children].forEach(c=>c.classList.toggle('on', c.dataset.mode===state.mode)); }
+[...modeChips.children].forEach(c=> c.onclick=()=>{ state.mode=c.dataset.mode; paintMode(); renderAll(); saveRState(); });
+paintMode();
+
+// ── UI: приоритет авто-раскроя ──
+const autoChips = document.getElementById('auto-chips');
+const autoHint = document.getElementById('auto-hint');
+function paintAuto(){
+  [...autoChips.children].forEach(c=>c.classList.toggle('on', c.dataset.auto===state.autoMode));
+  autoHint.textContent = state.autoMode==='maps'
+    ? 'Одинаковые листы держатся вместе — меньше карт для печати (мелочь идёт на листы своей длины).'
+    : 'Каждый лист забивается по ширине максимально — меньше отход, но иногда появляется лишний тип карты.';
+}
+[...autoChips.children].forEach(c=> c.onclick=()=>{ state.autoMode=c.dataset.auto; paintAuto(); computeAuto(); renderAll(); saveRState(); });
+paintAuto();
+
+// ── UI: укладка (сторона отхода) ──
+const alignChips = document.getElementById('align-chips');
+function paintAlign(){ [...alignChips.children].forEach(c=>c.classList.toggle('on', c.dataset.align===state.align)); }
+[...alignChips.children].forEach(c=> c.onclick=()=>{ state.align=c.dataset.align; paintAlign(); renderAll(); saveRState(); });
+paintAlign();
+
+// ── UI: позиции ──
+const itemsEl = document.getElementById('items');
+function renderItems(){
+  itemsEl.innerHTML='';
+  state.items.forEach((it,i)=>{
+    const card = document.createElement('div'); card.className='item';
+    const toggle=`<div class="imode">
+        <button type="button" data-im="${i}" data-v="len" class="${it.flex?'':'on'}">по длине</button>
+        <button type="button" data-im="${i}" data-v="flex" class="${it.flex?'on':''}">по метражу</button>
+      </div>`;
+    const fields = it.flex
+      ? `<div class="row2">
+          <div><label class="f">Развёртка (ширина), мм</label><input type="number" inputmode="numeric" min="1" data-f="w" data-i="${i}" value="${it.w||''}" placeholder="300"></div>
+          <div><label class="f">Всего метража, м</label><input type="number" inputmode="decimal" min="0.1" step="0.1" data-f="meters" data-i="${i}" value="${it.meters||''}" placeholder="30"></div>
+        </div>
+        <div class="hintline" style="margin-top:6px">Длина куска не важна: режется на куски ≤ 3,18 м, добивает свободную ширину листов + отдельные листы (добор до целого листа).</div>`
+      : `<div class="row3">
+          <div><label class="f">Развёртка (ширина), мм</label><input type="number" inputmode="numeric" min="1" data-f="w" data-i="${i}" value="${it.w||''}" placeholder="300"></div>
+          <div><label class="f">Длина, м <span>≤3,18</span></label><input type="number" inputmode="decimal" min="0.01" step="0.01" data-f="l" data-i="${i}" value="${it.l||''}" placeholder="3"></div>
+          <div><label class="f">Кол-во, шт</label><input type="number" inputmode="numeric" min="1" data-f="qty" data-i="${i}" value="${it.qty||''}" placeholder="2"></div>
+        </div>`;
+    card.innerHTML = `<div class="num">Заготовка ${i+1}</div>${state.items.length>1?`<button class="del" data-del="${i}" title="Удалить">×</button>`:''}${toggle}${fields}<div class="warn" data-warn="${i}"></div>`;
+    itemsEl.appendChild(card);
+  });
+  itemsEl.querySelectorAll('input').forEach(inp=>{
+    inp.oninput=()=>{ state.items[+inp.dataset.i][inp.dataset.f]=inp.value; computeAuto(); renderAll(); saveRState(); };
+  });
+  itemsEl.querySelectorAll('[data-im]').forEach(b=> b.onclick=()=>{
+    const i=+b.dataset.im, it=state.items[i];
+    if(b.dataset.v==='flex' && !it.flex) state.items[i]={w:it.w||'', meters:'', flex:true};
+    else if(b.dataset.v==='len' && it.flex) state.items[i]={w:it.w||'', l:'', qty:''};
+    renderItems(); computeAuto(); renderAll(); saveRState();
+  });
+  itemsEl.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick=()=>{ state.items.splice(+b.dataset.del,1); renderItems(); computeAuto(); renderAll(); saveRState(); };
+  });
+}
+document.getElementById('add').onclick=()=>{ state.items.push({w:'',l:'',qty:''}); renderItems(); computeAuto(); renderAll(); saveRState(); };
+
+// ── Ядро: заготовки из заявки ──
+function buildPieces(){
+  const pieces=[]; const flex=[]; const errors=[];
+  const maxW=Math.max(...state.rollWidths);
+  state.items.forEach((it,idx)=>{
+    const warn=itemsEl.querySelector(`[data-warn="${idx}"]`);
+    const w=parseFloat(it.w); let msg='';
+    if(it.flex){                                             // «по метражу» — режет программа
+      const m=parseFloat(it.meters);
+      if(it.w||it.meters){
+        if(!(w>0)||!(m>0)) msg='Заполните развёртку и метраж.';
+        else if(w>maxW) msg=`Развёртка ${w} мм больше самой большой выбранной ширины ${maxW} мм — не режется.`;
+      }
+      if(warn){ warn.textContent=msg; warn.classList.toggle('show', !!msg); }
+      if(msg) errors.push(msg);
+      if(w>0&&m>0&&!msg) flex.push({w, meters:m, src:idx});
+    } else {
+      const l=parseFloat(it.l), q=parseInt(it.qty,10);
+      if(it.w||it.l||it.qty){
+        if(!(w>0)||!(l>0)||!(q>0)) msg='Заполните развёртку, длину и количество.';
+        else if(w>maxW) msg=`Развёртка ${w} мм больше самой большой выбранной ширины ${maxW} мм — не режется.`;
+        else if(l>MAX_SHEET_LEN+1e-9) msg=`Длина ${l} м больше максимума листа ${MAX_SHEET_LEN} м.`;
+      }
+      if(warn){ warn.textContent=msg; warn.classList.toggle('show', !!msg); }
+      if(msg) errors.push(msg);
+      if(w>0&&l>0&&q>0&&!msg){ for(let k=0;k<q;k++) pieces.push({id:nid(), w,l,src:idx}); }
+    }
+  });
+  return {pieces, flex, errors};
+}
+
+// ── Авто-раскрой (эвристика: длина листа = самая длинная заготовка, добиваем ширину) ──
+// Собрать лист ширины W из базовой заготовки, добивая жадно из пула (пул НЕ мутируется).
+function packOnWidth(base, pool, W){
+  const sheet={ pieces:[base], W };
+  let used=base.w; const L=base.l; const taken=[]; const avail=pool.slice(); let go=true;
+  while(go){
+    go=false; let bi=-1, bw=-1;
+    for(let i=0;i<avail.length;i++){
+      if(avail[i].l<=L+1e-9 && avail[i].w<=W-used+1e-9 && avail[i].w>bw){ bw=avail[i].w; bi=i; }
+    }
+    if(bi>=0){ const p=avail.splice(bi,1)[0]; sheet.pieces.push(p); taken.push(p); used+=p.w; go=true; }
+  }
+  return { sheet, used, taken };
+}
+// Раскладка по НЕСКОЛЬКИМ ширинам: для каждого листа пробуем все ширины, берём плотнейшую (меньше отход; при равенстве — узкую).
+function packSheets(pieces, widths){
+  const ws=[...widths].sort((a,b)=>a-b);
+  const rem = pieces.slice().sort((a,b)=> b.l-a.l || b.w-a.w);
+  const sheets=[];
+  while(rem.length){
+    const base=rem[0]; const pool=rem.slice(1);
+    let best=null;
+    for(const W of ws){
+      if(base.w > W+1e-9) continue;                       // база не влезает в эту ширину
+      const res=packOnWidth(base, pool, W); const waste=W-res.used;
+      if(!best || waste < best.waste-1e-9 || (Math.abs(waste-best.waste)<1e-9 && W < best.W)){ best=res; best.waste=waste; best.W=W; }
+    }
+    if(!best){ rem.shift(); continue; }                    // ни одна ширина не вмещает (ловит валидация)
+    const takenSet=new Set(best.taken);
+    for(let i=rem.length-1;i>=0;i--){ if(rem[i]===base || takenSet.has(rem[i])) rem.splice(i,1); }
+    sheets.push(best.sheet);
+  }
+  return sheets;
+}
+
+// «Меньше карт»: переносим короткие заготовки-добивки на листы своей длины,
+// чтобы одинаковых листов было больше. Кол-во листов и метраж не меняются.
+function consolidate(sheets){
+  let changed=true, guard=0;
+  while(changed && guard++<400){
+    changed=false;
+    for(const src of sheets){
+      const Ls=derive(src).L;
+      for(let pi=src.pieces.length-1; pi>=0; pi--){
+        const p=src.pieces[pi];
+        if(p.l >= Ls-1e-9) continue;                 // не добивка (сама задаёт длину листа)
+        let best=null;
+        for(const tgt of sheets){
+          if(tgt===src) continue;
+          const dt=derive(tgt);
+          if(dt.used + p.w > dt.W+1e-9) continue;     // нет места по ширине этого листа
+          if(dt.L + 1e-9 < p.l) continue;             // лист короче заготовки — вырастет его длина
+          if(dt.L >= Ls-1e-9) continue;               // не короче исходного — переносить незачем
+          const score=Math.abs(dt.L - p.l)*10000 - dt.used;  // ближе по длине, потом плотнее
+          if(!best || score<best.score) best={tgt,score};
+        }
+        if(best){ best.tgt.pieces.push(p); src.pieces.splice(pi,1); changed=true; }
+      }
+    }
+    for(let i=sheets.length-1;i>=0;i--) if(!sheets[i].pieces.length){ sheets.splice(i,1); changed=true; }
+  }
+  return sheets;
+}
+
+// «по метражу» (резиновые заготовки): (1) добить свободную ширину уже готовых листов их длиной,
+// (2) добрать отдельными листами полной длины плотной ширины. Куски ≤ MAX_SHEET_LEN, добор до целого листа.
+function placeFlexible(sheets, flex, widths){
+  const ws=[...widths].sort((a,b)=>a-b);
+  flex.forEach(fi=>{
+    let remM=fi.meters; const fw=fi.w;
+    // 1) добить свободную ширину существующих листов (полосой длиной = длина листа)
+    for(const sh of sheets){
+      if(remM<=1e-9) break;
+      const d=derive(sh); let used=d.used; const L=d.L, W=d.W;
+      if(!(L>0)) continue;
+      while(remM>1e-9 && W-used >= fw-1e-9){
+        sh.pieces.push({id:nid(), w:fw, l:L, src:fi.src, flex:true});
+        used+=fw; remM-=L;
+      }
+    }
+    // 2) отдельные листы: плотная ширина (макс полос), полная длина
+    if(remM>1e-9){
+      let bestW=ws[0], k0=0, bestWaste=Infinity;
+      for(const W of ws){ if(fw>W+1e-9) continue; const k=Math.floor(W/fw); const waste=W-k*fw; if(k>0 && waste<bestWaste-1e-9){ bestWaste=waste; k0=k; bestW=W; } }
+      if(k0>0){
+        let sheet=null, onSheet=0, guard=0;
+        while(remM>1e-9 && guard++<5000){
+          if(!sheet || onSheet>=k0){ sheet={pieces:[], W:bestW}; sheets.push(sheet); onSheet=0; }
+          sheet.pieces.push({id:nid(), w:fw, l:MAX_SHEET_LEN, src:fi.src, flex:true});
+          onSheet++; remM-=MAX_SHEET_LEN;
+        }
+      }
+    }
+  });
+  return sheets;
+}
+function computeAuto(){
+  const {pieces, flex, errors}=buildPieces();
+  let sheets=packSheets(pieces, state.rollWidths);
+  if(state.autoMode==='maps') sheets=consolidate(sheets);
+  placeFlexible(sheets, flex, state.rollWidths);
+  layout = { sheets, unplaced:[], errors, hasInput:(pieces.length>0||flex.length>0||errors.length>0) };
+  editedManually=false; selectedId=null; approved=false;
+}
+
+// производные по листу — ширина берётся из самого листа (sh.W), Wf — запасная (совместимость)
+function derive(sh, Wf){
+  const W = (sh.W!=null ? sh.W : (Wf!=null ? Wf : state.rollWidth));
+  const used=sh.pieces.reduce((a,p)=>a+p.w,0);
+  const L=sh.pieces.reduce((a,p)=>Math.max(a,p.l),0);
+  return { W, used, L, waste:Math.max(0,W-used), load: W?used/W:0, over: used>W+1e-9 };
+}
+
+// FFD-упаковка листов в рулоны по 12 м — по каждой ширине отдельно (рулоны разных ширин не смешиваются)
+function packRolls(sheets, cap){
+  const byW=new Map();
+  sheets.forEach(sh=>{ const W=derive(sh).W; if(!byW.has(W)) byW.set(W,[]); byW.get(W).push(sh); });
+  const rolls=[];
+  [...byW.keys()].sort((a,b)=>a-b).forEach(W=>{
+    byW.get(W).forEach(sh=>{
+      const L=derive(sh).L; let placed=false;
+      for(const r of rolls){ if(r.W===W && r.len+L<=cap+1e-9){ r.sheets.push(sh); r.len+=L; placed=true; break; } }
+      if(!placed) rolls.push({ W, len:L, sheets:[sh] });
+    });
+  });
+  return rolls;
+}
+
+// ── Метрики ──
+function renderAll(){ renderMain(); renderScheme(); }
+
+function activeSheets(){ return layout.sheets.filter(s=>s.pieces.length); }
+
+function renderMain(){
+  const W=state.rollWidth;
+  const res=document.getElementById('res-main');
+  const act=activeSheets();
+
+  if(!act.length && !layout.unplaced.length){
+    res.innerHTML = `<div class="res-empty">${layout.errors.length?'Исправьте ошибки в заготовках выше.':'Добавьте заготовки — покажем раскрой.'}</div>`;
+    document.getElementById('scheme').innerHTML=''; return;
+  }
+
+  const totalLen=act.reduce((s,x)=>s+derive(x).L,0);
+  const wasteAreaW=act.reduce((s,x)=>{const d=derive(x); return s+d.waste*(d.L*1000);},0);
+  const usedArea=act.reduce((s,x)=>{const d=derive(x); return s+d.W*(d.L*1000);},0)||1;   // площадь по ширине каждого листа
+  const wastePctW=wasteAreaW/usedArea*100;
+  const pieceArea=act.reduce((s,x)=>s+x.pieces.reduce((a,p)=>a+p.w*(p.l*1000),0),0);
+  const yieldPct=pieceArea/usedArea*100;
+  const nPieces=act.reduce((a,x)=>a+x.pieces.length,0);
+  const anyOver=act.some(x=>derive(x).over);
+
+  let h='';
+  h+=`<div class="res-row"><div class="l">Заготовок размещено</div><div class="v">${nPieces} шт${editedManually?'<span class="badge-hand">ручная правка</span>':''}</div></div>`;
+  h+=`<div class="res-row"><div class="l">Листов раскроя</div><div class="v">${act.length}</div></div>`;
+
+  if(state.mode==='12'){
+    const rolls=packRolls(act, ROLL_12);
+    const lastLeft=ROLL_12-rolls[rolls.length-1].len;
+    h+=`<div class="res-row big"><div class="l">Рулонов по 12 м</div><div class="v">${rolls.length} шт</div></div>`;
+    h+=`<div class="res-row"><div class="l">Погонных метров рулона (факт)</div><div class="v">${fmt(totalLen)} м</div></div>`;
+    h+=`<div class="res-row"><div class="l">Остаток в последнем рулоне</div><div class="v">${fmt(lastLeft)} м</div></div>`;
+  } else {
+    h+=`<div class="res-row big"><div class="l">Длина рулона</div><div class="v">${fmt(totalLen)} м</div></div>`;
+  }
+  h+=`<div class="res-row"><div class="l">Отход (незаполненная ширина)</div><div class="v">${fmt(wastePctW,1)} %</div></div>`;
+  h+=`<div class="res-note">Полезный выход по площади заготовок — <b style="color:#fff">${fmt(yieldPct,1)} %</b> (учитывает недобор по длине, когда короткая заготовка стоит рядом с длинной).</div>`;
+  const flexM=act.reduce((s,sh)=>s+sh.pieces.filter(p=>p.flex).reduce((a,p)=>a+p.l,0),0);
+  if(flexM>0.01) h+=`<div class="res-note">По метражу нарезано и разложено: <b style="color:#fff">${fmt(flexM)} пог. м</b> (куски ≤ ${fmt(MAX_SHEET_LEN,2)} м, добор до целого листа).</div>`;
+
+  if(layout.unplaced.length) h+=`<div class="res-alert">⚠ Не размещено заготовок: ${layout.unplaced.length} шт. Перетащите их на листы в режиме «Правка».</div>`;
+  if(anyOver) h+=`<div class="res-alert">⚠ Есть перегруженные листы (сумма ширин больше ширины рулона). Поправьте раскладку в режиме «Правка».</div>`;
+  res.innerHTML=h;
+}
+
+// ── Схема: цвета ──
+const PALETTE = ['#4a90d9','#e08e45','#5aa469','#a86ec4','#d95a7a','#3fa6a0','#c9a13b','#7c8a99','#c1596b','#6b8f3a'];
+const colorFor = src => PALETTE[((src%PALETTE.length)+PALETTE.length)%PALETTE.length];
+function loadClass(load){ return load>=0.9?'full':load>=0.7?'mid':'low'; }
+
+// SVG одного листа (для просмотра и печати) — с линейкой разметки реза сверху
+function sheetSvg(sh){
+  const d=derive(sh); const W=d.W;
+  const PX_W=640, scaleX=PX_W/1250, boxW=W*scaleX, PX_PER_M=46;
+  const boxH=Math.max(38, d.L*PX_PER_M), padL=6, padT=44, padB=6, padR=6;
+  const svgW=boxW+padL+padR, svgH=boxH+padT+padB;
+
+  // «справа налево» = ЗЕРКАЛО листа: заготовки в обратном порядке (первая — у правой кромки), отход слева
+  const rightAlign = state.align==='right';
+  const wasteSeg = d.waste>0.5 ? [{waste:true, w:d.waste}] : [];
+  const segs = rightAlign ? [...wasteSeg, ...sh.pieces.slice().reverse()] : [...sh.pieces, ...wasteSeg];
+  let cols='', ruler=`<line x1="${padL}" y1="36" x2="${padL+boxW}" y2="36" stroke="#d8d2c8" stroke-width="1"/>`;
+  let xpx=0, xmm=0;
+  segs.forEach((seg,si)=>{
+    const cw=seg.w*scaleX;
+    if(seg.waste){
+      cols+=`<rect x="${padL+xpx}" y="${padT}" width="${cw}" height="${boxH}" fill="url(#waste)"/>`+
+        (cw>30?`<text x="${padL+xpx+cw/2}" y="${padT+boxH/2+4}" text-anchor="middle" font-size="10" font-weight="700" fill="#b3261e">${Math.round(seg.w)}</text>`:'');
+    } else {
+      const p=seg, ch=d.L? p.l/d.L*boxH : boxH, col=colorFor(p.src), midY=padT+Math.min(ch,boxH)/2;
+      cols+=`<rect x="${padL+xpx}" y="${padT}" width="${cw}" height="${ch}" fill="${col}" opacity="0.9"/>`;
+      if(ch<boxH-0.5) cols+=`<rect x="${padL+xpx}" y="${padT+ch}" width="${cw}" height="${boxH-ch}" fill="url(#gap)"/>`;
+      cols+=`<line x1="${padL+xpx}" y1="${padT}" x2="${padL+xpx}" y2="${padT+boxH}" stroke="#fff" stroke-width="1"/>`;
+      if(cw>26){
+        cols+=`<text x="${padL+xpx+cw/2}" y="${padT+13}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff" opacity="0.92">№${(p.src??0)+1}</text>`;
+        cols+=`<text x="${padL+xpx+cw/2}" y="${midY+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${p.w}</text>`;
+      }
+    }
+    xpx+=cw; xmm+=seg.w;
+    if(si<segs.length-1){   // метка реза; отсчёт от ОПОРНОЙ кромки (левой; при зеркале — правой) − RULER_OFFSET
+      const markMm = rightAlign ? (W - xmm) : xmm;
+      ruler+=`<line x1="${padL+xpx}" y1="36" x2="${padL+xpx}" y2="${padT}" stroke="#1A1A1A" stroke-width="1.2"/>`+
+             `<text x="${padL+xpx}" y="31" text-anchor="middle" font-size="10.5" font-weight="800" fill="#1A1A1A">${Math.round(markMm-RULER_OFFSET)}</text>`;
+    }
+  });
+  const wasteRect='';
+  return `<svg class="diag" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="waste" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="#fbe4dd"/><line x1="0" y1="0" x2="0" y2="7" stroke="#e46a4a" stroke-width="2"/></pattern>
+      <pattern id="gap" patternUnits="userSpaceOnUse" width="6" height="6">
+        <rect width="6" height="6" fill="#f4f2ee"/><circle cx="3" cy="3" r="0.9" fill="#cfc8bd"/></pattern>
+    </defs>
+    <text x="${padL}" y="12" font-size="11" fill="#8a8a8a">ширина рулона ${W} мм · сверху — разметка реза по линейке (мм)</text>
+    ${ruler}
+    <rect x="${padL}" y="${padT}" width="${boxW}" height="${boxH}" fill="none" stroke="#c9c2b7" stroke-width="1"/>
+    ${cols}${wasteRect}
+  </svg>`;
+}
+
+// ── Рендер схемы (просмотр / правка) ──
+function renderScheme(){
+  const W=state.rollWidth;
+  const scheme=document.getElementById('scheme');
+  const act=activeSheets();
+  if(!act.length && !layout.unplaced.length){ scheme.innerHTML=''; return; }
+
+  const canApprove = act.length && !layout.unplaced.length && !act.some(s=>derive(s,W).over);
+
+  let top=`<div class="card"><div class="scheme-top">
+      <div class="seg">
+        <button data-vm="view" class="${viewMode==='view'?'on':''}">Просмотр</button>
+        <button data-vm="edit" class="${viewMode==='edit'?'on':''}">Правка</button>
+      </div>
+      <div class="tool-btns">
+        ${editedManually?'<button class="tbtn" id="reset-auto" type="button">↺ Сбросить к авто</button>':''}
+        ${approved
+          ? '<span class="appr-badge">✓ Утверждено</span>'
+          : (canApprove?'<button class="tbtn approve" id="approve-btn" type="button">✓ Утвердить раскрой</button>':'')}
+        <button class="tbtn print" id="print-btn" type="button">🖨 Печать A4</button>
+      </div>
+    </div>`;
+
+  let body='';
+  if(viewMode==='view'){
+    body+=schemeLegend();
+    body+= approved ? groupedView(act, W) : viewSheets(act, W);
+  } else {
+    body+=editBoard(W);
+  }
+  scheme.innerHTML=top+body+`</div>`;
+  bindScheme();
+}
+
+function schemeLegend(){
+  return `<div class="legend">
+    <span><i style="background:#4a90d9"></i>заготовки (цифра — развёртка, мм)</span>
+    <span><i style="background:#fbe4dd;border:1px solid #e46a4a"></i>отход по ширине</span>
+    <span><i style="background:#f4f2ee;border:1px solid #cfc8bd"></i>недобор по длине</span>
+    <span><i style="background:#1A1A1A"></i>чёрные метки сверху — разметка реза (−40)</span>
+  </div>`;
+}
+
+// множественное число «лист/листа/листов»
+function plural(n){ n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20) return 'ов'; if(n1>1&&n1<5) return 'а'; if(n1===1) return ''; return 'ов'; }
+// подпись листа: одинаковые листы = совпадают набор (ширина×длина)
+function sheetSig(sh){ return (sh.W||'?')+'::'+sh.pieces.map(p=>p.w+'x'+p.l).sort((a,b)=>a.localeCompare(b)).join('|'); }
+function groupSheets(act){
+  const m=new Map();
+  act.forEach(sh=>{ const s=sheetSig(sh); if(!m.has(s)) m.set(s,{sheet:sh,count:0}); m.get(s).count++; });
+  return [...m.values()];
+}
+
+// Просмотр после утверждения — уникальные карты с количеством
+function groupedView(act, W){
+  const groups=groupSheets(act);
+  let html=`<div class="grp-info">Одинаковые листы объединены. Всего листов: <b>${act.length}</b> · типов карт: <b>${groups.length}</b>. Печатается каждая карта по одному разу с количеством.</div>`;
+  groups.forEach((g,i)=>{
+    const d=derive(g.sheet,W);
+    const items=g.sheet.pieces.map(p=>`${p.w}×${fmt(p.l)}м`).join(' + ');
+    html+=`<div class="sheet"><div class="sheet-head">
+        <div><div class="st">Карта ${i+1} · ${d.W} мм · длина ${fmt(d.L)} м <span class="cnt">× ${g.count} лист${plural(g.count)}</span></div><div class="sm">${items}</div></div>
+        <div class="load ${loadClass(d.load)}">заполнение ${fmt(d.load*100,0)}%</div>
+      </div>${sheetSvg(g.sheet)}</div>`;
+  });
+  return html;
+}
+
+function viewSheets(act, W){
+  const draw=(sh,n)=>{
+    const d=derive(sh,W);
+    const items=sh.pieces.map(p=>`${p.w}×${fmt(p.l)}м`).join(' + ');
+    return `<div class="sheet"><div class="sheet-head">
+        <div><div class="st">Лист ${n} · ${d.W} мм — длина ${fmt(d.L)} м</div><div class="sm">${items}</div></div>
+        <div class="load ${loadClass(d.load)}">заполнение ${fmt(d.load*100,0)}%</div>
+      </div>${sheetSvg(sh)}</div>`;
+  };
+  let html='', n=0;
+  if(state.mode==='12'){
+    const rolls=packRolls(act, ROLL_12);
+    rolls.forEach((r,ri)=>{
+      html+=`<div class="roll-sep"><div class="tx">РУЛОН ${ri+1} · ${r.W} мм · 12 м</div><div class="ln"></div><div class="tx" style="color:#8a8a8a;font-weight:600">занято ${fmt(r.len)} м</div></div>`;
+      r.sheets.forEach(sh=> html+=draw(sh, ++n));
+    });
+  } else {
+    act.forEach(sh=> html+=draw(sh, ++n));
+  }
+  return html;
+}
+
+// редактируемая доска
+function editBoard(W){
+  const sel = selectedId!=null;
+  let html = sel
+    ? `<div class="edit-hint pick">Выбрана заготовка — нажмите на лист, куда её переместить (или «＋ Новый лист» / «Убрать в остаток»). Повторный клик по ней — отмена.</div>`
+    : `<div class="edit-hint">Перетащите заготовку на другой лист — или нажмите на неё, затем на нужный лист. Метраж и отход пересчитаются сами.</div>`;
+
+  layout.sheets.forEach((sh,idx)=>{
+    const d=derive(sh);
+    const metaCls = d.over?'meta bad':'meta';
+    const metaTxt = d.over? `перегруз ${d.used}/${d.W} мм` : `${d.used}/${d.W} мм · ${fmt(d.load*100,0)}% · длина ${fmt(d.L)} м`;
+    let pblocks='';
+    (state.align==='right' ? sh.pieces.slice().reverse() : sh.pieces).forEach(p=>{   // зеркало при «справа налево»
+      const wpc=Math.max(6, p.w/d.W*100);
+      pblocks+=`<div class="blk${selectedId===p.id?' sel':''}" draggable="true" data-id="${p.id}" style="flex:0 0 ${wpc}%; background:${colorFor(p.src)}"><b class="pn">№${(p.src??0)+1}</b>${p.w}<small>×${fmt(p.l)}м</small></div>`;
+    });
+    let wblock='';
+    if(d.waste>0.5 && !d.over){
+      const wpc=Math.max(4, d.waste/d.W*100);
+      wblock=`<div class="bfree" style="flex:0 0 ${wpc}%">${Math.round(d.waste)}</div>`;
+    }
+    let blocks = state.align==='right' ? (wblock+pblocks) : (pblocks+wblock);   // зеркало укладки
+    if(!sh.pieces.length) blocks=`<div class="bfree" style="flex:1 1 auto">пусто</div>`;
+    html+=`<div class="bsheet${d.over?' over':''}" data-sheet="${idx}">
+        <div class="bsheet-h"><span class="n">Лист ${idx+1}</span>
+          <span class="${metaCls}">${metaTxt}</span>
+          ${state.rollWidths.length>1?`<select class="wsel" data-wsel="${idx}" title="Ширина рулона для этого листа">${state.rollWidths.map(w=>`<option value="${w}"${w===d.W?' selected':''}>${w} мм</option>`).join('')}</select>`:''}
+          ${!sh.pieces.length?`<button class="rm" data-rm="${idx}" title="Удалить пустой лист">×</button>`:''}
+        </div>
+        <div class="brow">${blocks}</div>
+      </div>`;
+  });
+
+  if(layout.unplaced.length){
+    let blocks='';
+    layout.unplaced.forEach(p=>{
+      blocks+=`<div class="blk${selectedId===p.id?' sel':''}" draggable="true" data-id="${p.id}" style="flex:0 0 auto;min-width:64px;background:${colorFor(p.src)}">${p.w}<small>×${fmt(p.l)}м</small></div>`;
+    });
+    html+=`<div class="tray" data-tray="1"><div class="th">Не размещено — перетащите на лист</div><div class="brow">${blocks}</div></div>`;
+  } else {
+    html+=`<div class="tray" data-tray="1" style="border-style:dashed;opacity:.6"><div class="th" style="color:#8a8a8a">Остаток (сюда можно убрать заготовку)</div></div>`;
+  }
+  html+=`<button class="newsheet" data-newsheet="1" type="button">＋ Новый лист</button>`;
+  return html;
+}
+
+// ── Перемещение заготовки ──
+function findPiece(id){
+  for(const sh of layout.sheets){ const i=sh.pieces.findIndex(p=>p.id===id); if(i>=0) return {arr:sh.pieces,i}; }
+  const j=layout.unplaced.findIndex(p=>p.id===id); if(j>=0) return {arr:layout.unplaced,i:j};
+  return null;
+}
+// ширина для нового листа: самая узкая из выбранных, куда влезает заготовка (иначе — самая широкая)
+function newSheetWidth(minW){
+  const fit=state.rollWidths.filter(w=>w>=(minW||0)-1e-9).sort((a,b)=>a-b);
+  return fit.length? fit[0] : Math.max(...state.rollWidths);
+}
+function movePiece(id, target){
+  const loc=findPiece(id); if(!loc) return;
+  const [p]=loc.arr.splice(loc.i,1);
+  if(target==='tray') layout.unplaced.push(p);
+  else if(target==='new') layout.sheets.push({pieces:[p], W:newSheetWidth(p.w)});
+  else layout.sheets[target].pieces.push(p);
+  editedManually=true; selectedId=null; approved=false;
+  renderMain(); renderScheme();
+}
+
+function bindScheme(){
+  const scheme=document.getElementById('scheme');
+  scheme.querySelectorAll('.seg button').forEach(b=> b.onclick=()=>{ viewMode=b.dataset.vm; selectedId=null; renderScheme(); });
+  const reset=scheme.querySelector('#reset-auto'); if(reset) reset.onclick=()=>{ computeAuto(); renderAll(); };
+  const pbtn=scheme.querySelector('#print-btn'); if(pbtn) pbtn.onclick=doPrint;
+  const ab=scheme.querySelector('#approve-btn'); if(ab) ab.onclick=()=>{ approved=true; viewMode='view'; renderAll(); };
+  if(viewMode!=='edit') return;
+
+  scheme.querySelectorAll('.blk').forEach(bl=>{
+    bl.onclick=(e)=>{ e.stopPropagation(); const id=+bl.dataset.id; selectedId=(selectedId===id?null:id); renderScheme(); };
+    bl.ondragstart=(e)=>{ e.dataTransfer.setData('text/plain', bl.dataset.id); e.dataTransfer.effectAllowed='move'; };
+  });
+  const wire=(t,kind)=>{
+    t.ondragover=(e)=>{ e.preventDefault(); t.classList.add('drop'); };
+    t.ondragleave=()=> t.classList.remove('drop');
+    t.ondrop=(e)=>{ e.preventDefault(); t.classList.remove('drop'); const id=+e.dataTransfer.getData('text/plain'); if(id) movePiece(id, kind); };
+  };
+  scheme.querySelectorAll('.bsheet').forEach(t=>{ const k=+t.dataset.sheet; wire(t,k);
+    t.addEventListener('click',(e)=>{ if(selectedId==null||e.target.closest('.blk')) return; movePiece(selectedId,k); }); });
+  scheme.querySelectorAll('.tray').forEach(t=>{ wire(t,'tray');
+    t.addEventListener('click',(e)=>{ if(selectedId==null||e.target.closest('.blk')) return; movePiece(selectedId,'tray'); }); });
+  const ns=scheme.querySelector('[data-newsheet]');
+  if(ns){ wire(ns,'new');
+    ns.addEventListener('click',()=>{ if(selectedId!=null){ movePiece(selectedId,'new'); } else { layout.sheets.push({pieces:[], W:Math.max(...state.rollWidths)}); approved=false; renderScheme(); } }); }
+  scheme.querySelectorAll('[data-rm]').forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); layout.sheets.splice(+b.dataset.rm,1); approved=false; editedManually=true; renderMain(); renderScheme(); });
+  scheme.querySelectorAll('[data-wsel]').forEach(sel=> sel.onchange=()=>{ layout.sheets[+sel.dataset.wsel].W=+sel.value; editedManually=true; approved=false; renderMain(); renderScheme(); });
+}
+
+// ── Печать A4 ──
+function doPrint(){
+  const act=activeSheets();
+  if(!act.length){ return; }
+  const widthsUsed=[...new Set(act.map(s=>derive(s).W))].sort((a,b)=>a-b).join(', ');
+  const totalLen=act.reduce((s,x)=>s+derive(x).L,0);
+  const wasteAreaW=act.reduce((s,x)=>{const d=derive(x); return s+d.waste*(d.L*1000);},0);
+  const totalArea=act.reduce((s,x)=>{const d=derive(x); return s+d.W*(d.L*1000);},0)||1;
+  const wastePctW=wasteAreaW/totalArea*100;
+  const nPieces=act.reduce((a,x)=>a+x.pieces.length,0);
+  const now=new Date();
+  const dd=now.toLocaleDateString('ru-RU');
+
+  // сводка заявки
+  const zayavka=state.items.filter(it=>parseFloat(it.w)>0&&parseFloat(it.l)>0&&parseInt(it.qty,10)>0)
+    .map(it=>`${it.w}×${fmt(parseFloat(it.l))}м×${it.qty}шт`).join(', ');
+
+  let tot='';
+  if(state.mode==='12'){
+    const rolls=packRolls(act, ROLL_12);
+    tot=`Ширины: <b>${widthsUsed} мм</b>, стандарт 12 м · Рулонов: <b>${rolls.length} шт</b> · Погонных метров: <b>${fmt(totalLen)} м</b> · Листов: <b>${act.length}</b> · Заготовок: <b>${nPieces} шт</b> · Отход по ширине: <b>${fmt(wastePctW,1)}%</b>`;
+  } else {
+    tot=`Ширины: <b>${widthsUsed} мм</b>, без ограничения · Длина рулона: <b>${fmt(totalLen)} м</b> · Листов: <b>${act.length}</b> · Заготовок: <b>${nPieces} шт</b> · Отход по ширине: <b>${fmt(wastePctW,1)}%</b>`;
+  }
+  if(approved) tot += ` · Типов карт: <b>${groupSheets(act).length}</b>`;
+
+  let sheetsHtml='', n=0;
+  if(approved){
+    const groups=groupSheets(act);
+    groups.forEach((g,i)=>{ const d=derive(g.sheet); const items=g.sheet.pieces.map(p=>`${p.w}×${fmt(p.l)}м`).join(' + ');
+      sheetsHtml+=`<div class="p-sheet"><div class="psh">Карта ${i+1} — × ${g.count} лист${plural(g.count)} — ${d.W} мм — длина ${fmt(d.L)} м — заполнение ${fmt(d.load*100,0)}%</div><div class="psm">${items}</div>${sheetSvg(g.sheet)}</div>`;
+    });
+  } else {
+    const drawP=(sh)=>{ n++; const d=derive(sh); const items=sh.pieces.map(p=>`${p.w}×${fmt(p.l)}м`).join(' + ');
+      return `<div class="p-sheet"><div class="psh">Лист ${n} — ${d.W} мм — длина ${fmt(d.L)} м — заполнение ${fmt(d.load*100,0)}%</div><div class="psm">${items}</div>${sheetSvg(sh)}</div>`; };
+    if(state.mode==='12'){
+      const rolls=packRolls(act, ROLL_12);
+      rolls.forEach((r,ri)=>{ sheetsHtml+=`<div class="p-roll" style="margin:8px 0 4px;font-weight:800;color:#C1440E">— Рулон ${ri+1} · ${r.W} мм (12 м), занято ${fmt(r.len)} м —</div>`; r.sheets.forEach(sh=> sheetsHtml+=drawP(sh)); });
+    } else { act.forEach(sh=> sheetsHtml+=drawP(sh)); }
+  }
+
+  document.getElementById('print-root').innerHTML = `
+    <div class="p-head">
+      <div><div class="p-brand"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+        <div class="p-title">Карта раскроя жести</div></div>
+      <div class="p-meta">ЧПТУП «Дианаст», г. Кобрин<br>+375 29 797-43-62 · otlivy@bk.ru<br>Дата: ${dd}</div>
+    </div>
+    <div class="p-tot">${tot}<br><span style="color:#555">Заявка: ${zayavka||'—'}</span></div>
+    ${sheetsHtml}`;
+  window.print();
+}
+
+// старт
+function bannerOk(m, text){ const b=document.createElement('div'); b.style.cssText='background:#eef7f0;border:1px solid #b7ddc3;color:#1f5130;font-size:13px;font-weight:700;border-radius:10px;padding:10px 12px;margin-bottom:14px'; b.textContent=text; m.insertBefore(b, m.firstChild); }
+// импорт заявки из «заказа» (нажата «Передать в раскрой» в библиотеке) — одноразовый мост
+function importOrder(){
+  try{
+    const raw=localStorage.getItem('dianast_raskroy_handoff_v1'); if(!raw) return false;
+    localStorage.removeItem('dianast_raskroy_handoff_v1');
+    const items=JSON.parse(raw); if(!Array.isArray(items)||!items.length) return false;
+    state.items=items.map(it=> it.flex
+      ? ({ w:String(it.w||''), meters:String(it.meters||''), flex:true })
+      : ({ w:String(it.w||''), l:String(it.l||''), qty:String(it.qty||'') }));
+    saveRState();
+    const m=document.querySelector('main'); if(m) bannerOk(m, '✓ Заявка подставлена из заказа ('+items.length+' поз.). Проверьте и запускайте раскрой.');
+    return true;
+  }catch(e){ return false; }
+}
+// заготовки из «Заказа» библиотеки (тот же localStorage) — для плашки-подсказки
+function pendingOrderBlanks(){
+  try{
+    const ord=JSON.parse(localStorage.getItem('dianast_order_v1')||'[]');
+    if(!Array.isArray(ord)||!ord.length) return {blanks:[], positions:0};
+    const blanks=[]; ord.forEach(it=>{
+      if(it.flex){ const m=parseFloat(it.meters); if(m>0) blanks.push({w:String(it.razv||''), meters:String(m), flex:true}); }
+      else (it.rows||[]).forEach(r=>{ const l=parseFloat(r.len), q=parseInt(r.qty,10); if(l>0&&q>0) blanks.push({w:String(it.razv||''), l:String(l), qty:String(q)}); });
+    });
+    return {blanks, positions:ord.length};
+  }catch(e){ return {blanks:[], positions:0}; }
+}
+function hasRealItems(){ return state.items.some(it=> it.flex ? (parseFloat(it.w)>0 && parseFloat(it.meters)>0) : (parseFloat(it.w)>0 && parseFloat(it.l)>0 && parseInt(it.qty,10)>0)); }
+// раскрой пуст, а в библиотеке собран заказ → предложить подставить одним кликом
+function maybeShowPendingOrderBanner(){
+  if(hasRealItems()) return;
+  const {blanks, positions}=pendingOrderBlanks(); if(!blanks.length) return;
+  const m=document.querySelector('main'); if(!m) return;
+  const totQty=blanks.reduce((a,x)=>a+(parseInt(x.qty,10)||0),0);
+  const b=document.createElement('div'); b.id='pending-order-banner';
+  b.style.cssText='background:#fdf3ec;border:1px solid #e0b79c;color:#8a4a22;font-size:13px;font-weight:700;border-radius:10px;padding:11px 13px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap';
+  b.innerHTML=`<span style="flex:1;min-width:170px">📦 В библиотеке собран заказ: <b>${positions}</b> ${plu(positions,'позиция','позиции','позиций')} · <b>${totQty}</b> заготовок. Подставить в раскрой?</span>`
+    +`<button id="pull-order" type="button" style="border:none;background:var(--терракота);color:#fff;font-weight:800;font-size:13px;border-radius:9px;padding:8px 14px">Подставить</button>`
+    +`<button id="pull-dismiss" type="button" title="Скрыть" style="border:1.5px solid #e0b79c;background:#fff;color:#8a4a22;font-weight:800;border-radius:9px;width:32px;height:32px">×</button>`;
+  m.insertBefore(b, m.firstChild);
+  document.getElementById('pull-order').onclick=()=>{ state.items=blanks.map(x=>({...x})); b.remove(); renderItems(); computeAuto(); renderAll(); saveRState(); bannerOk(m, '✓ Заказ подставлен ('+positions+' поз.). Проверьте и запускайте раскрой.'); };
+  document.getElementById('pull-dismiss').onclick=()=> b.remove();
+}
+const handoffApplied=importOrder();
+renderItems();
+computeAuto();
+renderAll();
+if(!handoffApplied) maybeShowPendingOrderBanner();
+</script>
+</body>
+</html>

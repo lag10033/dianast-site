@@ -192,7 +192,13 @@ const Облако = (function () {
       }
     } catch (e) {
       const текст = String(e.message || e);
-      статус(/relation|does not exist/i.test(текст) ? '⚠ таблицы ещё не созданы' : '⚠ ' + текст.slice(0, 40), 'err');
+      // PostgREST на отсутствующую таблицу отвечает по-английски и длинно —
+      // человеку нужно понятное действие, а не текст ошибки
+      const нетТаблиц = /relation|does not exist|could not find the table|schema cache/i.test(текст);
+      const неДобавлен = /рабочее пространство/i.test(текст);
+      статус(нетТаблиц ? '⚠ база не готова — запустите схему в Supabase'
+           : неДобавлен ? '⚠ вас не добавили в пространство'
+           : '⚠ ' + текст.slice(0, 40), 'err');
       console.warn('[облако]', e);
     }
     занят = false;

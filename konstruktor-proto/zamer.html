@@ -567,6 +567,11 @@ function updatePrintHead(){
 var EB={scale:70, blocks:[], sel:null, undo:null, builtSig:'', dirty:false, uid:0, planWarn:null, sideWarn:null, touched:false};
 var LSKEY='dianast:zamer-editor:v1';
 var MODS=[2.61,2.73,2.86,2.98,3.11];
+// Линейка выше — предпочтительные значения около цели 2,98. Но модуль кладки — это
+// ЛЮБОЕ k×125−20; если по линейке не собирается, лучше взять соседний модуль
+// (2,48 или 3,23), чем немодульный пролёт с уродливой подрезкой.
+var MODS_WIDE=(function(){ var a=[]; for(var k=1;k<=40;k++){ var v=Math.round(k*125-20)/1000;
+  if(v>=2.35&&v<=3.36) a.push(v); } return a; })();
 var MAXM=200;
 var POST=0.38, SPAN_TGT=2.98, SPAN_REC=3.11, SPAN_MAX=3.48, SPAN_MIN=2.0;
 function spanBad(m){ return m>SPAN_REC||m<SPAN_MIN; }
@@ -617,6 +622,32 @@ function cutTail(m){                  // сколько остаётся на п
   var u=(m+JOINT)/HALF; return Math.round((u-Math.floor(u+1e-9))*HALF*1000)/1000;
 }
 function uglyCut(m){ var t=cutTail(m); return t>=UGLY_MIN && t<=UGLY_MAX; }
+// Раздача остатка по проёмам: пропорционально ширине (4 см на воротах 4 м незаметны,
+// на калитке 1 м бросались бы в глаза), но ни один проём не уезжает дальше
+// OPEN_ADJ_MAX — упёрся, значит его доля переходит остальным.
+function spreadRest(opens, rest, Lopen){
+  var adj=opens.slice();
+  if(!(Math.abs(rest)>0.0005) || !(Lopen>0)) return adj;
+  var locked=opens.map(function(){return false;}), left=rest;
+  for(var pass=0; pass<opens.length+1 && Math.abs(left)>0.0005; pass++){
+    var freeW=0;
+    for(var i=0;i<opens.length;i++) if(!locked[i]) freeW+=opens[i];
+    if(freeW<=0) break;
+    var moved=0, hitCap=false;
+    for(var j=0;j<opens.length;j++){
+      if(locked[j]) continue;
+      var want=left*(opens[j]/freeW), cur=adj[j]-opens[j], next=cur+want;
+      if(Math.abs(next)>OPEN_ADJ_MAX){
+        next=(next>0?OPEN_ADJ_MAX:-OPEN_ADJ_MAX); locked[j]=true; hitCap=true;
+      }
+      moved+=(next-cur); adj[j]=opens[j]+next;
+    }
+    left-=moved;
+    if(!hitCap) break;
+  }
+  for(var k=0;k<adj.length;k++) adj[k]=Math.round(adj[k]*1000)/1000;
+  return adj;
+}
 function planSpans(seq, T, postDelta){
   var nSeg=0,nOpen=0,gi=0,opens=[];
   seq.forEach(function(e){
@@ -631,32 +662,42 @@ function planSpans(seq, T, postDelta){
 
   // сколько метров остаётся на пролёты при n пролётах (столбов = n+nOpen+1+postDelta)
   function avail(n){ return T - Lopen - (n+nOpen+1+postDelta)*POST; }
-  var LIM=Math.max(nOpen*OPEN_ADJ_MAX, 0.001);   // остаток должны поглотить проёмы
-  var best=null;
-  for(var n=Math.max(1,nSeg); n<=120; n++){
-    var A=avail(n);
-    if(A<=0) break;
-    var avg=A/n;
-    if(avg>SPAN_MAX) continue;                   // пролёты слишком длинные — нужно больше
-    if(avg<SPAN_MIN-0.4) break;                  // стали слишком мелкими — дальше только хуже
-    // смесь двух СОСЕДНИХ модулей линейки: k штук большего + (n−k) меньшего
-    for(var mi=0; mi<MODS.length; mi++){
-      for(var k=0; k<=n; k++){
-        var lo=MODS[mi], hi=MODS[Math.min(mi+1,MODS.length-1)];
-        var sum=k*hi+(n-k)*lo, rest=A-sum;
-        if(Math.abs(rest)>LIM) continue;          // проёмы столько не проглотят
-        var mean=sum/n;
-        // лучший: меньше остаток, затем ближе к цели 2,98, затем меньше разнобой.
-        // Отдельный штраф за уродливый огрызок подрезки (3–5 см) — правило Андрея.
-        var ugly=(uglyCut(lo)?1:0)+(hi!==lo&&k>0&&uglyCut(hi)?1:0);
-        var score=Math.abs(rest)*1000 + Math.abs(mean-SPAN_TGT)*10 + (hi!==lo && k>0 && k<n ? 1 : 0) + ugly*500;
-        if(!best||score<best.score){
-          var arr=[]; for(var j=0;j<n-k;j++)arr.push(lo); for(var j2=0;j2<k;j2++)arr.push(hi);
-          best={n:n,spans:arr,rest:rest,mean:mean,score:score};
+  // Лимит на общий остаток держим широким — иначе модульная раскладка перестаёт
+  // находиться. Сдвиг КАЖДОГО проёма ограничиваем при раздаче (см. spreadRest).
+  var LIM=Math.max(nOpen*OPEN_ADJ_MAX, 0.001);
+  // Ищем смесь двух СОСЕДНИХ модулей. Первый проход — по рабочей линейке Андрея;
+  // если по ней не собирается, второй проход по расширенному набору k×125−20:
+  // модульный пролёт 3,23 всё равно лучше немодульного 3,05 с уродливой подрезкой.
+  function search(SET, wide){
+    var b=null;
+    for(var n=Math.max(1,nSeg); n<=120; n++){
+      var A=avail(n);
+      if(A<=0) break;
+      var avg=A/n;
+      if(avg>SPAN_MAX) continue;                 // пролёты слишком длинные — нужно больше
+      if(avg<SPAN_MIN-0.4) break;                // стали слишком мелкими — дальше только хуже
+      for(var mi=0; mi<SET.length; mi++){
+        for(var k=0; k<=n; k++){
+          var lo=SET[mi], hi=SET[Math.min(mi+1,SET.length-1)];
+          var sum=k*hi+(n-k)*lo, rest=A-sum;
+          if(Math.abs(rest)>LIM) continue;        // проёмы столько не проглотят
+          var mean=sum/n;
+          // лучший: меньше остаток, затем ближе к цели 2,98, затем меньше разнобой.
+          // Отдельный штраф за мелкий огрызок подрезки — правило Андрея.
+          var ugly=(uglyCut(lo)?1:0)+(hi!==lo&&k>0&&uglyCut(hi)?1:0);
+          var score=Math.abs(rest)*1000 + Math.abs(mean-SPAN_TGT)*10
+                    + (hi!==lo && k>0 && k<n ? 1 : 0) + ugly*500
+                    + (wide?Math.abs(mean-SPAN_TGT)*4:0);   // вне линейки — только если иначе никак
+          if(!b||score<b.score){
+            var arr=[]; for(var j=0;j<n-k;j++)arr.push(lo); for(var j2=0;j2<k;j2++)arr.push(hi);
+            b={n:n,spans:arr,rest:rest,mean:mean,score:score};
+          }
         }
       }
     }
+    return b;
   }
+  var best=search(MODS,false) || search(MODS_WIDE,true);
 
   if(!best){
     // Остаток некуда увести (у стороны нет проёмов — так всегда на боковой).
@@ -670,8 +711,8 @@ function planSpans(seq, T, postDelta){
     for(var na=Math.max(1,nSeg); na<=120; na++){
       var Aa=avail(na); if(Aa<=0) break;
       if(Aa/na>SPAN_MAX) continue;
-      for(var mj=0; mj<MODS.length; mj++){
-        var mod=MODS[mj];
+      for(var mj=0; mj<MODS_WIDE.length; mj++){    // здесь сразу широкий набор: модуль важнее «красивого» числа
+        var mod=MODS_WIDE[mj];
         // все пролёты по модулю
         var d0=Aa-na*mod;
         if(Math.abs(d0)<=0.001){
@@ -692,24 +733,25 @@ function planSpans(seq, T, postDelta){
     if(nb){
       var arr2=[]; for(var z=0;z<nb.cnt;z++)arr2.push(nb.mod);
       if(nb.addon>0.001) arr2.push(Math.round(nb.addon*1000)/1000);
+      var uglyAddon=(nb.addon>0.001&&uglyCut(nb.addon));
       return {nSpans:arr2.length,spans:arr2,spanLen:arr2.reduce(function(a,b){return a+b;},0)/arr2.length,
-              nSeg:nSeg,opens:opens,rest:0,addon:(nb.addon>0.001?nb.addon:0),
+              nSeg:nSeg,opens:opens,rest:0,addon:(nb.addon>0.001?nb.addon:0),uglyAddon:uglyAddon,
               warn:(nb.addon>0.001?'addon':null)};
     }
-    // совсем не собирается — раскладываем поровну, чтобы длина хотя бы сошлась
+    // Совсем не собирается — раскладываем поровну, чтобы длина сошлась.
+    // Кламп на 0,3 м здесь недопустим: он ломал сумму. Если пролёты выходят
+    // меньше — участок физически не вмещает забор, это честный 'short'.
     var nFall=Math.max(1,nSeg), s0=avail(nFall)/nFall;
     for(var nf=Math.max(1,nSeg); nf<=120; nf++){ var a2=avail(nf)/nf; if(a2<=SPAN_MAX){ nFall=nf; s0=a2; break; } }
-    var fb=[]; for(var q=0;q<nFall;q++)fb.push(Math.max(0.3,s0));
-    return {nSpans:nFall,spans:fb,spanLen:Math.max(0.3,s0),nSeg:nSeg,opens:opens,rest:0,
-            warn:(s0<=0?'short':'nomodule')};
+    if(s0<0.3){
+      var sh=[]; for(var qs=0;qs<nFall;qs++)sh.push(Math.max(0.05,s0));
+      return {nSpans:nFall,spans:sh,spanLen:Math.max(0.05,s0),nSeg:nSeg,opens:opens,rest:0,warn:'short'};
+    }
+    var fb=[]; for(var q=0;q<nFall;q++)fb.push(s0);
+    return {nSpans:nFall,spans:fb,spanLen:s0,nSeg:nSeg,opens:opens,rest:0,warn:'nomodule'};
   }
 
-  // остаток распределяем по проёмам пропорционально их ширине: 4 см на воротах 4 м
-  // незаметны, а на калитке 1 м бросались бы в глаза
-  var adj=opens.slice();
-  if(Math.abs(best.rest)>0.0005 && Lopen>0){
-    for(var o=0;o<adj.length;o++) adj[o]=Math.round((opens[o]+best.rest*(opens[o]/Lopen))*1000)/1000;
-  }
+  var adj=spreadRest(opens, best.rest, Lopen);
   return { nSpans:best.n, spans:best.spans, spanLen:best.mean, nSeg:nSeg,
            opens:adj, openBase:opens, rest:best.rest,
            warn:(best.mean>SPAN_REC?'big':null) };
@@ -764,6 +806,7 @@ function buildBlocksFromSchema(){
   // столбы между всеми элементами и по краям
   EB.blocks=[]; EB.sel=null; EB.undo=null;   // undo от прошлой раскладки протух — блоки с чужими id ломают сумму
   EB.planWarn=plan.warn;                     // 'short' — участок физически короче суммы проёмов и столбов
+  EB.planAddon=plan.addon||0;                // доборный пролёт на фасаде — сказать прямо, а не молчать
   EB.sideWarn=null; EB.touched=false;        // свежая авто-раскладка: ручных правок в ней ещё нет
   // Г-образный участок: фасад + боковая сторона, между ними ОДИН общий угловой столб.
   // Он завершает фасад (входит в его длину), боковая начинается сразу за ним.
@@ -926,6 +969,11 @@ function checkWarn(){
   if(EB.sideWarn==='addon'&&EB.sideAddon){
     msgs.push('Боковая сторона: последний пролёт доборный — '+fmt(EB.sideAddon)+' м вместо целого модуля. Остальные лягут по кирпичу. На боковой нет ворот и калитки, поэтому остаток увести некуда.');
   }
+  // на фасаде один доборный пролёт — раньше про это вообще ничего не говорилось
+  if(EB.planWarn==='addon'&&EB.planAddon){
+    msgs.push('Один пролёт доборный — '+fmt(EB.planAddon)+' м вместо целого модуля. Остальные лягут по кирпичу.'
+      +(uglyCut(EB.planAddon)?' Кусок подрезки получится мелкий — подвиньте ворота или калитку на пару сантиметров.':''));
+  }
   // по модулю не собралось: подсказываем ближайшую длину, при которой ляжет ровно
   if(EB.planWarn==='nomodule'){
     var scN=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
@@ -933,7 +981,10 @@ function checkWarn(){
     for(var dm=-0.6; dm<=0.6001; dm+=0.01){          // ищем ближайшую длину с точной раскладкой
       var t=(S.plotLen||0)+dm; if(t<=0) continue;
       var pp=planSpans(seqN,t);
-      if(pp.warn!=='nomodule'&&pp.warn!=='short'&&Math.abs(dm)<bestD){ bestD=Math.abs(dm); ideal=t; }
+      // «ровно ляжет» — значит без доборного и без мелких огрызков, иначе подсказка врёт
+      if(pp.warn==='nomodule'||pp.warn==='short'||pp.warn==='addon') continue;
+      if((pp.spans||[]).some(function(m){ return uglyCut(m); })) continue;
+      if(Math.abs(dm)<bestD){ bestD=Math.abs(dm); ideal=t; }
     }
     msgs.push('Участок '+fmt(S.plotLen||0)+' м не раскладывается по кирпичу: пролёты придётся подрезать.'
       +(ideal? ' Ровно ляжет при длине '+fmt(ideal)+' м — или подвиньте ворота/калитку на несколько сантиметров.'

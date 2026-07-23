@@ -27,4 +27,7 @@ Allow: /
 # Старые страницы-заглушки НЕ закрываем: у них noindex+redirect,
 # робот должен зайти и увидеть noindex, чтобы выкинуть их из индекса.
 
+# Файл для ИИ-поисковиков — краткая карта сайта и фактов
+# https://dianast.by/llms.txt
+
 Sitemap: https://dianast.by/sitemap.xml

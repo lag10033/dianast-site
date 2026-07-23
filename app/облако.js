@@ -18,7 +18,8 @@ const Облако = (function () {
 
   const МЕТА = 'dianast_sync_meta';                 // когда что синхронизировали
   const WS_KEY = 'dianast_workspace';               // id своего пространства
-  const СЛУЖЕБНЫЕ = [МЕТА, WS_KEY, 'dianast_app_session_v2'];
+  const ПОЛЬЗ = 'dianast_last_user';                // кто входил на этом устройстве
+  const СЛУЖЕБНЫЕ = [МЕТА, WS_KEY, ПОЛЬЗ, 'dianast_app_session_v2'];
   const своиДанные = k => k && k.startsWith('dianast_') && СЛУЖЕБНЫЕ.indexOf(k) === -1;
 
   let sb = null, сессия = null, ws = null, статусЭл = null;
@@ -217,11 +218,30 @@ const Облако = (function () {
     };
   }
 
+  // Если на устройстве до этого работал ДРУГОЙ человек — его данные здесь
+  // чужие: не показываем их и, главное, не даём push() отправить их
+  // в новое пространство. Прайс одного цеха не должен утечь другому.
+  function проверитьСменуПользователя() {
+    const был = localStorage.getItem(ПОЛЬЗ);
+    const стал = сессия && сессия.user ? сессия.user.id : null;
+    if (!стал) return;
+    if (был && был !== стал) {
+      Object.keys(localStorage).filter(своиДанные).forEach(k => localStorage.removeItem(k));
+      localStorage.removeItem(МЕТА);
+      localStorage.removeItem(WS_KEY);
+      грязные.clear();
+    }
+    try { localStorage.setItem(ПОЛЬЗ, стал); } catch (e) {}
+  }
+
   async function послеВхода() {
+    проверитьСменуПользователя();
     монтироватьСтатус();
     статусЭл.title = (сессия.user && сессия.user.email ? сессия.user.email + ' · ' : '') + 'нажмите, чтобы синхронизировать';
     перехватитьЗапись();
-    await синхронизировать(true);
+    // стартовая синхронизация — не «ручная»: если из облака пришли данные,
+    // страница перезагрузится и сразу покажет их (важно при первом входе)
+    await синхронизировать(false);
     window.addEventListener('online', () => синхронизировать(true));
     document.addEventListener('visibilitychange', () => { if (!document.hidden) синхронизировать(true); });
   }

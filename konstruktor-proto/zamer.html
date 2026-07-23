@@ -605,6 +605,18 @@ function mkBlock(type,x,y,m){
 // проём клиент задаёт «примерно», а кладка обязана лечь по кирпичу без подрезки.
 // Внутри группы допустима смесь двух соседних значений линейки.
 var OPEN_ADJ_MAX=0.15;    // насколько можно подвинуть один проём, чтобы это осталось незаметно
+// ПОДРЕЗКА (правило Андрея 21.07.2026): подрезка есть всегда, беда не в ней, а в
+// РАЗМЕРЕ огрызка. Кусок 3–5 см смотрится некрасиво. Нормально: почти ноль
+// (скрадывается в запиле) либо крупный кусок от 6 см.
+var HALF=0.125;                       // половина кирпича — шаг кладки
+var JOINT=0.02;                       // запил столба: по 10 мм с двух сторон
+// Уродливый огрызок — от 16 до 99 мм. Ноль-пятнадцать скрадывается в запиле,
+// от 100 мм это уже полноценный кусок кладки (уточнено Андреем 21.07.2026).
+var UGLY_MIN=0.016, UGLY_MAX=0.099;
+function cutTail(m){                  // сколько остаётся на подрезку сверх целых половинок
+  var u=(m+JOINT)/HALF; return Math.round((u-Math.floor(u+1e-9))*HALF*1000)/1000;
+}
+function uglyCut(m){ var t=cutTail(m); return t>=UGLY_MIN && t<=UGLY_MAX; }
 function planSpans(seq, T, postDelta){
   var nSeg=0,nOpen=0,gi=0,opens=[];
   seq.forEach(function(e){
@@ -634,8 +646,10 @@ function planSpans(seq, T, postDelta){
         var sum=k*hi+(n-k)*lo, rest=A-sum;
         if(Math.abs(rest)>LIM) continue;          // проёмы столько не проглотят
         var mean=sum/n;
-        // лучший: меньше остаток, затем ближе к цели 2,98, затем меньше разнобой
-        var score=Math.abs(rest)*1000 + Math.abs(mean-SPAN_TGT)*10 + (hi!==lo && k>0 && k<n ? 1 : 0);
+        // лучший: меньше остаток, затем ближе к цели 2,98, затем меньше разнобой.
+        // Отдельный штраф за уродливый огрызок подрезки (3–5 см) — правило Андрея.
+        var ugly=(uglyCut(lo)?1:0)+(hi!==lo&&k>0&&uglyCut(hi)?1:0);
+        var score=Math.abs(rest)*1000 + Math.abs(mean-SPAN_TGT)*10 + (hi!==lo && k>0 && k<n ? 1 : 0) + ugly*500;
         if(!best||score<best.score){
           var arr=[]; for(var j=0;j<n-k;j++)arr.push(lo); for(var j2=0;j2<k;j2++)arr.push(hi);
           best={n:n,spans:arr,rest:rest,mean:mean,score:score};
@@ -648,20 +662,32 @@ function planSpans(seq, T, postDelta){
     // Остаток некуда увести (у стороны нет проёмов — так всегда на боковой).
     // Кладём максимум пролётов по модулю, а разницу — в ОДИН крайний доборный
     // пролёт: так делают и на объекте, вместо подрезки каждого пролёта.
+    // Число пролётов должно совпадать с тем, под которое считались столбы, иначе
+    // длина не сойдётся. Поэтому строго: либо все na по модулю, либо (na−1) по
+    // модулю плюс ОДИН доборный. Перебираем все na и берём лучший — ранний выход
+    // оставлял уродливый огрызок там, где чуть дальше была красивая подрезка.
     var nb=null;
     for(var na=Math.max(1,nSeg); na<=120; na++){
       var Aa=avail(na); if(Aa<=0) break;
       if(Aa/na>SPAN_MAX) continue;
       for(var mj=0; mj<MODS.length; mj++){
-        var mod=MODS[mj], cnt=Math.floor((Aa+1e-9)/mod);
-        if(cnt<1||cnt>na) continue;
-        var addon=Aa-cnt*mod;                       // остаток в доборный пролёт
-        if(cnt<na){ if(addon<SPAN_MIN*0.4) continue; }   // доборный не должен быть щелью
-        else if(Math.abs(addon)>0.001) continue;
-        var sc2=Math.abs(mod-SPAN_TGT)*10+Math.abs(addon)*2;
-        if(!nb||sc2<nb.sc){ nb={n:na,mod:mod,cnt:cnt,addon:addon,sc:sc2}; }
+        var mod=MODS[mj];
+        // все пролёты по модулю
+        var d0=Aa-na*mod;
+        if(Math.abs(d0)<=0.001){
+          var s0c=Math.abs(mod-SPAN_TGT)*10+(uglyCut(mod)?500:0);
+          if(!nb||s0c<nb.sc) nb={n:na,mod:mod,cnt:na,addon:0,sc:s0c};
+        }
+        // (na−1) по модулю + доборный
+        if(na>=2){
+          var add=Aa-(na-1)*mod;
+          if(add>=SPAN_MIN*0.4 && add<=SPAN_MAX){
+            var s1c=Math.abs(mod-SPAN_TGT)*10+Math.abs(add-mod)*2
+                    +(uglyCut(mod)?500:0)+(uglyCut(add)?500:0);
+            if(!nb||s1c<nb.sc) nb={n:na,mod:mod,cnt:na-1,addon:add,sc:s1c};
+          }
+        }
       }
-      if(nb) break;
     }
     if(nb){
       var arr2=[]; for(var z=0;z<nb.cnt;z++)arr2.push(nb.mod);
@@ -687,6 +713,24 @@ function planSpans(seq, T, postDelta){
   return { nSpans:best.n, spans:best.spans, spanLen:best.mean, nSeg:nSeg,
            opens:adj, openBase:opens, rest:best.rest,
            warn:(best.mean>SPAN_REC?'big':null) };
+}
+// Ближайшая длина стороны БЕЗ проёмов (боковой), при которой доборный кусок
+// выходит красивым. Столб 380 и половина кирпича 125 несоизмеримы, поэтому при
+// произвольной длине огрызок часто попадает в мелкий диапазон — тогда честно
+// подсказываем, на сколько подвинуть крайний столб.
+function niceSideLen(L){
+  if(!L||L<=0) return null;
+  for(var step=0.005; step<=1.2; step+=0.005){
+    for(var sgn=1; sgn>=-1; sgn-=2){
+      var t=Math.round((L+sgn*step)*1000)/1000; if(t<=0) continue;
+      var p=planSpans([{t:'P'}], t, -1);
+      if(!p||!p.spans||!p.spans.length) continue;
+      if(p.warn==='short'||p.warn==='nomodule') continue;
+      var bad=p.spans.some(function(m){ return uglyCut(m); });
+      if(!bad) return t;
+    }
+  }
+  return null;
 }
 // идеальная длина участка, при которой всё ляжет по модулю без правки проёмов
 function idealLen(seq, T, postDelta){
@@ -900,6 +944,23 @@ function checkWarn(){
     var runsW=orderedRuns(), face=(runsW[0]?runsW[0].items:EB.blocks);
     var need=0; face.forEach(function(b){ if(b.type!=='span'&&b.m!=null)need+=b.m; });
     msgs.push('Участок '+fmt(S.plotLen)+' м короче, чем нужно: только ворота, калитка и столбы занимают '+fmt(need)+' м. Раскладка ниже нереальная — увеличьте длину участка или уменьшите ширину проёмов.');
+  }
+  // мелкий огрызок подрезки смотрится некрасиво — предупреждаем, пока не залили фундамент
+  var ugly=EB.blocks.filter(function(b){ return b.type==='span'&&b.m>0&&uglyCut(b.m); });
+  if(ugly.length){
+    var runsU=orderedRuns(), flank=(runsU.length>1?runsU[1].items:[]);
+    var onlyFlank=ugly.every(function(b){ return flank.indexOf(b)>=0; });
+    var hint='';
+    if(onlyFlank && S.side==='corner' && S.sideLen>0){
+      var nl=niceSideLen(S.sideLen);
+      hint=nl ? ' На боковой ворот и калитки нет, остаток увести некуда — красиво ляжет при её длине '+fmt(nl)+' м (подвиньте крайний столб на '+Math.round(Math.abs(nl-S.sideLen)*100)+' см).'
+              : ' На боковой ворот и калитки нет, остаток увести некуда.';
+    } else {
+      hint=' Подвиньте ворота или калитку на пару сантиметров.';
+    }
+    msgs.push('Подрезка получится мелкой: '+ugly.map(function(b){
+      return (b.name||'пролёт')+' '+fmt(b.m)+' м (кусок '+Math.round(cutTail(b.m)*1000)+' мм)'; }).join(', ')
+      +'. Нужен либо незаметный кусок до 1,5 см, либо полноценный от 10 см.'+hint);
   }
   var big=EB.blocks.filter(function(b){return b.type==='span'&&b.m>SPAN_REC;});
   var small=EB.blocks.filter(function(b){return b.type==='span'&&b.m<SPAN_MIN;});

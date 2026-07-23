@@ -322,6 +322,75 @@ build({ len: 30 });
     'точных: ' + exact.join(', ') + ' — если Андрей переведёт линейку на 2,605/2,855/3,105, тест обновить');
 }
 
+/* 12г. ПОДРЕЗКА (правило Андрея 21.07.2026): подрезка есть всегда, беда — в размере
+   огрызка. Кусок 3–5 см смотрится некрасиво; нормально почти ноль или крупный кусок. */
+{
+  // проверка самой функции хвоста
+  eq('2,98 м — ровно по кирпичу, огрызка нет', Math.round(P.cutTail(2.98) * 1000), 0);
+  eq('2,73 м — ровно по кирпичу', Math.round(P.cutTail(2.73) * 1000), 0);
+  eq('2,61 м — хвост 5 мм, скрадывается в запиле', Math.round(P.cutTail(2.61) * 1000), 5);
+  eq('2,86 м — хвост 5 мм', Math.round(P.cutTail(2.86) * 1000), 5);
+  eq('3,11 м — хвост 5 мм', Math.round(P.cutTail(3.11) * 1000), 5);
+  ok('линейка не даёт уродливых огрызков', P.MODS.every((m) => !P.uglyCut(m)),
+    'уродливые: ' + P.MODS.filter((m) => P.uglyCut(m)).join(', '));
+
+  // старый сломанный расчёт давал ровно тот огрызок, о котором говорит Андрей
+  eq('3,029 м (старый расчёт) — огрызок 49 мм', Math.round(P.cutTail(3.029) * 1000), 49);
+  ok('3,029 м опознаётся как уродливая подрезка', P.uglyCut(3.029) === true);
+  ok('5 мм не считается уродливым', P.uglyCut(2.61) === false);
+  ok('75 мм — тоже мелко, считается уродливым (Андрей 21.07)', P.uglyCut(1.18) === true,
+    'хвост 1,18 м = ' + Math.round(P.cutTail(1.18) * 1000) + ' мм');
+  ok('кусок от 100 мм — полноценный, не уродливый', P.uglyCut(1.205) === false,
+    'хвост 1,205 м = ' + Math.round(P.cutTail(1.205) * 1000) + ' мм');
+
+  // ни одна раскладка не должна давать огрызок 3–5 см
+  [20, 22, 24.5, 25, 26.09, 28, 30, 32, 34, 36, 40, 42, 50, 55, 60].forEach((len) => {
+    build({ len });
+    const bad = P.EB.blocks.filter((b) => b.type === 'span' && P.uglyCut(b.m));
+    ok(`прямая ${len} м: нет огрызков 3–5 см`, bad.length === 0,
+      bad.length ? bad.map((b) => b.m.toFixed(3) + ' → ' + Math.round(P.cutTail(b.m) * 1000) + ' мм').join(', ') : '');
+  });
+  // Фасад (там есть проёмы) обязан быть без мелких огрызков всегда.
+  [[30, 15], [34, 12], [25, 8], [42, 20], [30, 7], [30, 23]].forEach(([len, side]) => {
+    build({ len, side });
+    const runs = P.orderedRuns();
+    const badFace = runs[0].items.filter((b) => b.type === 'span' && P.uglyCut(b.m));
+    ok(`угловая ${len}+${side}: на фасаде нет мелких огрызков`, badFace.length === 0,
+      badFace.length ? badFace.map((b) => Math.round(P.cutTail(b.m) * 1000) + ' мм').join(', ') : '');
+  });
+
+  // Боковая: столб 380 и половина кирпича 125 несоизмеримы, поэтому при произвольной
+  // длине красивого варианта может не быть вовсе — тогда обязана быть подсказка длины.
+  [[30, 15], [34, 12], [25, 8], [30, 7]].forEach(([len, side]) => {
+    build({ len, side });
+    const flank = P.orderedRuns()[1].items.filter((b) => b.type === 'span');
+    const bad = flank.filter((b) => P.uglyCut(b.m));
+    if (bad.length) {
+      const nice = P.niceSideLen(side);
+      ok(`боковая ${side} м: есть подсказка красивой длины`, nice != null, 'подсказки нет');
+      if (nice != null) {
+        P.S.sideLen = nice; P.EB.blocks = []; P.buildBlocksFromSchema();
+        const f2 = P.orderedRuns()[1].items.filter((b) => b.type === 'span');
+        const stillBad = f2.filter((b) => P.uglyCut(b.m));
+        ok(`боковая ${side} → подсказанные ${nice.toFixed(3)} м: огрызок красивый`, stillBad.length === 0,
+          stillBad.map((b) => Math.round(P.cutTail(b.m) * 1000) + ' мм').join(', '));
+        ok(`подсказка ${side} → ${nice.toFixed(3)} м: сдвиг не больше 1,2 м`, Math.abs(nice - side) <= 1.2,
+          'сдвиг ' + Math.abs(nice - side).toFixed(3));
+      }
+    } else {
+      ok(`боковая ${side} м: огрызок сразу красивый`, true);
+    }
+  });
+  // где красивый вариант существует — он должен быть найден без подсказки
+  [[30, 20], [30, 23]].forEach(([len, side]) => {
+    build({ len, side });
+    const flank = P.orderedRuns()[1].items.filter((b) => b.type === 'span');
+    const bad = flank.filter((b) => P.uglyCut(b.m));
+    ok(`боковая ${side} м: красивый вариант найден сам`, bad.length === 0,
+      bad.map((b) => Math.round(P.cutTail(b.m) * 1000) + ' мм').join(', '));
+  });
+}
+
 /* 13. Граничные случаи — не падать и не врать */
 [null, 0, -5].forEach((len) => {
   let threw = false;

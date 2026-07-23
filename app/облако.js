@@ -19,7 +19,8 @@ const Облако = (function () {
   const МЕТА = 'dianast_sync_meta';                 // когда что синхронизировали
   const WS_KEY = 'dianast_workspace';               // id своего пространства
   const ПОЛЬЗ = 'dianast_last_user';                // кто входил на этом устройстве
-  const СЛУЖЕБНЫЕ = [МЕТА, WS_KEY, ПОЛЬЗ, 'dianast_app_session_v2'];
+  const ПЛАН = 'dianast_plan_info';                 // кэш тарифа: работает и офлайн
+  const СЛУЖЕБНЫЕ = [МЕТА, WS_KEY, ПОЛЬЗ, ПЛАН, 'dianast_app_session_v2'];
   const своиДанные = k => k && k.startsWith('dianast_') && СЛУЖЕБНЫЕ.indexOf(k) === -1;
 
   let sb = null, сессия = null, ws = null, статусЭл = null;
@@ -186,6 +187,7 @@ const Облако = (function () {
       if (!ws) await найтиПространство();
       const отправлено = await push();
       const принято = await pull();
+      await обновитьПлан();
       статус('☁ синхронизировано', 'ok');
       if (принято && !вручную) {
         // данные пришли с другого устройства — показываем актуальные цифры
@@ -218,6 +220,91 @@ const Облако = (function () {
     };
   }
 
+  // ── подписка ──
+  // Мягкая модель: расчёты работают всегда, при неоплате отключается только
+  // печать и выгрузка файлов. Резервная копия данных доступна в любом случае —
+  // данные клиента остаются его данными. Пространству Дианаст (plan own)
+  // ничего не показываем и ничего не ограничиваем.
+  let подпискаЭл = null;
+
+  const инфоПлана = () => { try { return JSON.parse(localStorage.getItem(ПЛАН) || 'null'); } catch (e) { return null; } };
+
+  function статусПодписки() {
+    const и = инфоПлана();
+    // нет данных о тарифе (старое устройство, первый запуск) — не ограничиваем
+    if (!и || !и.plan || и.plan === 'own' || !и.paid_until) return { план: и && и.plan, дн: null, блок: false };
+    const сегодня = new Date(); сегодня.setHours(0, 0, 0, 0);
+    const до = new Date(и.paid_until + 'T00:00:00');
+    const дн = Math.round((до - сегодня) / 86400000);   // 0 = последний день
+    const блок = и.plan === 'trial' ? дн < 0 : дн < -3; // оплатившим — 3 льготных дня
+    return { план: и.plan, дн, блок };
+  }
+
+  async function обновитьПлан() {
+    if (!sb || !ws) return;
+    const { data, error } = await sb.from('workspaces').select('plan,paid_until').eq('id', ws).single();
+    if (error || !data) return;
+    try { localStorage.setItem(ПЛАН, JSON.stringify(data)); } catch (e) {}
+    показатьПодписку();
+  }
+
+  function показатьПодписку() {
+    const s = статусПодписки();
+    let текст = '', вид = '';
+    if (s.блок) { текст = '⛔ подписка закончилась'; вид = 'err'; }
+    else if (s.план === 'trial' && s.дн != null) {
+      текст = s.дн === 0 ? '⏳ пробный: последний день' : '⏳ пробный: ' + s.дн + ' дн.'; вид = 'wait';
+    }
+    else if (s.план === 'paid' && s.дн != null && s.дн <= 7) {
+      const и = инфоПлана(), д = и.paid_until.split('-');
+      текст = '⏳ подписка до ' + д[2] + '.' + д[1]; вид = 'wait';
+    }
+    if (!текст) { if (подпискаЭл) подпискаЭл.remove(), подпискаЭл = null; return; }
+    if (!подпискаЭл) {
+      подпискаЭл = document.createElement('div');
+      подпискаЭл.className = 'obl-chip';
+      подпискаЭл.style.bottom = '52px';
+      подпискаЭл.onclick = окноБлока;
+      document.body.appendChild(подпискаЭл);
+    }
+    подпискаЭл.textContent = текст;
+    подпискаЭл.className = 'obl-chip' + (вид ? ' ' + вид : '');
+    подпискаЭл.style.bottom = '52px';
+  }
+
+  function окноБлока() {
+    if (document.getElementById('obl-sub-box')) return;
+    const s = статусПодписки();
+    const g = document.createElement('div');
+    g.id = 'obl-sub-box';
+    g.innerHTML = `<div style="position:fixed;inset:0;z-index:9000;background:rgba(26,26,26,.45);display:flex;align-items:center;justify-content:center;padding:24px 16px;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;">
+      <div style="width:100%;max-width:360px;background:#fff;border-radius:16px;padding:24px 22px;color:#1A1A1A;">
+        <div style="font-size:16px;font-weight:800;margin-bottom:8px;">${s.блок ? 'Подписка закончилась' : 'Подписка'}</div>
+        <div style="font-size:13.5px;line-height:1.5;color:#4a4a4a;margin-bottom:14px;">
+          ${s.блок
+            ? 'Расчёты работают, а печать и выгрузка файлов отключены до продления. Резервную копию своих данных можно сохранить в настройках в любой момент.'
+            : 'Чтобы продлить доступ, свяжитесь с нами — активируем в день оплаты.'}
+        </div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:16px;">📞 +375 29 797-43-62<br>✉️ mvpdom@yandex.ru</div>
+        <button onclick="document.getElementById('obl-sub-box').remove()"
+          style="width:100%;border:none;border-radius:11px;background:#D4521E;color:#fff;font-size:15px;font-weight:800;padding:12px;font-family:inherit;cursor:pointer;">Понятно</button>
+      </div></div>`;
+    document.body.appendChild(g);
+  }
+
+  function перехватитьВыгрузку() {
+    const печать = window.print.bind(window);
+    window.print = function () { if (статусПодписки().блок) { окноБлока(); return; } печать(); };
+    document.addEventListener('click', function (e) {
+      if (!статусПодписки().блок) return;
+      const a = e.target && e.target.closest ? e.target.closest('a[download]') : null;
+      if (!a) return;
+      // резервную копию данных не блокируем никогда
+      if (String(a.getAttribute('download') || '').startsWith('dianast-данные-')) return;
+      e.preventDefault(); e.stopImmediatePropagation(); окноБлока();
+    }, true);
+  }
+
   // Если на устройстве до этого работал ДРУГОЙ человек — его данные здесь
   // чужие: не показываем их и, главное, не даём push() отправить их
   // в новое пространство. Прайс одного цеха не должен утечь другому.
@@ -229,6 +316,7 @@ const Облако = (function () {
       Object.keys(localStorage).filter(своиДанные).forEach(k => localStorage.removeItem(k));
       localStorage.removeItem(МЕТА);
       localStorage.removeItem(WS_KEY);
+      localStorage.removeItem(ПЛАН);
       грязные.clear();
     }
     try { localStorage.setItem(ПОЛЬЗ, стал); } catch (e) {}
@@ -237,6 +325,8 @@ const Облако = (function () {
   async function послеВхода() {
     проверитьСменуПользователя();
     монтироватьСтатус();
+    перехватитьВыгрузку();
+    показатьПодписку();
     статусЭл.title = (сессия.user && сессия.user.email ? сессия.user.email + ' · ' : '') + 'нажмите, чтобы синхронизировать';
     перехватитьЗапись();
     // стартовая синхронизация — не «ручная»: если из облака пришли данные,
@@ -248,7 +338,8 @@ const Облако = (function () {
 
   async function старт() {
     if (typeof window.supabase === 'undefined') {          // нет сети при первой загрузке
-      монтироватьСтатус(); статус('⚠ облако недоступно — работаем локально', 'wait'); return;
+      монтироватьСтатус(); статус('⚠ облако недоступно — работаем локально', 'wait');
+      перехватитьВыгрузку(); показатьПодписку(); return;
     }
     sb = window.supabase.createClient(URL_, KEY_);
     const { data } = await sb.auth.getSession();           // сессия хранится локально: офлайн вход работает
@@ -256,7 +347,10 @@ const Облако = (function () {
     if (!сессия) {
       // Без сети войти всё равно нельзя, а перекрывать расчёт экраном входа —
       // значит оставить мастера на объекте без калькулятора. Работаем локально.
-      if (!navigator.onLine) { монтироватьСтатус(); статус('⚠ нет сети — работаем локально', 'wait'); return; }
+      if (!navigator.onLine) {
+        монтироватьСтатус(); статус('⚠ нет сети — работаем локально', 'wait');
+        перехватитьВыгрузку(); показатьПодписку(); return;
+      }
       показатьВход(); return;
     }
     await послеВхода();

@@ -127,6 +127,7 @@ function calcItem(el, k) {
 
   let наимен = '', ед = '', колво = 0, колвоСтр = '', цена = 0, сумма = 0;
   let pieceLen = 0, lapShow = false, lapDefault = false, geoShow = false, ready = false;
+  let раскрой = null;   // заготовки позиции для калькулятора раскроя: {w, l, qty}
 
   const базаНаим = `${p.название}, ${цвет}, ширина ${wMM} мм`;
 
@@ -158,6 +159,7 @@ function calcItem(el, k) {
       : 'Укажите метраж';
     наимен = `${базаНаим}, ${pieces} ${склЗаг(pieces)} по ${fmtL(zag)} м${lap ? ' (нахлёст 2 см)' : ''} = ${trimM(billed)} м.п.`;
     ready = m2 > 0 && wMM > 0 && meters > 0 && !warn;
+    if (pieces > 0) раскрой = { w: wMM, l: perLen, qty: pieces };
 
   } else {
     // порезка в размер: отлив/сложный — за метраж (м.п.); лист — за шт по площади
@@ -206,6 +208,10 @@ function calcItem(el, k) {
       (plan.split ? ` (каждое — ${plan.pieces} частями по ${fmtE(pieceLen * (isList ? 1000 : 1))} ${ед2}${lap ? ', нахлёст 2 см' : ''})` : '') +
       (auto15 ? ' (+15% — до 1500 мм)' : '');
     ready = m2 > 0 && wMM > 0 && lenM > 0 && qty > 0 && !warn;
+    // каждый кусок = pieceLen (+нахлёст, если куски соединяются в линию)
+    if (qty > 0 && plan.pieces > 0) {
+      раскрой = { w: wMM, l: r3(pieceLen + (lap && plan.split ? нахл : 0)), qty: qty * plan.pieces };
+    }
   }
 
   lapWrap.classList.toggle('show', lapShow);
@@ -218,7 +224,7 @@ function calcItem(el, k) {
     ? (el.querySelector('.other-name').value || '')
     : (/^ral/i.test(c.id) ? c.id.replace(/^ral/i, '') : c.название);
 
-  return { наимен, ед, колво, колвоСтр, цена, сумма, ready, invalid: !!warn,
+  return { наимен, ед, колво, колвоСтр, цена, сумма, ready, invalid: !!warn, раскрой,
            база: p.коротко || p.название, разв: wMM, цветКод, едЗБ: ед === 'м.п.' ? 'пог.м' : ед };
 }
 
@@ -565,6 +571,20 @@ $('zayavka-btn').onclick = () => {
   ЗаявкаБухгалтеру.открыть({ источник: позицииДляЗаявки, ключЧерновика: 'dianast_invoice_otlivy_v1',
                              тариф: false, клиентId: КЛИЕНТ ? КЛИЕНТ.id : '' });
 };
+// ── Передать в раскрой ──
+// Тот же мост, что у конструктора доборных: заготовки уезжают в калькулятор
+// раскроя через localStorage, там строится карта листов и метраж рулона.
+$('raskroy-btn').onclick = () => {
+  if (window._invalid) return;
+  calc();
+  const items = (window._rows || [])
+    .filter(r => r.раскрой && r.раскрой.w > 0 && r.раскрой.l > 0 && r.раскрой.qty > 0)
+    .map(r => ({ w: String(r.раскрой.w), l: String(r.раскрой.l), qty: String(r.раскрой.qty) }));
+  if (!items.length) { alert('Сначала добавьте позиции с размерами.'); return; }
+  try { localStorage.setItem('dianast_raskroy_handoff_v1', JSON.stringify(items)); } catch (e) {}
+  location.href = '../raskroy/index.html';
+};
+
 $('inv-close').onclick = () => $('invoice-overlay').classList.remove('show');
 $('inv-print').onclick = () => window.print();
 $('inv-send').onclick = sendOrder;

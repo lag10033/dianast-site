@@ -128,7 +128,7 @@ table.res .d{ color:#9a9a9a; font-size:11px; }
 .res-row.big .v{ font-size:23px; font-weight:900; color:var(--акцент); }
 .res-note{ font-size:11.5px; color:#9a9a9a; margin-top:10px; line-height:1.45; }
 .btns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
-#zayavka-btn{ grid-column:1 / -1; }   /* заявка бухгалтеру — во всю ширину под первыми двумя */
+/* заявка бухгалтеру и раскрой — парой под первыми двумя */
 .btn{
   border:none; border-radius:10px; font-size:14.5px; font-weight:800; padding:13px; transition:all .15s;
 }
@@ -166,7 +166,7 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 }
 </style>
 <script src="../../vendor/supabase-2.110.8.js"></script>
-<script src="../../облако.js?v=2026-07-23c"></script>
+<script src="../../облако.js?v=2026-07-23d"></script>
 </head>
 <body>
 
@@ -243,6 +243,7 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
       <button class="btn ghost" id="copy" type="button">Скопировать смету</button>
       <button class="btn primary" id="invoice-btn" type="button">Сформировать счёт</button>
       <button class="btn ghost" id="zayavka-btn" type="button">📋 Заявка бухгалтеру</button>
+      <button class="btn ghost" id="raskroy-btn" type="button">✂️ Передать в раскрой</button>
     </div>
     <div class="send-status" id="send-status"></div>
   </div>
@@ -267,9 +268,9 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 </div>
 
 <!-- цены.js — единый конфиг цен приложения (лежит в корне DIANAST-app, один на все инструменты) -->
-<script src="../../цены.js?v=2026-07-23c"></script>
+<script src="../../цены.js?v=2026-07-23d"></script>
 <!-- заявка-бухгалтеру.js — общая форма заявки на счёт (та же, что в калькуляторе доборных) -->
-<script src="../../заявка-бухгалтеру.js?v=2026-07-23c"></script>
-<script src="app.js?v=2026-07-23c"></script>
+<script src="../../заявка-бухгалтеру.js?v=2026-07-23d"></script>
+<script src="app.js?v=2026-07-23d"></script>
 </body>
 </html>

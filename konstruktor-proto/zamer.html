@@ -600,27 +600,101 @@ function mkBlock(type,x,y,m){
 // подбор пролётов: сумма блоков (пролёты+ворота+калитка+столбы 0,38) точно = длине фасада
 // T — длина стороны (по умолчанию фасад). postDelta — поправка к числу столбов:
 // у боковой стороны начальный столб общий с фасадом (угол), поэтому -1.
+// ПРАВИЛО (Андрей 21.07.2026): пролёты ВСЕГДА кратны кирпичу — только значения из
+// линейки MODS (модуль k×125−20). Остаток длины уводим в ширину ворот и калитки:
+// проём клиент задаёт «примерно», а кладка обязана лечь по кирпичу без подрезки.
+// Внутри группы допустима смесь двух соседних значений линейки.
+var OPEN_ADJ_MAX=0.15;    // насколько можно подвинуть один проём, чтобы это осталось незаметно
 function planSpans(seq, T, postDelta){
-  var nSeg=0,nOpen=0,Lopen=0,gi=0;
-  seq.forEach(function(e){ if(e.t==='P')nSeg++; else { nOpen++; Lopen+=(e.t==='G'?(S.gateW[gi++]!=null?S.gateW[gi-1]:4.0):S.wicketW); } });
+  var nSeg=0,nOpen=0,gi=0,opens=[];
+  seq.forEach(function(e){
+    if(e.t==='P')nSeg++;
+    else { nOpen++; opens.push(e.t==='G' ? (S.gateW[gi++]!=null?S.gateW[gi-1]:4.0) : S.wicketW); }
+  });
+  var Lopen=opens.reduce(function(a,b){return a+b;},0);
   if(T==null) T=S.plotLen;
   postDelta=postDelta||0;
-  if(!T||T<=0) return {nSpans:nSeg,spanLen:2.86,nSeg:nSeg,warn:null};
-  function slen(n){ return (T-Lopen-(n+nOpen+1+postDelta)*POST)/n; }   // n пролётов, столбов = n+nOpen+1+postDelta
+  var empty={nSpans:nSeg,spans:null,spanLen:2.86,nSeg:nSeg,opens:opens,rest:0,warn:null};
+  if(!T||T<=0) return empty;
+
+  // сколько метров остаётся на пролёты при n пролётах (столбов = n+nOpen+1+postDelta)
+  function avail(n){ return T - Lopen - (n+nOpen+1+postDelta)*POST; }
+  var LIM=Math.max(nOpen*OPEN_ADJ_MAX, 0.001);   // остаток должны поглотить проёмы
   var best=null;
-  for(var n=Math.max(1,nSeg); n<=400; n++){
-    var s=slen(n);
-    if(s<=0) break;
-    if(s>SPAN_MAX) continue;                 // пролёты слишком длинные — нужно больше
-    var d=Math.abs(s-SPAN_TGT);
-    if(!best||d<best.d) best={n:n,s:s,d:d};
-    if(s<2.2) break;                         // стали слишком мелкими — хватит
+  for(var n=Math.max(1,nSeg); n<=120; n++){
+    var A=avail(n);
+    if(A<=0) break;
+    var avg=A/n;
+    if(avg>SPAN_MAX) continue;                   // пролёты слишком длинные — нужно больше
+    if(avg<SPAN_MIN-0.4) break;                  // стали слишком мелкими — дальше только хуже
+    // смесь двух СОСЕДНИХ модулей линейки: k штук большего + (n−k) меньшего
+    for(var mi=0; mi<MODS.length; mi++){
+      for(var k=0; k<=n; k++){
+        var lo=MODS[mi], hi=MODS[Math.min(mi+1,MODS.length-1)];
+        var sum=k*hi+(n-k)*lo, rest=A-sum;
+        if(Math.abs(rest)>LIM) continue;          // проёмы столько не проглотят
+        var mean=sum/n;
+        // лучший: меньше остаток, затем ближе к цели 2,98, затем меньше разнобой
+        var score=Math.abs(rest)*1000 + Math.abs(mean-SPAN_TGT)*10 + (hi!==lo && k>0 && k<n ? 1 : 0);
+        if(!best||score<best.score){
+          var arr=[]; for(var j=0;j<n-k;j++)arr.push(lo); for(var j2=0;j2<k;j2++)arr.push(hi);
+          best={n:n,spans:arr,rest:rest,mean:mean,score:score};
+        }
+      }
+    }
   }
+
   if(!best){
-    var s0=slen(Math.max(1,nSeg));
-    return {nSpans:Math.max(1,nSeg),spanLen:Math.max(0.3,s0),nSeg:nSeg,warn:(s0<=0?'short':'big')};
+    // Остаток некуда увести (у стороны нет проёмов — так всегда на боковой).
+    // Кладём максимум пролётов по модулю, а разницу — в ОДИН крайний доборный
+    // пролёт: так делают и на объекте, вместо подрезки каждого пролёта.
+    var nb=null;
+    for(var na=Math.max(1,nSeg); na<=120; na++){
+      var Aa=avail(na); if(Aa<=0) break;
+      if(Aa/na>SPAN_MAX) continue;
+      for(var mj=0; mj<MODS.length; mj++){
+        var mod=MODS[mj], cnt=Math.floor((Aa+1e-9)/mod);
+        if(cnt<1||cnt>na) continue;
+        var addon=Aa-cnt*mod;                       // остаток в доборный пролёт
+        if(cnt<na){ if(addon<SPAN_MIN*0.4) continue; }   // доборный не должен быть щелью
+        else if(Math.abs(addon)>0.001) continue;
+        var sc2=Math.abs(mod-SPAN_TGT)*10+Math.abs(addon)*2;
+        if(!nb||sc2<nb.sc){ nb={n:na,mod:mod,cnt:cnt,addon:addon,sc:sc2}; }
+      }
+      if(nb) break;
+    }
+    if(nb){
+      var arr2=[]; for(var z=0;z<nb.cnt;z++)arr2.push(nb.mod);
+      if(nb.addon>0.001) arr2.push(Math.round(nb.addon*1000)/1000);
+      return {nSpans:arr2.length,spans:arr2,spanLen:arr2.reduce(function(a,b){return a+b;},0)/arr2.length,
+              nSeg:nSeg,opens:opens,rest:0,addon:(nb.addon>0.001?nb.addon:0),
+              warn:(nb.addon>0.001?'addon':null)};
+    }
+    // совсем не собирается — раскладываем поровну, чтобы длина хотя бы сошлась
+    var nFall=Math.max(1,nSeg), s0=avail(nFall)/nFall;
+    for(var nf=Math.max(1,nSeg); nf<=120; nf++){ var a2=avail(nf)/nf; if(a2<=SPAN_MAX){ nFall=nf; s0=a2; break; } }
+    var fb=[]; for(var q=0;q<nFall;q++)fb.push(Math.max(0.3,s0));
+    return {nSpans:nFall,spans:fb,spanLen:Math.max(0.3,s0),nSeg:nSeg,opens:opens,rest:0,
+            warn:(s0<=0?'short':'nomodule')};
   }
-  return {nSpans:best.n,spanLen:best.s,nSeg:nSeg,warn:(best.s>SPAN_REC?'big':null)};
+
+  // остаток распределяем по проёмам пропорционально их ширине: 4 см на воротах 4 м
+  // незаметны, а на калитке 1 м бросались бы в глаза
+  var adj=opens.slice();
+  if(Math.abs(best.rest)>0.0005 && Lopen>0){
+    for(var o=0;o<adj.length;o++) adj[o]=Math.round((opens[o]+best.rest*(opens[o]/Lopen))*1000)/1000;
+  }
+  return { nSpans:best.n, spans:best.spans, spanLen:best.mean, nSeg:nSeg,
+           opens:adj, openBase:opens, rest:best.rest,
+           warn:(best.mean>SPAN_REC?'big':null) };
+}
+// идеальная длина участка, при которой всё ляжет по модулю без правки проёмов
+function idealLen(seq, T, postDelta){
+  var p=planSpans(seq,T,postDelta);
+  if(!p||!p.spans||!p.spans.length) return null;
+  var nOpen=(p.opens||[]).length, Lbase=(p.openBase||p.opens||[]).reduce(function(a,b){return a+b;},0);
+  var sum=p.spans.reduce(function(a,b){return a+b;},0);
+  return sum + Lbase + (p.nSpans+nOpen+1+(postDelta||0))*POST;
 }
 function buildBlocksFromSchema(){
   var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
@@ -629,12 +703,19 @@ function buildBlocksFromSchema(){
   var per=[],base=Math.floor(plan.nSpans/plan.nSeg),rem=plan.nSpans%plan.nSeg;
   for(var i=0;i<plan.nSeg;i++) per.push(base);
   for(var k=0;k<rem;k++){ var mid=Math.floor((plan.nSeg-1)/2), idx=mid+(k%2? Math.ceil(k/2): -Math.ceil(k/2)); if(idx<0)idx=0; if(idx>=plan.nSeg)idx=plan.nSeg-1; per[idx]++; }
-  // строим упорядоченный список элементов
-  var elems=[],segI=0,gi=0;
+  // строим упорядоченный список элементов.
+  // Пролёты берём из подобранных модулей: крупные ставим ближе к центру, чтобы
+  // разнобой не бросался в глаза у краёв. Проёмы — скорректированные (остаток в них).
+  var pool=(plan.spans||[]).slice().sort(function(a,b){return a-b;});
+  var ordered=[];                                    // мелкие по краям, крупные к центру
+  for(var pi=pool.length-1; pi>=0; pi--){ if((pool.length-1-pi)%2===0) ordered.push(pool[pi]); else ordered.unshift(pool[pi]); }
+  var spanQ=ordered.slice(), oi=0;
+  function nextSpan(){ return spanQ.length ? spanQ.shift() : plan.spanLen; }
+  var elems=[],segI=0;
   seq.forEach(function(e){
-    if(e.t==='P'){ var c=Math.max(1,per[segI++]); for(var j=0;j<c;j++) elems.push({type:'span',m:plan.spanLen,meas:false}); }
-    else if(e.t==='G'){ elems.push({type:'gate',m:(S.gateW[gi++]!=null?S.gateW[gi-1]:4.0),meas:true}); }
-    else elems.push({type:'wicket',m:S.wicketW,meas:true});
+    if(e.t==='P'){ var c=Math.max(1,per[segI++]); for(var j=0;j<c;j++) elems.push({type:'span',m:nextSpan(),meas:false}); }
+    else if(e.t==='G'){ elems.push({type:'gate',m:(plan.opens&&plan.opens[oi]!=null?plan.opens[oi]:4.0),meas:true}); oi++; }
+    else { elems.push({type:'wicket',m:(plan.opens&&plan.opens[oi]!=null?plan.opens[oi]:S.wicketW),meas:true}); oi++; }
   });
   // столбы между всеми элементами и по краям
   EB.blocks=[]; EB.sel=null; EB.undo=null;   // undo от прошлой раскладки протух — блоки с чужими id ломают сумму
@@ -654,9 +735,11 @@ function buildBlocksFromSchema(){
   if(isCorner){
     // боковая: столбов на один меньше — начальный общий с фасадом (угол)
     var plan2=planSpans([{t:'P'}], S.sideLen, -1);
-    EB.sideWarn=(plan2.warn==='short'?'short':null);   // своё поле: иначе предупреждение фасада его проглатывает
+    EB.sideWarn=plan2.warn||null;        // своё поле: иначе предупреждение фасада его проглатывает
+    EB.sideAddon=plan2.addon||0;         // доборный пролёт на боковой — сказать замерщику
     x=20; cy=250;                                // вторая полоса — orderedRuns увидит её отдельной стороной
-    for(var j=0;j<plan2.nSpans;j++){ put('span',plan2.spanLen,false); put('post'); }
+    var side2=(plan2.spans||[]);
+    for(var j=0;j<plan2.nSpans;j++){ put('span',(side2[j]!=null?side2[j]:plan2.spanLen),false); put('post'); }
   }
   EB.builtSig=schemaSig(); EB.dirty=false; EB.needFit=true;
   renumber(); totals();
@@ -712,10 +795,11 @@ function fenceGeom(){
     var scObj=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
     var seq=expand(scObj.seq), plan=planSpans(seq), nOpen=0;
     seq.forEach(function(e){ if(e.t!=='P')nOpen++; });
-    spans=plan.nSpans; spanLen=plan.nSpans*plan.spanLen; posts=plan.nSpans+nOpen+1;   // включает угол (последний столб фасада)
+    function sumSpans(p){ return (p.spans&&p.spans.length) ? p.spans.reduce(function(a,b){return a+b;},0) : p.nSpans*p.spanLen; }
+    spans=plan.nSpans; spanLen=sumSpans(plan); posts=plan.nSpans+nOpen+1;              // включает угол (последний столб фасада)
     if(S.side==='corner' && S.sideLen>0){
       var p2=planSpans([{t:'P'}], S.sideLen, -1);
-      spans+=p2.nSpans; spanLen+=p2.nSpans*p2.spanLen; posts+=p2.nSpans;              // боковая: начальный столб общий с фасадом
+      spans+=p2.nSpans; spanLen+=sumSpans(p2); posts+=p2.nSpans;                       // боковая: начальный столб общий с фасадом
     }
   }
   return { posts:posts, spanLen:spanLen, spans:spans };
@@ -791,6 +875,25 @@ function checkWarn(){
   var el=document.getElementById('ewarn'); if(!el)return; var msgs=[];
   if(EB.sideWarn==='short'){
     msgs.push('Боковая сторона '+fmt(S.sideLen)+' м слишком коротка для пролётов — увеличьте её или уберите поворот.');
+  }
+  if(EB.sideWarn==='nomodule'){
+    msgs.push('Боковая сторона '+fmt(S.sideLen)+' м не раскладывается по кирпичу — пролёты там придётся подрезать.');
+  }
+  if(EB.sideWarn==='addon'&&EB.sideAddon){
+    msgs.push('Боковая сторона: последний пролёт доборный — '+fmt(EB.sideAddon)+' м вместо целого модуля. Остальные лягут по кирпичу. На боковой нет ворот и калитки, поэтому остаток увести некуда.');
+  }
+  // по модулю не собралось: подсказываем ближайшую длину, при которой ляжет ровно
+  if(EB.planWarn==='nomodule'){
+    var scN=SCHEMES[S.gates].find(function(x){return x.id===S.scheme;})||SCHEMES[S.gates][0];
+    var seqN=expand(scN.seq), ideal=null, bestD=1e9;
+    for(var dm=-0.6; dm<=0.6001; dm+=0.01){          // ищем ближайшую длину с точной раскладкой
+      var t=(S.plotLen||0)+dm; if(t<=0) continue;
+      var pp=planSpans(seqN,t);
+      if(pp.warn!=='nomodule'&&pp.warn!=='short'&&Math.abs(dm)<bestD){ bestD=Math.abs(dm); ideal=t; }
+    }
+    msgs.push('Участок '+fmt(S.plotLen||0)+' м не раскладывается по кирпичу: пролёты придётся подрезать.'
+      +(ideal? ' Ровно ляжет при длине '+fmt(ideal)+' м — или подвиньте ворота/калитку на несколько сантиметров.'
+             : ' Попробуйте изменить ширину ворот или калитки.'));
   }
   if(EB.planWarn==='short'){
     // считаем только ФАСАД (первый прогон) — столбы боковой сюда не относятся

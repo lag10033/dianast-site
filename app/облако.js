@@ -363,5 +363,10 @@ const Облако = (function () {
   }
 
   if (document.body) старт(); else document.addEventListener('DOMContentLoaded', старт);
-  return { синхронизировать, выйти, статус: () => (статусЭл ? статусЭл.textContent : '') };
+  return {
+    синхронизировать, выйти,
+    // токен вошедшего — для подписанных запросов (заказ в CRM)
+    токен: () => (сессия ? сессия.access_token : null),
+    статус: () => (статусЭл ? статусЭл.textContent : ''),
+  };
 })();

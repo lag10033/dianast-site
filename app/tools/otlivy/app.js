@@ -437,17 +437,45 @@ function buildInvoice() {
 }
 
 // ── Отправка ──
+// Два канала, независимые по итогу: сделка в воронке CRM (подписана токеном
+// вошедшего в облако) и письмо через Google Script (с файлом и копией счёта
+// клиенту). Упал один — заказ доходит вторым.
+async function crmOrder() {
+  const ток = window.Облако && Облако.токен ? Облако.токен() : null;
+  if (!ток) return false;
+  try {
+    const r = await fetch('https://dianast-crm.vercel.app/api/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ток },
+      body: JSON.stringify({
+        контакт: { название: $('client').value.trim(), телефон: $('client-phone').value.trim(), почта: $('client-email').value.trim() },
+        позиции: (window._rows || []).map(r => ({ название: r.наимен, количество: r.колвоСтр || r.колво, ед: r.ед })),
+        комментарий: $('client-note').value.trim(),
+        смета: window._copyText || ''
+      })
+    });
+    return r.ok;
+  } catch (e) { return false; }
+}
+
 async function sendOrder() {
   const st = $('send-status'); st.classList.add('show');
   const btn = $('inv-send');
   if (!window._rows || !window._rows.length) { alert('Сначала добавьте позиции.'); return; }
+  btn.disabled = true; btn.textContent = 'Отправляю…';
+  const вCrm = await crmOrder();
   if (!SCRIPT_URL) {
+    if (вCrm) {
+      btn.textContent = 'Заказ отправлен ✓'; btn.classList.add('ok');
+      st.textContent = 'Заказ ушёл в Дианаст. Мы свяжемся с вами.';
+      return;
+    }
+    btn.disabled = false; btn.textContent = 'Отправить заказ в Дианаст';
     const body = encodeURIComponent(window._copyText + '\n\nЗаказчик: ' + $('client').value + '\nТел: ' + $('client-phone').value + '\nEmail: ' + $('client-email').value);
     location.href = `mailto:${РЕКВИЗИТЫ.заказыEmail}?subject=${encodeURIComponent('Заказ с калькулятора · счёт ' + (window._invNum || ''))}&body=${body}`;
     st.textContent = 'Автоотправка ещё не подключена (см. «УСТАНОВКА ОТПРАВКИ.md») — открыл письмо в вашей почте, нажмите «Отправить». Файл приложите к письму вручную.';
     return;
   }
-  btn.disabled = true; btn.textContent = 'Отправляю…';
   const payload = {
     номер: window._invNum, смета: window._copyText,
     клиент: $('client').value, телефон: $('client-phone').value, email: $('client-email').value,
@@ -464,8 +492,13 @@ async function sendOrder() {
     btn.textContent = 'Заказ отправлен ✓'; btn.classList.add('ok');
     st.textContent = 'Заказ ушёл в Дианаст' + ($('client-email').value ? ', копия счёта — вам на ' + $('client-email').value : '') + '. Мы свяжемся с вами.';
   } catch (e) {
-    btn.disabled = false; btn.textContent = 'Отправить заказ в Дианаст';
-    st.textContent = 'Не получилось отправить (нет интернета?). Позвоните: ' + РЕКВИЗИТЫ.моб;
+    if (вCrm) {
+      btn.textContent = 'Заказ отправлен ✓'; btn.classList.add('ok');
+      st.textContent = 'Заказ ушёл в Дианаст. Мы свяжемся с вами.';
+    } else {
+      btn.disabled = false; btn.textContent = 'Отправить заказ в Дианаст';
+      st.textContent = 'Не получилось отправить (нет интернета?). Позвоните: ' + РЕКВИЗИТЫ.моб;
+    }
   }
 }
 

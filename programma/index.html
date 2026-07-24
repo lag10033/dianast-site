@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Программа для жестянщика — расчёт отливов, доборных и раскроя | DIANAST</title>
+<meta name="description" content="Рабочее место жестянщика: расчёт отливов и доборных элементов, раскрой листа, свой прайс, бланк счёта и файл для 1С. Работает на телефоне и без интернета. 14 дней бесплатно.">
+<link rel="canonical" href="https://dianast.by/programma/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dianast.by/programma/">
+<meta property="og:title" content="Программа для жестянщика | DIANAST">
+<meta property="og:description" content="Отливы, доборные, раскрой листа: расчёт и готовый счёт за минуту. Свой прайс и реквизиты. 14 дней бесплатно.">
+<style>
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;size-adjust:105%;src:url('/assets/fonts/montserrat-700-cyrillic.woff2') format('woff2');unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;size-adjust:105%;src:url('/assets/fonts/montserrat-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+FEFF,U+FFFD}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:800;font-display:swap;size-adjust:105%;src:url('/assets/fonts/montserrat-800-cyrillic.woff2') format('woff2');unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:800;font-display:swap;size-adjust:105%;src:url('/assets/fonts/montserrat-800-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/inter-400-cyrillic.woff2') format('woff2');unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/inter-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/inter-600-cyrillic.woff2') format('woff2');unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/inter-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+FEFF,U+FFFD}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--orange:#D4521E;--dark:#1A1A1A;--mid:#4A4A4A;--light:#F7F5F2;--white:#fff;--border:#E8E3DC}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--dark);background:var(--white);line-height:1.55}
+h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.2}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--border);background:var(--white)}
+.head{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px;flex-wrap:wrap}
+.logo{font-family:'Montserrat';font-weight:800;font-size:22px;letter-spacing:2px;color:var(--orange);text-decoration:none}
+.logo i{color:var(--dark);font-style:normal}
+.head a.tel{color:var(--dark);font-weight:600;text-decoration:none;font-size:15px}
+.hero{background:var(--light);padding:52px 0 46px}
+.hero h1{font-size:clamp(26px,4.5vw,40px);font-weight:800;max-width:760px}
+.hero p.sub{font-size:clamp(15px,2.2vw,18px);color:var(--mid);margin:16px 0 26px;max-width:640px}
+.btn{display:inline-block;background:var(--orange);color:#fff;font-family:'Montserrat';font-weight:700;font-size:16px;padding:15px 30px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;transition:background .15s}
+.btn:hover{background:#C1440E}
+.btn.ghost{background:transparent;color:var(--orange);border:2px solid var(--orange);padding:13px 28px}
+.hero .btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero .note{font-size:13px;color:var(--mid);margin-top:14px}
+section{padding:48px 0}
+section h2{font-size:clamp(22px,3.5vw,30px);font-weight:800;margin-bottom:24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{border:1px solid var(--border);border-radius:14px;padding:20px;background:var(--white)}
+.card .ic{font-size:26px;margin-bottom:10px}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{font-size:14px;color:var(--mid)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;counter-reset:s}
+.step{background:var(--light);border-radius:14px;padding:20px}
+.step::before{counter-increment:s;content:counter(s);display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;font-family:'Montserrat';font-weight:700;margin-bottom:10px}
+.step p{font-size:14.5px;color:var(--mid)}
+.step b{display:block;color:var(--dark);margin-bottom:4px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.plan{border:1.5px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column}
+.plan.hit{border-color:var(--orange);position:relative}
+.plan.hit::before{content:'популярный';position:absolute;top:-11px;left:20px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.5px}
+.plan h3{font-size:18px}
+.plan .price{font-family:'Montserrat';font-weight:800;font-size:30px;margin:10px 0 2px}
+.plan .price span{font-size:14px;font-weight:600;color:var(--mid)}
+.plan .year{font-size:13px;color:var(--mid);margin-bottom:14px}
+.plan ul{list-style:none;font-size:14px;color:var(--mid);flex:1}
+.plan li{padding:4px 0 4px 24px;position:relative}
+.plan li::before{content:'✓';position:absolute;left:0;color:var(--orange);font-weight:700}
+.plan .btn{margin-top:16px;text-align:center}
+.faq details{border-bottom:1px solid var(--border);padding:14px 0}
+.faq summary{font-weight:600;cursor:pointer;font-size:15.5px}
+.faq p{font-size:14.5px;color:var(--mid);margin-top:8px;max-width:720px}
+.form-sec{background:var(--light)}
+form{max-width:440px}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+input,textarea{width:100%;font-size:16px;font-family:inherit;padding:12px 13px;border:1.5px solid var(--border);border-radius:10px;background:#fff}
+input:focus,textarea:focus{outline:none;border-color:var(--orange)}
+.hp{position:absolute;left:-9999px;opacity:0}
+#f-status{font-size:14px;font-weight:600;margin-top:12px;min-height:20px}
+#f-status.ok{color:#2e7d32}#f-status.err{color:#b3261e}
+footer{border-top:1px solid var(--border);padding:26px 0;font-size:13.5px;color:var(--mid)}
+footer a{color:var(--mid)}
+</style>
+</head>
+<body>
+
+<header><div class="wrap head">
+  <a class="logo" href="/">DI<i>A</i>NAST</a>
+  <a class="tel" href="tel:+375297974362">+375 29 797-43-62</a>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <h1>Программа для жестянщика: отливы, доборные и раскрой — расчёт и счёт за минуту</h1>
+  <p class="sub">Вводите размеры — программа сама считает развертку, раскрой листа и цену по вашему прайсу.
+  На выходе готовая смета, печатный счёт с вашими реквизитами и файл для 1С. Работает на телефоне прямо в цеху, даже без интернета.</p>
+  <div class="btns">
+    <a class="btn" href="#probnyj">Попробовать 14 дней бесплатно</a>
+    <a class="btn ghost" href="#tarify">Тарифы</a>
+  </div>
+  <div class="note">Без карты и предоплаты. Доступ выдаём в день заявки.</div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Знакомо?</h2>
+  <div class="cards">
+    <div class="card"><div class="ic">📝</div><p>Считаете развертку и раскрой на бумажке или в экселе — и раз в месяц ошибка съедает лист металла.</p></div>
+    <div class="card"><div class="ic">⏳</div><p>Клиент ждёт цену «прямо сейчас», а посчитать и выставить счёт — полчаса возни.</p></div>
+    <div class="card"><div class="ic">📄</div><p>Бухгалтер переспрашивает размеры и наименования, счета набиваются вручную.</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>Что умеет программа</h2>
+  <div class="cards">
+    <div class="card"><div class="ic">💧</div><h3>Отливы</h3><p>Расчёт по ширине и длине: развертка, припуск, цена за погонный метр с НДС и без.</p></div>
+    <div class="card"><div class="ic">📐</div><h3>Доборные элементы</h3><p>Конструктор профиля с чертежом: нащельники, коньки, планки любой формы.</p></div>
+    <div class="card"><div class="ic">✂️</div><h3>Раскрой листа</h3><p>Схема нарезки заготовок: минимум отходов, ни один кусок не длиннее станка.</p></div>
+    <div class="card"><div class="ic">🧾</div><h3>Счёт и 1С</h3><p>Печатный бланк с вашими реквизитами и файл, который бухгалтер загружает в 1С.</p></div>
+    <div class="card"><div class="ic">💰</div><h3>Ваш прайс</h3><p>Свои тарифы, наценки по клиентам, минималка. Цены видите только вы.</p></div>
+    <div class="card"><div class="ic">📱</div><h3>Телефон и офлайн</h3><p>Ставится иконкой на телефон, работает без интернета. Данные синхронизируются между устройствами.</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>Как это работает</h2>
+  <div class="steps">
+    <div class="step"><p><b>Вводите размеры</b>Ширина, длина, цвет, количество — как диктует клиент по телефону.</p></div>
+    <div class="step"><p><b>Программа считает</b>Развертка, раскрой, цена по вашему прайсу — мгновенно и без ошибок.</p></div>
+    <div class="step"><p><b>Отдаёте документы</b>Смета клиенту, счёт на печать, файл для 1С бухгалтеру. Всё за одну минуту.</p></div>
+  </div>
+</div></section>
+
+<section id="tarify" style="padding-top:0"><div class="wrap">
+  <h2>Тарифы</h2>
+  <div class="plans">
+    <div class="plan">
+      <h3>Мастер</h3>
+      <div class="price">39 <span>руб/мес</span></div>
+      <div class="year">или 390 руб/год — 2 месяца в подарок</div>
+      <ul>
+        <li>1 пользователь</li>
+        <li>Все калькуляторы и раскрой</li>
+        <li>Свой прайс и реквизиты</li>
+        <li>Счета и файл для 1С</li>
+        <li>Облако и работа офлайн</li>
+      </ul>
+      <a class="btn" href="#probnyj">Попробовать бесплатно</a>
+    </div>
+    <div class="plan hit">
+      <h3>Цех</h3>
+      <div class="price">89 <span>руб/мес</span></div>
+      <div class="year">или 890 руб/год — 2 месяца в подарок</div>
+      <ul>
+        <li>До 5 пользователей</li>
+        <li>Общие данные: мастера считают, офис выставляет счета</li>
+        <li>Всё из тарифа «Мастер»</li>
+        <li>Поможем перенести ваш прайс при старте</li>
+      </ul>
+      <a class="btn" href="#probnyj">Попробовать бесплатно</a>
+    </div>
+    <div class="plan">
+      <h3>Клиентам DIANAST</h3>
+      <div class="price">0 <span>руб</span></div>
+      <div class="year">покупаете жесть у нас от 1000 руб/мес</div>
+      <ul>
+        <li>Полный тариф «Цех» бесплатно</li>
+        <li>Считаете в программе — заказ улетает нам в один клик</li>
+        <li>Пока вы наш клиент, программа не стоит ничего</li>
+      </ul>
+      <a class="btn ghost" href="#probnyj">Получить доступ</a>
+    </div>
+  </div>
+  <p style="font-size:13.5px;color:var(--mid);margin-top:14px">Цены конечные, без НДС (продавец — ЧСУП «Мы Вам построим дом», упрощённая система налогообложения). Оплата по счёту, документы для бухгалтерии выдаём.</p>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="wrap">
+  <h2>Частые вопросы</h2>
+  <details><summary>Работает без интернета?</summary><p>Да. Программа ставится на телефон или компьютер и считает без сети — в цеху, на объекте, в подвале. Как только сеть появляется, данные сами синхронизируются с облаком.</p></details>
+  <details><summary>Мои цены и клиенты кому-нибудь видны?</summary><p>Нет. У каждого цеха своё изолированное пространство данных — доступ к нему закрыт на уровне базы. Ваш прайс, наценки и клиенты видны только вам.</p></details>
+  <details><summary>Что будет после пробных 14 дней?</summary><p>Расчёты продолжают работать, отключается только печать и выгрузка файлов. Резервную копию своих данных вы можете сохранить в любой момент. Оплатили счёт — всё включается обратно в тот же день.</p></details>
+  <details><summary>Нужно что-то устанавливать?</summary><p>Нет. Открываете ссылку, входите по почте и паролю — и работаете. На телефоне программа добавляется на главный экран как обычное приложение.</p></details>
+  <details><summary>У меня свои цены на металл — программа справится?</summary><p>Да. Прайс полностью ваш: тарифы за квадратный метр, припуски, минималка, наценки по конкретным клиентам. На тарифе «Цех» мы поможем всё это перенести при старте.</p></details>
+</div></section>
+
+<section class="form-sec" id="probnyj"><div class="wrap">
+  <h2>Попробовать 14 дней бесплатно</h2>
+  <p style="color:var(--mid);font-size:15px;max-width:560px">Оставьте телефон — перезвоним, выдадим доступ и за 10 минут покажем, как всё работает. Без карты и автосписаний.</p>
+  <form id="lead-form">
+    <label for="f-name">Как вас зовут</label>
+    <input id="f-name" name="name" autocomplete="name" placeholder="Иван">
+    <label for="f-phone">Телефон *</label>
+    <input id="f-phone" name="phone" type="tel" required autocomplete="tel" placeholder="+375 29 000-00-00">
+    <label for="f-org">Город и название цеха <span style="font-weight:400;color:var(--mid)">(по желанию)</span></label>
+    <input id="f-org" name="org" placeholder="Гомель, ИП Иванов">
+    <input class="hp" name="hp" tabindex="-1" autocomplete="off">
+    <div style="margin-top:20px"><button class="btn" type="submit" id="f-btn">Получить пробный доступ</button></div>
+    <div id="f-status"></div>
+  </form>
+</div></section>
+
+<footer><div class="wrap">
+  DIANAST · Кобрин, ул. Никольская, 64К · <a href="tel:+375297974362">+375 29 797-43-62</a> · <a href="mailto:mvpdom@yandex.ru">mvpdom@yandex.ru</a><br>
+  Программа «Рабочее место жестянщика» · <a href="/">dianast.by</a>
+</div></footer>
+
+<script>
+document.getElementById('lead-form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const st = document.getElementById('f-status'), btn = document.getElementById('f-btn');
+  const имя = document.getElementById('f-name').value.trim();
+  const тел = document.getElementById('f-phone').value.trim();
+  const орг = document.getElementById('f-org').value.trim();
+  if (!тел) { st.className = 'err'; st.textContent = 'Укажите телефон.'; return; }
+  btn.disabled = true; st.className = ''; st.textContent = 'Отправляю…';
+  const text = ['Заявка на программу для жестянщиков (пробный доступ 14 дней)', '',
+    'Имя: ' + (имя || 'не указано'), 'Телефон: ' + тел, орг ? 'Цех: ' + орг : ''].filter(Boolean).join('\n');
+  try {
+    const r = await fetch('https://dianast-crm.vercel.app/api/lead', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, page: '/programma/', hp: document.querySelector('.hp').value })
+    });
+    if (!r.ok) throw new Error('код ' + r.status);
+    st.className = 'ok'; st.textContent = 'Заявка принята! Перезвоним и выдадим доступ в течение рабочего дня.';
+    this.reset();
+  } catch (err) {
+    st.className = 'err'; st.textContent = 'Не получилось отправить. Позвоните нам: +375 29 797-43-62';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

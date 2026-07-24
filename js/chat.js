@@ -157,7 +157,8 @@
       typing.style.display = 'none';
       var reply = d.reply || 'Позвоните нам: +375 29 797-43-62';
       add('assistant', reply);
-      setMood(d.reply ? moodFromReply(reply) : 'hello'); armIdle();
+      // Настроение: приоритет — серверная метка d.mood, иначе клиентская эвристика.
+      setMood(d.reply ? (d.mood || moodFromReply(reply)) : 'hello'); armIdle();
       if (d.lead && typeof ym === 'function') ym(110181067, 'reachGoal', 'chat_lead');
     }).catch(function(){
       typing.style.display = 'none';

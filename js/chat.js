@@ -47,7 +47,8 @@
     '.dch-send{background:#E8600A;color:#fff;border:none;border-radius:13px;width:48px;cursor:pointer;font-size:18px;flex:none}' +
     '.dch-typing{font-size:12px;font-weight:600;color:#C24E08;padding:2px 16px 8px;background:#FBF1EA;display:none}' +
     // Григорич на кромке шапки — над окном, поверх шапки
-    '.dch-grig{position:absolute;right:var(--g-right);top:var(--g-top);height:var(--g-h);aspect-ratio:820/800;z-index:5;pointer-events:none;filter:drop-shadow(0 9px 9px rgba(60,32,10,.22));opacity:1;transition:opacity .2s}' +
+    '.dch-grig{position:absolute;right:var(--g-right);top:var(--g-top);height:var(--g-h);aspect-ratio:820/800;z-index:5;pointer-events:none;filter:drop-shadow(0 9px 9px rgba(60,32,10,.22));opacity:1;transition:opacity .2s;animation:dchBreath 4.5s ease-in-out infinite}' +
+    '@keyframes dchBreath{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}' +
     '.dch-layer{position:absolute;inset:0;background-size:contain;background-position:bottom center;background-repeat:no-repeat;opacity:0;transition:opacity .28s ease}' +
     '.dch-layer.on{opacity:1}' +
     '.dch-rest{position:absolute;right:var(--r-right);top:var(--r-top);width:var(--r-w);aspect-ratio:1211/379;background-size:contain;background-position:bottom center;background-repeat:no-repeat;z-index:5;pointer-events:none;filter:drop-shadow(0 8px 8px rgba(60,32,10,.22));opacity:0;transition:opacity .28s ease}' +
@@ -55,7 +56,7 @@
     '.dch-stage[data-mood="rest"] .dch-rest{opacity:1}' +
     ':root{}' +
     '.dch-stage{--g-h:200px;--g-right:-32px;--g-top:-119px;--r-w:250px;--r-right:16px;--r-top:-70px}' +
-    '@media(prefers-reduced-motion:reduce){.dch-grig,.dch-rest,.dch-layer{transition:none}}' +
+    '@media(prefers-reduced-motion:reduce){.dch-grig,.dch-rest,.dch-layer{transition:none}.dch-grig{animation:none}}' +
     '@media(max-width:620px){.dch-stage{left:8px;right:8px;bottom:88px;width:auto;--g-right:-6px;--r-right:22px}.dch-win{height:calc(100vh - 232px)}}';
   document.head.appendChild(css);
 

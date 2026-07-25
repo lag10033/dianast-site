@@ -101,6 +101,15 @@
   var typing = stage.querySelector('.dch-typing');
   var layers = stage.querySelectorAll('.dch-layer');
 
+  // Ночной статус: по Минску (UTC+3) с 22:00 до 08:00 — честно «отвечу утром».
+  (function(){
+    var mh = (new Date().getUTCHours() + 3) % 24;
+    if (mh < 8 || mh >= 22){
+      var s = stage.querySelector('.dch-who span');
+      if (s) s.innerHTML = '<i class="dch-dot" style="background:#E8A400;box-shadow:0 0 0 3px rgba(232,164,0,.3)"></i>ночью — отвечу утром';
+    }
+  })();
+
   // --- состояния Григорича ---
   var idle1, idle2;
   function setMood(m){

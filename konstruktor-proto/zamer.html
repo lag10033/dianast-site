@@ -1424,7 +1424,7 @@ function bindOrder(){
       if(okFlag){
         msg.className='ordMsg ok';
         msg.textContent='Заявка принята — расчёт ушёл Андрею. Перезвоним и назовём точную цену с доставкой.';
-        if(typeof ym==='function') ym(110181067,'reachGoal','lead_form');
+        if(typeof ym==='function'){ ym(110181067,'reachGoal','lead_form'); ym(110181067,'reachGoal','konstruktor_order'); }
       } else {
         msg.className='ordMsg err';
         msg.innerHTML='Не удалось отправить. Позвоните напрямую: <a href="tel:+375297974362">+375 29 797-43-62</a>';

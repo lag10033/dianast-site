@@ -57,7 +57,7 @@
     ':root{}' +
     '.dch-stage{--g-h:200px;--g-right:-32px;--g-top:-119px;--r-w:250px;--r-right:16px;--r-top:-70px}' +
     '@media(prefers-reduced-motion:reduce){.dch-grig,.dch-rest,.dch-layer{transition:none}.dch-grig{animation:none}}' +
-    '@media(max-width:620px){.dch-stage{left:8px;right:8px;bottom:88px;width:auto;--g-right:-6px;--r-right:22px}.dch-win{height:calc(100vh - 232px)}}';
+    '@media(max-width:620px){.dch-stage{left:8px;right:8px;bottom:88px;width:auto;--g-right:-4px;--g-h:170px;--g-top:-101px;--r-right:22px}.dch-win{height:calc(100vh - 232px)}}';
   document.head.appendChild(css);
 
   var bubble = document.createElement('button');

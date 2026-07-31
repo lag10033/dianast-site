@@ -1035,6 +1035,7 @@ button { font-family: inherit; cursor: pointer; }
     </div>
     <h2 class="ty-title">Заявка принята!</h2>
     <p class="ty-body">Менеджер свяжется с вами<br>в течение <strong>30 минут</strong></p>
+    <div id="ty-queue" style="display:none;font-size:14px;font-weight:600;color:#C1440E;margin:6px 0 2px"></div>
     <div class="ty-timer">⏱ Работаем с 8:00 до 20:00</div>
     <div class="ty-divider"></div>
     <p class="ty-bonus-label">🎁 Ваш подарок</p>
@@ -1058,6 +1059,12 @@ button { font-family: inherit; cursor: pointer; }
     <div class="step active" id="step-0">
       <h2 class="step-title">Какая сторона забора?</h2>
       <p class="step-sub">Выберите один вариант, чтобы мы подобрали нужный материал</p>
+      <!-- Очередь на монтаж: дата приходит из календаря загрузки в CRM.
+           Нет ответа — блок не показывается, страница выглядит как раньше. -->
+      <div id="queue" style="display:none;background:#fff8f3;border:2px solid #C1440E;border-radius:10px;padding:12px 16px;margin:0 0 16px">
+        <b id="queue-date" style="display:block;font-size:16px;color:#C1440E;margin-bottom:2px"></b>
+        <span style="font-size:13px;line-height:1.5;color:#555">Берём столько объектов, сколько успеваем сделать сами. Цена фиксируется в день договора.</span>
+      </div>
       <div class="cards">
         <div class="card has-img" data-group="fenceSide" data-val="face" onclick="selectCard(this)">
           <img class="card-img" src="/assets/photos/pf-kras-1.webp" alt="Лицевая сторона забора" loading="eager">
@@ -2396,6 +2403,24 @@ document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
   if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
 });
+</script>
+<script>
+/* Ближайшая свободная дата монтажа — из календаря загрузки в CRM.
+   Показываем и на первом шаге, и на экране «Заявка принята»: человек должен
+   узнать срок до того, как начнёт считать, и увидеть его ещё раз в конце. */
+(function(){
+  if(!window.fetch)return;
+  fetch('https://dianast-crm.vercel.app/api/free-slot')
+    .then(function(r){return r.ok?r.json():null})
+    .then(function(d){
+      if(!d||!d.text)return;
+      var box=document.getElementById('queue'),el=document.getElementById('queue-date');
+      if(box&&el){el.textContent='Ближайшая свободная дата монтажа — '+d.text;box.style.display='block';}
+      var ty=document.getElementById('ty-queue');
+      if(ty){ty.textContent='Ближайшая свободная дата монтажа — '+d.text;ty.style.display='block';}
+    })
+    .catch(function(){});
+})();
 </script>
 </body>
 </html>

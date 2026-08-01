@@ -126,6 +126,11 @@ li{font-size:16px;line-height:1.8;color:#333;margin-bottom:6px}
 .steps li::before{content:counter(step);position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;background:var(--orange);color:#fff;font-family:'Montserrat',sans-serif;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
 .steps b{display:block;font-family:'Montserrat',sans-serif;font-size:16px;margin-bottom:4px}
 .works-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:24px 0}
+/* Видео с объекта. preload="none" — файл тянется только по клику, чтобы
+   не грузить мобильный трафик: 61% посетителей заходят с телефона. */
+.video-block{margin:28px 0}
+.site-video{width:100%;height:auto;display:block;border-radius:10px;background:#000}
+.video-block figcaption{font-size:14px;line-height:1.6;color:#666;margin-top:10px}
 .works-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
 .cities{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}
 .cities a{font-size:13px;color:#555;border:1px solid #ddd;border-radius:5px;padding:5px 11px;text-decoration:none}
@@ -140,6 +145,24 @@ li{font-size:16px;line-height:1.8;color:#333;margin-bottom:6px}
 footer{background:var(--dark);color:rgba(255,255,255,0.6);padding:30px 5%;text-align:center;font-size:14px}
 footer a{color:rgba(255,255,255,0.75)}
 </style>
+<!-- JSON-LD: VideoObject -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Кладка забора из колотого кирпича на клей-пену",
+  "description": "Монтаж забора Dianast на объекте: ряды колотого кирпича садятся на клей-пену без раствора и бетономешалки. Съёмка зимой — «мокрого» сезона у технологии нет.",
+  "thumbnailUrl": "https://dianast.by/assets/video/kladka-na-kley-penu.jpg",
+  "contentUrl": "https://dianast.by/assets/video/kladka-na-kley-penu.mp4",
+  "uploadDate": "2026-08-01",
+  "duration": "PT27S",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Dianast",
+    "url": "https://dianast.by"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -184,6 +207,23 @@ footer a{color:rgba(255,255,255,0.75)}
     <li>швы тонкие и ровные — геометрия столба 380×380 мм выдерживается по всей высоте.</li>
   </ul>
   <p>Цвет — в массе бетона (графит, коричневый, красный, горчичный), морозостойкость F150. Забор стоит <strong>десятилетиями без покраски и обслуживания</strong> — подробно о материале на странице <a href="/demler">блок демлер (колотый кирпич)</a>.</p>
+
+  <figure class="video-block">
+    <video
+      class="site-video"
+      preload="none"
+      muted
+      loop
+      playsinline
+      controls
+      poster="/assets/video/kladka-na-kley-penu.jpg"
+      width="960" height="540"
+      aria-label="Кладка колотого кирпича на клей-пену на объекте Dianast">
+      <source src="/assets/video/kladka-na-kley-penu.mp4" type="video/mp4">
+      Ваш браузер не воспроизводит видео — <a href="/assets/video/kladka-na-kley-penu.mp4">скачать ролик</a>.
+    </video>
+    <figcaption>Кладка на объекте: ряды садятся на клей-пену, без раствора и бетономешалки. Снято зимой — «мокрого» сезона у этой технологии нет.</figcaption>
+  </figure>
 
   <h2>Как мы строим: 5 шагов</h2>
   <ol class="steps">

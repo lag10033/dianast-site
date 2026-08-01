@@ -1036,6 +1036,14 @@ button { font-family: inherit; cursor: pointer; }
     <h2 class="ty-title">Заявка принята!</h2>
     <p class="ty-body">Менеджер свяжется с вами<br>в течение <strong>30 минут</strong></p>
     <div id="ty-queue" style="display:none;font-size:14px;font-weight:600;color:#C1440E;margin:6px 0 2px"></div>
+    <!-- Ссылка на сохранённую смету: расчёт не пропадает вместе с вкладкой.
+         Появляется, только если смета сохранилась на сервере. -->
+    <div id="quote-box" style="display:none;background:#fff8f3;border:1px solid #C1440E;border-radius:10px;padding:12px 14px;margin:14px 0 4px;text-align:left">
+      <div style="font-size:13px;font-weight:700;color:#C1440E;margin-bottom:4px">Ваша смета сохранена</div>
+      <div style="font-size:13px;color:#555;line-height:1.5;margin-bottom:8px">Ссылка не потеряется — откройте когда угодно и покажите дома:</div>
+      <a id="quote-link" href="" target="_blank" rel="noopener" style="font-size:13px;color:#C1440E;word-break:break-all">—</a>
+      <a id="quote-viber" href="" style="display:block;margin-top:10px;background:#7360f2;color:#fff;text-align:center;padding:10px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none">Отправить себе в Viber</a>
+    </div>
     <div class="ty-timer">⏱ Работаем с 8:00 до 20:00</div>
     <div class="ty-divider"></div>
     <p class="ty-bonus-label">🎁 Ваш подарок</p>
@@ -1608,7 +1616,7 @@ details > summary:hover{color:#E8600A}
   </div>
 </section>
 
-<script src="/js/lead.js?v=1"></script>
+<script src="/js/lead.js?v=2"></script>
 <script src="/js/chat.js?v=2" defer></script>
 <script>
 // ── State ──────────────────────────────────────────────
@@ -2369,21 +2377,58 @@ function submitFinalSmeta(){
   var lines=ckSides.map(function(s,i){
     return (i+1)+') '+s.role+' — '+CK_T[s.type].n+(CK_T[s.type].mason?' / заполнение: '+CK_FILLS[s.fill]:'')+', '+s.len+' м × '+s.h.toFixed(1)+' м';
   });
+  var gateTxt = gw>0?(ckGT==='sliding'?'откатные':'распашные')+' '+gw+' м'+(ckAutoOn?' + автоматика':''):'нет';
+  var wickTxt = ww>0?ww+' м':'нет';
+  var foundTxt = state.foundationOn?(state.foundationType==='lenta'?'ленточный':'ригель'):'нет';
+  var totalTxt = document.getElementById('ckPrice').textContent;
+
   var text='🧮 Финальная смета из калькулятора\n\n'
     +'👤 '+state.name+' · '+state.phone+' · '+state.city+'\n\n'
     +'Стороны:\n'+lines.join('\n')+'\n'
-    +'Ворота: '+(gw>0?(ckGT==='sliding'?'откатные':'распашные')+' '+gw+' м'+(ckAutoOn?' + автоматика':''):'нет')+'\n'
-    +'Калитка: '+(ww>0?ww+' м':'нет')+'\n'
-    +'Фундамент: '+(state.foundationOn?(state.foundationType==='lenta'?'ленточный':'ригель'):'нет')+'\n'
-    +'Итог по калькулятору: '+document.getElementById('ckPrice').textContent;
-  fetch(LEAD_URL, {
+    +'Ворота: '+gateTxt+'\n'
+    +'Калитка: '+wickTxt+'\n'
+    +'Фундамент: '+foundTxt+'\n'
+    +'Итог по калькулятору: '+totalTxt;
+
+  // Сохраняем смету по постоянной ссылке. Клиент решает неделями и обсуждает дома —
+  // без ссылки расчёт живёт ровно до закрытия вкладки. Менеджеру та же ссылка
+  // приходит в заявке: звонок идёт по готовой смете, а не с нуля.
+  // Не сохранилось — просто отправляем заявку как раньше, клиент ничего не теряет.
+  fetch(QUOTE_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      name:state.name, phone:state.phone, city:state.city,
-      note:text, text:text, page:location.pathname
+      name:state.name, phone:state.phone, city:state.city, total:totalTxt,
+      lines:lines, gate:gateTxt, wicket:wickTxt, foundation:foundTxt
     })
-  }).then(function(){showThankyou();}).catch(function(){showThankyou();});
+  })
+  .then(function(r){return r.ok?r.json():null})
+  .catch(function(){return null})
+  .then(function(q){
+    var url = q && q.url ? q.url : '';
+    if(url){ showQuoteLink(url); text += '\n\n🔗 Смета клиента: ' + url; }
+    return fetch(LEAD_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name:state.name, phone:state.phone, city:state.city,
+        note:text, text:text, page:location.pathname
+      })
+    }).catch(function(){});
+  })
+  .then(function(){showThankyou();})
+  .catch(function(){showThankyou();});
+}
+
+// Ссылка на смету на экране «Заявка принята» + отправка себе в Viber одним тапом.
+function showQuoteLink(url){
+  var box=document.getElementById('quote-box');
+  var a=document.getElementById('quote-link');
+  var v=document.getElementById('quote-viber');
+  if(!box||!a) return;
+  a.href=url; a.textContent=url.replace(/^https?:\/\//,'');
+  if(v){ v.href='viber://forward?text='+encodeURIComponent('Моя смета на забор Dianast: '+url); }
+  box.style.display='block';
 }
 </script>
 <!-- Yandex.Metrika counter -->

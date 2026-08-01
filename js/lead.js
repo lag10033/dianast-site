@@ -4,6 +4,9 @@
 // Токенов в этом файле нет и быть не должно: код виден каждому посетителю.
 // Один файл на все страницы — менять адрес или логику в одном месте.
 var LEAD_URL = 'https://dianast-crm.vercel.app/api/lead';
+// Сохранение сметы по постоянной ссылке (квиз). Клиент возвращается к своему
+// расчёту и показывает его дома, менеджер звонит по готовой смете.
+var QUOTE_URL = 'https://dianast-crm.vercel.app/api/quote';
 function sendLead(text, onOk, onErr){
   onOk = onOk || function(){};
   onErr = onErr || function(){};

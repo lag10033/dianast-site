@@ -224,5 +224,16 @@ document.getElementById('lead-form').addEventListener('submit', async function (
   }
 });
 </script>
+
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="tel:"]');
+  if(a&&typeof ym==='function'){ym(110181067,'reachGoal','phone_click');}
+  var w=e.target.closest&&e.target.closest('a[href*="wa.me"]');
+  if(w&&typeof ym==='function'){ym(110181067,'reachGoal','wa_click');}
+  var t=e.target.closest&&e.target.closest('a[href*="t.me"]');
+  if(t&&typeof ym==='function'){ym(110181067,'reachGoal','tg_click');}
+});
+</script>
 </body>
 </html>

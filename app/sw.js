@@ -3,7 +3,7 @@
 //            дальше: страницы и скрипты → сначала сеть (свежий код), кэш как запас;
 //            картинки → сначала кэш (быстро).
 // Чтение из кэша идёт с ignoreSearch, поэтому смена версии ?v= не обнуляет оффлайн.
-const CACHE = 'dianast-app-v9';
+const CACHE = 'dianast-app-v10';
 
 const ФАЙЛЫ = [
   './', './index.html', './manifest.webmanifest',
@@ -14,6 +14,7 @@ const ФАЙЛЫ = [
   './tools/raskroy/index.html', './tools/raskroy/лого-знак.png',
   './tools/otlivy/index.html', './tools/otlivy/app.js', './tools/otlivy/лого-знак.png',
   './tools/crm/index.html', './tools/crm/лого-знак.png',
+  './tools/sebestoimost/index.html', './tools/sebestoimost/лого-знак.png',
 ];
 
 self.addEventListener('install', (e) => {

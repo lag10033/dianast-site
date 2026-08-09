@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Себестоимость и заработок — DIANAST</title>
+<meta name="description" content="Внутренний расчёт: закупка металла, работа и накладные против цен прайса. Прибыль на метр и на заказ.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A;
+  --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B;
+  --плюс:#2e7d43; --минус:#c0392b;
+}
+body{
+  font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--фон); color:var(--чёрный); line-height:1.5; min-height:100vh;
+}
+img{ max-width:100%; display:block; }
+button{ cursor:pointer; font-family:inherit; }
+
+header{
+  background:#fff; border-bottom:1px solid var(--рамка);
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand img{ height:44px; }
+.bn{ font-size:22px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:9px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.back{ font-size:13px; font-weight:700; color:var(--текст2); text-decoration:none; border:1.5px solid var(--рамка); border-radius:999px; padding:7px 13px; }
+.back:hover{ border-color:var(--терракота); color:var(--терракота); }
+
+main{ max-width:680px; margin:0 auto; padding:20px 16px 48px; }
+h1{ font-size:clamp(20px,5vw,26px); line-height:1.25; font-weight:800; margin:6px 0 4px; }
+h1 em{ font-style:normal; color:var(--терракота); }
+.sub{ font-size:13.5px; color:var(--текст2); margin-bottom:14px; }
+
+.warn{ font-size:12.5px; background:#fdf6df; border:1px solid #ead9a0; border-radius:10px; padding:10px 12px; margin-bottom:14px; line-height:1.45; color:#7a5c00; }
+.privat{ font-size:12px; color:var(--текст2); background:#fff; border:1px dashed var(--рамка); border-radius:10px; padding:9px 12px; margin-bottom:14px; }
+
+.card{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; margin-bottom:12px; }
+details.card > summary{ font-size:14.5px; font-weight:800; cursor:pointer; list-style:none; }
+details.card > summary::-webkit-details-marker{ display:none; }
+details.card > summary::after{ content:'▾'; float:right; color:var(--текст2); }
+details.card[open] > summary::after{ content:'▴'; }
+.sec-h{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--текст2); margin:14px 0 8px; }
+.mrow{ display:grid; grid-template-columns:minmax(120px,1fr) 84px 74px 76px; gap:8px; align-items:center; margin-bottom:7px; font-size:13px; }
+.mrow .nm{ font-weight:700; }
+.mrow .m2{ text-align:right; font-size:12px; color:var(--текст2); white-space:nowrap; }
+.mhead{ font-size:10.5px; color:var(--текст2); font-weight:700; }
+input[type=number], input[type=text], select{
+  width:100%; font-size:15px; padding:8px 9px; border:1.5px solid var(--рамка);
+  border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit;
+}
+input:focus-visible, select:focus-visible{ outline:none; border-color:var(--терракота); }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:9px; }
+.f label{ display:block; font-size:11.5px; font-weight:700; color:var(--текст2); margin-bottom:4px; }
+.chk{ display:flex; gap:8px; align-items:flex-start; font-size:12.5px; margin-top:10px; }
+.chk input{ width:17px; height:17px; margin-top:2px; }
+.savebtn{ width:100%; border:none; border-radius:11px; background:var(--терракота); color:#fff; font-size:14.5px; font-weight:800; padding:12px; margin-top:12px; }
+.savebtn:hover{ background:var(--кирпич); }
+.hint{ font-size:11.5px; color:#9a938a; line-height:1.4; margin-top:6px; }
+
+.tabs{ display:flex; gap:8px; margin:16px 0 12px; }
+.tab{ flex:1; border:1.5px solid var(--рамка); background:#fff; color:var(--текст2); border-radius:999px; font-size:13.5px; font-weight:800; padding:10px 14px; }
+.tab.on{ background:var(--терракота); border-color:var(--терракота); color:#fff; }
+.pane{ display:none; } .pane.on{ display:block; }
+
+.res{ margin-top:12px; }
+.res table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+.res td{ padding:6px 2px; border-bottom:1px solid #f0ebe3; }
+.res td.r{ text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.res tr.total td{ border-bottom:none; font-weight:800; font-size:15px; padding-top:10px; }
+.res .d{ font-size:11.5px; color:var(--текст2); }
+.plus{ color:var(--плюс); } .minus{ color:var(--минус); }
+.big{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+.kpi{ flex:1; min-width:130px; background:#faf8f5; border:1px solid var(--рамка); border-radius:11px; padding:10px 12px; }
+.kpi .l{ font-size:11px; font-weight:700; color:var(--текст2); }
+.kpi .v{ font-size:19px; font-weight:800; margin-top:2px; }
+.kpi .s{ font-size:11px; color:var(--текст2); }
+
+.ctable{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px; }
+.ctable th{ text-align:right; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--текст2); padding:5px 4px; border-bottom:1.5px solid var(--рамка); }
+.ctable th:first-child{ text-align:left; }
+.ctable td{ padding:6px 4px; border-bottom:1px solid #f0ebe3; text-align:right; font-variant-numeric:tabular-nums; }
+.ctable td:first-child{ text-align:left; font-weight:700; }
+
+.item{ background:#faf8f5; border:1px solid var(--рамка); border-radius:12px; padding:12px; margin-bottom:10px; position:relative; }
+.item .del{ position:absolute; top:6px; right:8px; background:none; border:none; font-size:19px; line-height:1; color:#b5aca0; padding:4px; }
+.item .del:hover{ color:var(--кирпич); }
+.irow{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+.irow3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.addbtn{ width:100%; border:1.5px dashed var(--рамка); background:#fff; color:var(--текст2); border-radius:11px; font-size:13.5px; font-weight:700; padding:11px; }
+.addbtn:hover{ border-color:var(--терракота); color:var(--терракота); }
+footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18px 16px 30px; }
+</style>
+<script src="../../vendor/supabase-2.110.8.js"></script>
+<script src="../../облако.js?v=2026-08-09a"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="DIANAST">
+    <div>
+      <div class="bn"><span>DI</span><span class="a">A</span><span>NAST</span></div>
+      <div class="bs">РАБОЧЕЕ МЕСТО ЖЕСТЯНЩИКА</div>
+    </div>
+  </div>
+  <a class="back" href="../../index.html">← Все инструменты</a>
+</header>
+
+<main>
+  <h1>Себестоимость и <em>заработок</em></h1>
+  <p class="sub">Закупка металла, работа и накладные — против цен вашего прайса.
+     Видно, сколько остаётся с метра и с заказа.</p>
+
+  <div class="warn" id="demo-warn" hidden></div>
+  <p class="privat">🔒 Инструмент внутренний: эти цифры не попадают в сметы, счета и КП.
+     Закупка хранится в вашем пространстве, как и прайс, — другие фирмы её не видят.</p>
+
+  <details class="card" id="cfg">
+    <summary>⚙ Закупка металла и затраты</summary>
+    <div class="sec-h">Металл — закупка без НДС</div>
+    <div class="mrow mhead"><span></span><span>руб/кг</span><span>кг/м²</span><span style="text-align:right">руб/м²</span></div>
+    <div id="metal-rows"></div>
+    <div class="mrow">
+      <span class="nm">Другой металл</span>
+      <input type="number" id="m-other" step="0.01" min="0" inputmode="decimal" style="grid-column:2/4">
+      <span class="m2">руб/м²</span>
+    </div>
+    <div class="hint">Цена за килограмм и расход в кг на квадрат — из накладной поставщика.
+       Для цвета без своей цены берётся строка «Другой металл».</div>
+
+    <div class="sec-h">Затраты сверх металла</div>
+    <div class="grid">
+      <div class="f"><label>Отход и обрезки, %</label><input type="number" id="c-othod" step="1" min="0" inputmode="numeric"></div>
+      <div class="f"><label>Работа, руб за м.п.</label><input type="number" id="c-rab-mp" step="0.1" min="0" inputmode="decimal"></div>
+      <div class="f"><label>Работа, руб за изделие</label><input type="number" id="c-rab-izd" step="0.1" min="0" inputmode="decimal"></div>
+      <div class="f"><label>Упаковка, руб за изделие</label><input type="number" id="c-upak" step="0.1" min="0" inputmode="decimal"></div>
+      <div class="f"><label>Накладные, % к затратам</label><input type="number" id="c-nakl" step="1" min="0" inputmode="numeric"></div>
+      <div class="f"><label>Налоги, % от выручки</label><input type="number" id="c-nalog" step="0.5" min="0" inputmode="decimal"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="c-vychet">
+      <span><b>НДС из закупки беру к вычету</b> (фирма — плательщик НДС).
+      Если галки нет — к цене металла прибавится НДС {{ндс}}%.</span></label>
+    <div class="hint">Накладные — аренда, свет, амортизация станка: процентом сверх прямых затрат.
+       Налоги — эффективный процент от выручки без НДС.</div>
+    <button class="savebtn" id="cfg-save" type="button">Сохранить</button>
+  </details>
+
+  <div class="tabs">
+    <button class="tab on" data-pane="unit" type="button">1 изделие</button>
+    <button class="tab" data-pane="order" type="button">Заказ</button>
+  </div>
+
+  <!-- ── Режим: одно изделие ── -->
+  <section class="pane on" id="pane-unit">
+    <div class="card">
+      <div class="irow">
+        <div class="f"><label>Что считаем</label><select id="u-type"></select></div>
+        <div class="f"><label>Цвет</label><select id="u-color"></select></div>
+      </div>
+      <div class="irow" id="u-manual-wrap" hidden>
+        <div class="f" style="grid-column:1/-1"><label>Цена продажи, руб/м² без НДС</label>
+          <input type="number" id="u-manual" step="1" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="irow">
+        <div class="f"><label>Ширина, мм</label><input type="number" id="u-w" step="10" min="0" inputmode="numeric" value="200"></div>
+        <div class="f"><label>Длина, м</label><input type="number" id="u-l" step="0.1" min="0" inputmode="decimal" value="2"></div>
+      </div>
+      <div class="res" id="u-res"></div>
+    </div>
+    <div class="card">
+      <div class="sec-h" style="margin-top:0">Все цвета при этих размерах — на 1 изделие</div>
+      <div style="overflow-x:auto"><table class="ctable" id="u-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ── Режим: заказ ── -->
+  <section class="pane" id="pane-order">
+    <div id="o-items"></div>
+    <button class="addbtn" id="o-add" type="button">+ Добавить позицию</button>
+    <div class="card" style="margin-top:12px">
+      <div class="irow">
+        <div class="f"><label>Доставка по заказу, руб</label><input type="number" id="o-dost" step="1" min="0" inputmode="decimal" value="0"></div>
+        <div class="f"><label>Продажа по факту, руб <span style="font-weight:400">(можно пусто)</span></label>
+          <input type="number" id="o-fact" step="0.01" min="0" inputmode="decimal" placeholder="иначе — по прайсу"></div>
+      </div>
+      <div class="res" id="o-res"></div>
+    </div>
+  </section>
+</main>
+
+<footer>DIANAST · рабочее место жестянщика</footer>
+
+<script src="../../цены.js?v=2026-08-09a"></script>
+<script>
+// ============================================================
+//  Себестоимость и заработок. Всё без НДС, как прайс.
+//  Продажа считается по правилам калькулятора отливов:
+//  цена м² (обычное/сложное) × наценка, коэф. до 1500 мм
+//  для сложных, минималка за изделие.
+// ============================================================
+const КЛЮЧ_С = 'dianast_cost_v1';
+const $ = id => document.getElementById(id);
+const r2 = x => Math.round(x * 100) / 100;
+const fmt = x => x.toFixed(2).replace('.', ',');
+const idx = 1 + (НАЦЕНКА_ПРОЦЕНТ || 0) / 100;
+const НДС = ЦЕНЫ.ндс_процент || 20;
+
+const ДЕМО_ЗАКУПКА = {
+  демо: true, вычет: true, отход: 12,
+  работа_мп: 0, работа_изд: 0, упаковка: 0, накладные: 0, налоги: 0,
+  другой_м2: 20, металл: {}   // металл[цветId] = { кг: руб/кг, расход: кг/м² }
+};
+
+let З = загрузить();
+function загрузить() {
+  try {
+    const v = JSON.parse(localStorage.getItem(КЛЮЧ_С) || 'null');
+    if (!v) return JSON.parse(JSON.stringify(ДЕМО_ЗАКУПКА));
+    return Object.assign(JSON.parse(JSON.stringify(ДЕМО_ЗАКУПКА)), v, { демо: false });
+  } catch (e) { return JSON.parse(JSON.stringify(ДЕМО_ЗАКУПКА)); }
+}
+
+const ЦВЕТА = (ЦЕНЫ.цвета || []).filter(c => !c.ручной);
+const ЦВЕТ_РУЧНОЙ = (ЦЕНЫ.цвета || []).find(c => c.ручной);
+const ИЗДЕЛИЯ = ЦЕНЫ.изделия || [];
+
+// ── металл: руб/м² без НДС по цвету (fallback — «другой металл») ──
+function металлМ2(цветId) {
+  const m = З.металл[цветId];
+  let м2 = (m && m.кг > 0 && m.расход > 0) ? m.кг * m.расход : (З.другой_м2 || 0);
+  if (!З.вычет) м2 *= 1 + НДС / 100;
+  return м2;
+}
+function ценаПродажиМ2(цветId, колонка, ручнаяМ2) {
+  if (цветId === '_ручной') return (ручнаяМ2 || 0) * idx;
+  const c = ЦВЕТА.find(x => x.id === цветId);
+  return c ? (c[колонка] || 0) * idx : 0;
+}
+
+// ── расчёт одного изделия ──
+// тип: элемент из ЦЕНЫ.изделия; ш мм, дл м; возвращает продажу и затраты без НДС
+function изделие(типId, цветId, ш, дл, ручнаяМ2) {
+  const тип = ИЗДЕЛИЯ.find(t => t.id === типId) || ИЗДЕЛИЯ[0];
+  const колонка = тип.колонка || 'обычное';
+  const м2 = ш / 1000 * дл;
+  const кор = (тип.сложный && дл > 0 && дл * 1000 < 1500) ? (ЦЕНЫ.коэф_до_1500 || 1) : 1;
+  let продажа = м2 * ценаПродажиМ2(цветId, колонка, ручнаяМ2) * кор;
+  продажа = Math.max(продажа, (ЦЕНЫ.минималка || 0) * idx);
+  const металл = м2 * (1 + (З.отход || 0) / 100) * металлМ2(цветId);
+  const работа = дл * (З.работа_мп || 0) + (З.работа_изд || 0);
+  const упаковка = З.упаковка || 0;
+  return { продажа: r2(продажа), металл: r2(металл), работа: r2(работа), упаковка: r2(упаковка), м2 };
+}
+
+// затраты → итог с накладными и налогами
+function итог(продажа, прямые) {
+  const накладные = r2(прямые * (З.накладные || 0) / 100);
+  const налоги = r2(продажа * (З.налоги || 0) / 100);
+  const себест = r2(прямые + накладные + налоги);
+  const прибыль = r2(продажа - себест);
+  const маржа = продажа > 0 ? r2(прибыль / продажа * 100) : 0;
+  return { накладные, налоги, себест, прибыль, маржа };
+}
+
+// ── настройки: интерфейс ──
+function рисоватьНастройки() {
+  const box = $('metal-rows'); box.innerHTML = '';
+  for (const c of ЦВЕТА) {
+    const m = З.металл[c.id] || {};
+    const row = document.createElement('div'); row.className = 'mrow';
+    row.innerHTML = `<span class="nm">${c.название}</span>
+      <input type="number" step="0.01" min="0" inputmode="decimal" data-metal="${c.id}" data-f="кг" value="${m.кг ?? ''}">
+      <input type="number" step="0.1" min="0" inputmode="decimal" data-metal="${c.id}" data-f="расход" value="${m.расход ?? ''}">
+      <span class="m2" data-m2="${c.id}"></span>`;
+    box.appendChild(row);
+  }
+  $('m-other').value = З.другой_м2 ?? '';
+  $('c-othod').value = З.отход ?? 12;
+  $('c-rab-mp').value = З.работа_мп ?? 0;
+  $('c-rab-izd').value = З.работа_изд ?? 0;
+  $('c-upak').value = З.упаковка ?? 0;
+  $('c-nakl').value = З.накладные ?? 0;
+  $('c-nalog').value = З.налоги ?? 0;
+  $('c-vychet').checked = !!З.вычет;
+  обновитьМ2();
+  box.oninput = обновитьМ2;
+}
+function обновитьМ2() {
+  for (const c of ЦВЕТА) {
+    const кг = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="кг"]`).value) || 0;
+    const рх = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="расход"]`).value) || 0;
+    document.querySelector(`[data-m2="${c.id}"]`).textContent = (кг > 0 && рх > 0) ? fmt(кг * рх) : '—';
+  }
+}
+$('cfg-save').onclick = () => {
+  const металл = {};
+  for (const c of ЦВЕТА) {
+    const кг = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="кг"]`).value) || 0;
+    const рх = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="расход"]`).value) || 0;
+    if (кг > 0 && рх > 0) металл[c.id] = { кг, расход: рх };
+  }
+  З = {
+    демо: false, металл,
+    другой_м2: parseFloat($('m-other').value) || 0,
+    отход: parseFloat($('c-othod').value) || 0,
+    работа_мп: parseFloat($('c-rab-mp').value) || 0,
+    работа_изд: parseFloat($('c-rab-izd').value) || 0,
+    упаковка: parseFloat($('c-upak').value) || 0,
+    накладные: parseFloat($('c-nakl').value) || 0,
+    налоги: parseFloat($('c-nalog').value) || 0,
+    вычет: $('c-vychet').checked
+  };
+  localStorage.setItem(КЛЮЧ_С, JSON.stringify(З));
+  $('cfg').open = false;
+  предупреждения(); считатьВсё();
+};
+
+function предупреждения() {
+  const w = $('demo-warn');
+  if (З.демо) {
+    w.hidden = false;
+    w.innerHTML = '<b>Закупка пока демонстрационная.</b> Откройте «⚙ Закупка металла и затраты» и впишите цены из накладной поставщика — иначе прибыль считается по условным цифрам.';
+  } else if (ЦЕНЫ.демо) {
+    w.hidden = false;
+    w.innerHTML = '<b>Прайс продажи демонстрационный.</b> Свои цены продажи вводятся на главной: «⚙ Настройки».';
+  } else w.hidden = true;
+}
+
+// ── режим «1 изделие» ──
+function заполнитьСелекты() {
+  $('u-type').innerHTML = ИЗДЕЛИЯ.map(t => `<option value="${t.id}">${t.название}</option>`).join('');
+  const оц = ЦВЕТА.map(c => `<option value="${c.id}">${c.название}</option>`).join('') +
+    (ЦВЕТ_РУЧНОЙ ? `<option value="_ручной">${ЦВЕТ_РУЧНОЙ.название}</option>` : '');
+  $('u-color').innerHTML = оц;
+}
+function считатьЕдиницу() {
+  const ш = parseFloat($('u-w').value) || 0, дл = parseFloat($('u-l').value) || 0;
+  const цвет = $('u-color').value;
+  $('u-manual-wrap').hidden = цвет !== '_ручной';
+  const ручная = parseFloat($('u-manual').value) || 0;
+  const box = $('u-res');
+  if (ш <= 0 || дл <= 0) { box.innerHTML = '<div class="d" style="color:#9a938a">Укажите ширину и длину.</div>'; $('u-table').innerHTML = ''; return; }
+  const r = изделие($('u-type').value, цвет, ш, дл, ручная);
+  const прямые = r.металл + r.работа + r.упаковка;
+  const т = итог(r.продажа, прямые);
+  const кл = т.прибыль >= 0 ? 'plus' : 'minus';
+  box.innerHTML = `
+    <table>
+      <tr><td>Продажа по прайсу <span class="d">без НДС</span></td><td class="r">${fmt(r.продажа)} руб</td></tr>
+      <tr><td>Металл <span class="d">с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(r.металл)}</td></tr>
+      ${r.работа ? `<tr><td>Работа</td><td class="r">−${fmt(r.работа)}</td></tr>` : ''}
+      ${r.упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r.упаковка)}</td></tr>` : ''}
+      ${т.накладные ? `<tr><td>Накладные ${З.накладные}%</td><td class="r">−${fmt(т.накладные)}</td></tr>` : ''}
+      ${т.налоги ? `<tr><td>Налоги ${З.налоги}% от выручки</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      <tr class="total"><td>Прибыль с изделия</td><td class="r ${кл}">${fmt(т.прибыль)} руб</td></tr>
+    </table>
+    <div class="big">
+      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(т.маржа).replace('.', ',')}%</div></div>
+      <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(дл > 0 ? т.прибыль / дл : 0)}</div><div class="s">руб/м.п.</div></div>
+      <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб/изделие</div></div>
+    </div>`;
+  // таблица по всем цветам
+  let html = '<tr><th>Цвет</th><th>Продажа</th><th>Себест.</th><th>Прибыль</th><th>Маржа</th></tr>';
+  for (const c of ЦВЕТА) {
+    const rr = изделие($('u-type').value, c.id, ш, дл, 0);
+    const пр = rr.металл + rr.работа + rr.упаковка;
+    const tt = итог(rr.продажа, пр);
+    const k = tt.прибыль >= 0 ? 'plus' : 'minus';
+    html += `<tr><td>${c.название}</td><td>${fmt(rr.продажа)}</td><td>${fmt(tt.себест)}</td>
+      <td class="${k}">${fmt(tt.прибыль)}</td><td class="${k}">${String(tt.маржа).replace('.', ',')}%</td></tr>`;
+  }
+  $('u-table').innerHTML = html;
+}
+
+// ── режим «заказ» ──
+let позиции = [];
+function новаяПозиция() { return { тип: ИЗДЕЛИЯ[0]?.id || 'otliv', цвет: ЦВЕТА[0]?.id || '', ш: 200, дл: 2, шт: 1, ручная: 0 }; }
+function рисоватьПозиции() {
+  const box = $('o-items'); box.innerHTML = '';
+  позиции.forEach((p, i) => {
+    const el = document.createElement('div'); el.className = 'item';
+    const оц = ЦВЕТА.map(c => `<option value="${c.id}" ${p.цвет === c.id ? 'selected' : ''}>${c.название}</option>`).join('') +
+      (ЦВЕТ_РУЧНОЙ ? `<option value="_ручной" ${p.цвет === '_ручной' ? 'selected' : ''}>${ЦВЕТ_РУЧНОЙ.название}</option>` : '');
+    el.innerHTML = `
+      <button class="del" type="button" title="Убрать">×</button>
+      <div class="irow">
+        <div class="f"><label>Изделие</label><select data-f="тип">${ИЗДЕЛИЯ.map(t => `<option value="${t.id}" ${p.тип === t.id ? 'selected' : ''}>${t.название}</option>`).join('')}</select></div>
+        <div class="f"><label>Цвет</label><select data-f="цвет">${оц}</select></div>
+      </div>
+      ${p.цвет === '_ручной' ? `<div class="irow"><div class="f" style="grid-column:1/-1"><label>Цена продажи, руб/м² без НДС</label><input type="number" step="1" min="0" data-f="ручная" value="${p.ручная || ''}"></div></div>` : ''}
+      <div class="irow3">
+        <div class="f"><label>Ширина, мм</label><input type="number" step="10" min="0" data-f="ш" value="${p.ш}"></div>
+        <div class="f"><label>Длина, м</label><input type="number" step="0.1" min="0" data-f="дл" value="${p.дл}"></div>
+        <div class="f"><label>Кол-во, шт</label><input type="number" step="1" min="0" data-f="шт" value="${p.шт}"></div>
+      </div>`;
+    el.querySelector('.del').onclick = () => { позиции.splice(i, 1); рисоватьПозиции(); считатьЗаказ(); };
+    el.querySelectorAll('[data-f]').forEach(inp => {
+      inp.oninput = () => {
+        const f = inp.dataset.f;
+        p[f] = (inp.tagName === 'SELECT') ? inp.value : (parseFloat(inp.value) || 0);
+        if (f === 'цвет' || f === 'тип') рисоватьПозиции();
+        считатьЗаказ();
+      };
+    });
+    box.appendChild(el);
+  });
+}
+$('o-add').onclick = () => { позиции.push(новаяПозиция()); рисоватьПозиции(); считатьЗаказ(); };
+
+function считатьЗаказ() {
+  const box = $('o-res');
+  const строки = позиции.filter(p => p.ш > 0 && p.дл > 0 && p.шт > 0);
+  if (!строки.length) { box.innerHTML = '<div class="d" style="color:#9a938a">Добавьте позиции — итог посчитается сам.</div>'; return; }
+  let продажа = 0, металл = 0, работа = 0, упаковка = 0, мп = 0;
+  for (const p of строки) {
+    const r = изделие(p.тип, p.цвет, p.ш, p.дл, p.ручная);
+    продажа += r.продажа * p.шт; металл += r.металл * p.шт;
+    работа += r.работа * p.шт; упаковка += r.упаковка * p.шт;
+    мп += p.дл * p.шт;
+  }
+  const факт = parseFloat($('o-fact').value) || 0;
+  const выручка = r2(факт > 0 ? факт : продажа);
+  const доставка = parseFloat($('o-dost').value) || 0;
+  const прямые = металл + работа + упаковка + доставка;
+  const т = итог(выручка, прямые);
+  const кл = т.прибыль >= 0 ? 'plus' : 'minus';
+  box.innerHTML = `
+    <table>
+      <tr><td>Выручка ${факт > 0 ? '<span class="d">по факту</span>' : '<span class="d">по прайсу, без НДС</span>'}</td><td class="r">${fmt(выручка)} руб</td></tr>
+      <tr><td>Металл <span class="d">с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(r2(металл))}</td></tr>
+      ${работа ? `<tr><td>Работа</td><td class="r">−${fmt(r2(работа))}</td></tr>` : ''}
+      ${упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r2(упаковка))}</td></tr>` : ''}
+      ${доставка ? `<tr><td>Доставка</td><td class="r">−${fmt(r2(доставка))}</td></tr>` : ''}
+      ${т.накладные ? `<tr><td>Накладные ${З.накладные}%</td><td class="r">−${fmt(т.накладные)}</td></tr>` : ''}
+      ${т.налоги ? `<tr><td>Налоги ${З.налоги}% от выручки</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      <tr class="total"><td>Прибыль по заказу</td><td class="r ${кл}">${fmt(т.прибыль)} руб</td></tr>
+    </table>
+    <div class="big">
+      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(т.маржа).replace('.', ',')}%</div></div>
+      <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(мп > 0 ? т.прибыль / мп : 0)}</div><div class="s">руб/м.п. · всего ${String(r2(мп)).replace('.', ',')} м.п.</div></div>
+      <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб на заказ</div></div>
+    </div>
+    ${факт > 0 && продажа > 0 ? `<div class="hint">По прайсу этот заказ стоил бы ${fmt(r2(продажа))} руб без НДС.</div>` : ''}`;
+}
+$('o-dost').oninput = считатьЗаказ;
+$('o-fact').oninput = считатьЗаказ;
+
+// ── табы ──
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + t.dataset.pane));
+  };
+});
+
+function считатьВсё() { считатьЕдиницу(); считатьЗаказ(); }
+['u-type', 'u-color', 'u-w', 'u-l', 'u-manual'].forEach(id => { $(id).oninput = считатьЕдиницу; $(id).onchange = считатьЕдиницу; });
+
+// подпись про НДС в чекбоксе
+document.querySelector('.chk span').innerHTML = document.querySelector('.chk span').innerHTML.replace('{{ндс}}', НДС);
+
+заполнитьСелекты();
+рисоватьНастройки();
+предупреждения();
+if (З.демо) $('cfg').open = true;
+позиции = [новаяПозиция()];
+рисоватьПозиции();
+считатьВсё();
+</script>
+</body>
+</html>

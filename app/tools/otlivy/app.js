@@ -225,7 +225,8 @@ function calcItem(el, k) {
     : (/^ral/i.test(c.id) ? c.id.replace(/^ral/i, '') : c.название);
 
   return { наимен, ед, колво, колвоСтр, цена, сумма, ready, invalid: !!warn, раскрой,
-           база: p.коротко || p.название, разв: wMM, цветКод, едЗБ: ед === 'м.п.' ? 'пог.м' : ед };
+           база: p.коротко || p.название, разв: wMM, цветКод, едЗБ: ед === 'м.п.' ? 'пог.м' : ед,
+           цветId: c.id, сложн: !!p.сложный };
 }
 
 // ── Клиент из справочника ──
@@ -378,6 +379,25 @@ function buildInvoice() {
   const клиент = $('client').value.trim() || '________________________________';
   const Р = РЕКВИЗИТЫ;
   window._invNum = номер;
+
+  // Очередь для «Себестоимость и заработок»: выставленный счёт сам попадает
+  // в факт месяца на дашборде (дедуп там — по id: дата+сумма+метраж).
+  try {
+    const годные = rows.filter(r => r.ready && r.раскрой);
+    if (годные.length) {
+      const позиции = годные.map(r => ({
+        ш: r.раскрой.w, дл: r3(r.раскрой.l * r.раскрой.qty), цвет: r.цветId || 'other',
+        сложн: !!r.сложн, сумма: r.сумма
+      }));
+      const итог = r2(годные.reduce((s, r) => s + r.сумма, 0));
+      const мп = r3(позиции.reduce((s, p) => s + p.дл, 0));
+      const id = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())}|${итог}|${мп}`;
+      const К = 'dianast_sebest_queue_v1';
+      const оч = (JSON.parse(localStorage.getItem(К) || '[]') || []).filter(x => x.id !== id);
+      оч.push({ id, дата: `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())}`, позиции, итог });
+      localStorage.setItem(К, JSON.stringify(оч.slice(-30)));
+    }
+  } catch (e) { /* очередь не должна ломать счёт */ }
 
   $('invoice').innerHTML = `
   <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:3px solid #D4521E;padding-bottom:12px">

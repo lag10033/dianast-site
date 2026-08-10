@@ -226,6 +226,7 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
         <div class="f"><label>Прибыль, руб</label><input type="number" id="dp-pri" step="100" min="0" inputmode="decimal"></div>
         <div class="f"><label>Металл, кг</label><input type="number" id="dp-kg" step="10" min="0" inputmode="decimal"></div>
         <div class="f"><label>Рабочих дней</label><input type="number" id="dp-dn" step="1" min="1" inputmode="numeric"></div>
+        <div class="f"><label>Человек в цехе</label><input type="number" id="dp-chel" step="1" min="1" inputmode="numeric"></div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
         <button class="addbtn" id="dash-plan-1" type="button" style="flex:1">План из выработки: 1 смена</button>
@@ -240,15 +241,39 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
     </div>
 
     <div class="card">
+      <div class="sec-h" style="margin-top:0">График месяца — прибыль по дням</div>
+      <div id="dash-chart"></div>
+    </div>
+
+    <div class="card">
+      <div class="sec-h" style="margin-top:0">Склад металла</div>
+      <div id="dash-sklad"></div>
+      <div class="irow3" style="margin-top:10px; grid-template-columns:1fr 90px auto; align-items:end">
+        <div class="f"><label>Приход: цвет</label><select id="sk-color"></select></div>
+        <div class="f"><label>кг</label><input type="number" id="sk-kg" step="1" min="0" inputmode="decimal"></div>
+        <button class="addbtn" id="sk-add" type="button" style="padding:10px 14px">+ Приход</button>
+      </div>
+      <div class="hint">Заказ, записанный в факт, сам списывает металл со склада по цветам. Удаление записи возвращает металл обратно.</div>
+    </div>
+
+    <div class="card">
+      <div class="sec-h" style="margin-top:0">Сравнение месяцев</div>
+      <div id="dash-compare"></div>
+    </div>
+
+    <div class="card">
       <div class="sec-h" style="margin-top:0">Факт — сделанные заказы</div>
       <div id="dash-fact"></div>
-      <button class="addbtn" id="dash-fact-add" type="button">+ Запись вручную</button>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="addbtn" id="dash-fact-add" type="button" style="flex:1">+ Запись вручную</button>
+        <button class="addbtn" id="dash-csv" type="button" style="flex:1">⬇ Скачать месяц (Excel/CSV)</button>
+      </div>
       <div class="hint">Быстрее так: посчитай заказ во вкладке «Заказ» и нажми «💾 Записать в факт месяца» — запись появится тут сама.</div>
     </div>
   </section>
 </main>
 
-<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 9 от 10.08.2026</footer>
+<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 10 от 10.08.2026</footer>
 
 <script src="../../цены.js?v=2026-08-09a"></script>
 <script>
@@ -549,7 +574,7 @@ function считатьЗаказ() {
     const m = З.металл[p.цвет];
     const имя = (цвет ? цвет.название : 'Другой цвет') + (m && m.толщина ? `, ${String(m.толщина).replace('.', ',')} мм` : '');
     const м2о = p.ш / 1000 * p.дл * p.шт * (1 + (З.отход || 0) / 100);
-    if (!списание[имя]) списание[имя] = { м2: 0, кг: 0, безВеса: !m || !(m.расход > 0) };
+    if (!списание[имя]) списание[имя] = { м2: 0, кг: 0, id: p.цвет, безВеса: !m || !(m.расход > 0) };
     списание[имя].м2 += м2о;
     if (m && m.расход > 0) списание[имя].кг += м2о * m.расход;
   }
@@ -585,10 +610,13 @@ function считатьЗаказ() {
       ${Object.entries(списание).map(([имя, s]) => `<tr><td>${имя}</td><td class="r">${fmt(r2(s.м2))} м² ${s.безВеса ? '<span class="d">(веса нет — кг/м² не заполнен)</span>' : '· ' + fmt(r2(s.кг)) + ' кг'}</td></tr>`).join('')}
       <tr class="total"><td>Итого</td><td class="r">${fmt(r2(Object.values(списание).reduce((s, x) => s + x.м2, 0)))} м² · ${fmt(r2(Object.values(списание).reduce((s, x) => s + x.кг, 0)))} кг</td></tr>
     </table>`;
+  const поЦветам = {};
+  Object.values(списание).forEach(s => { if (s.кг > 0) поЦветам[s.id] = r2((поЦветам[s.id] || 0) + s.кг); });
   ИтогЗаказа = {
     мп, прибыль: т.прибыль, выручкаНДС: в.выручка,
     м2: r2(Object.values(списание).reduce((s, x) => s + x.м2, 0)),
-    кг: r2(Object.values(списание).reduce((s, x) => s + x.кг, 0))
+    кг: r2(Object.values(списание).reduce((s, x) => s + x.кг, 0)),
+    поЦветам
   };
   считатьВыработку();
 }
@@ -636,11 +664,15 @@ const КЛЮЧ_Д = 'dianast_dashboard_v1';
 const МЕСЯЦА = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
 const текМесяц = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
 let Д = (function () {
-  try {
-    const v = JSON.parse(localStorage.getItem(КЛЮЧ_Д) || 'null');
-    if (v && v.план) return v;
-  } catch (e) {}
-  return { месяц: текМесяц(), план: { мп: 0, выручка: 0, прибыль: 0, кг: 0, дней: 22 }, факт: [] };
+  let v = null;
+  try { v = JSON.parse(localStorage.getItem(КЛЮЧ_Д) || 'null'); } catch (e) {}
+  if (!v || !v.план) v = { месяц: текМесяц(), план: { мп: 0, выручка: 0, прибыль: 0, кг: 0, дней: 22 }, факт: [] };
+  // добивка полей для старых записей
+  v.план.человек = v.план.человек || 2;
+  v.склад = v.склад || {};        // цветId → остаток кг
+  v.приходы = v.приходы || [];    // {дата, цвет, кг}
+  v.архив = v.архив || [];        // закрытые месяцы целиком
+  return v;
 })();
 function сохранитьДаш() { localStorage.setItem(КЛЮЧ_Д, JSON.stringify(Д)); }
 
@@ -660,15 +692,17 @@ function рисоватьПлан() {
   $('dp-pri').value = Д.план.прибыль || '';
   $('dp-kg').value = Д.план.кг || '';
   $('dp-dn').value = Д.план.дней || 22;
+  $('dp-chel').value = Д.план.человек || 2;
   const [г, м] = (Д.месяц || текМесяц()).split('-');
   $('dash-month').textContent = '— ' + МЕСЯЦА[parseInt(м, 10) - 1] + ' ' + г;
 }
-['dp-mp', 'dp-vyr', 'dp-pri', 'dp-kg', 'dp-dn'].forEach(id => {
+['dp-mp', 'dp-vyr', 'dp-pri', 'dp-kg', 'dp-dn', 'dp-chel'].forEach(id => {
   $(id).oninput = () => {
     Д.план = {
       мп: parseFloat($('dp-mp').value) || 0, выручка: parseFloat($('dp-vyr').value) || 0,
       прибыль: parseFloat($('dp-pri').value) || 0, кг: parseFloat($('dp-kg').value) || 0,
-      дней: parseFloat($('dp-dn').value) || 22
+      дней: parseFloat($('dp-dn').value) || 22,
+      человек: parseFloat($('dp-chel').value) || 2
     };
     сохранитьДаш(); рисоватьKPI();
   };
@@ -676,7 +710,8 @@ function рисоватьПлан() {
 function планИз(вар) {
   if (!ПоследняяВыработка) { alert('Сначала посчитайте заказ во вкладке «Заказ» — выработка возьмётся оттуда.'); return; }
   const в = ПоследняяВыработка[вар];
-  Д.план = { мп: в.мп, выручка: в.выручка, прибыль: в.прибыль, кг: в.кг, дней: parseFloat($('o-mdays').value) || 22 };
+  Д.план = { мп: в.мп, выручка: в.выручка, прибыль: в.прибыль, кг: в.кг,
+    дней: parseFloat($('o-mdays').value) || 22, человек: вар === 'смена2' ? 4 : 2 };
   сохранитьДаш(); рисоватьПлан(); рисоватьKPI();
 }
 $('dash-plan-1').onclick = () => планИз('смена1');
@@ -685,29 +720,35 @@ $('dash-plan-2').onclick = () => планИз('смена2');
 function рисоватьФакт() {
   const box = $('dash-fact'); box.innerHTML = '';
   if (!Д.факт.length) { box.innerHTML = '<div class="hint" style="margin-bottom:8px">Записей пока нет.</div>'; return; }
+  const колонки = '84px 1fr 1fr 1fr 1fr 34px 24px';
   const шапка = document.createElement('div');
   шапка.className = 'mrow mhead';
-  шапка.style.gridTemplateColumns = '86px 1fr 1fr 1fr 1fr 24px';
-  шапка.innerHTML = '<span>дата</span><span>м.п.</span><span>выручка</span><span>прибыль</span><span>кг</span><span></span>';
+  шапка.style.gridTemplateColumns = колонки;
+  шапка.innerHTML = '<span>дата</span><span>м.п.</span><span>выручка</span><span>прибыль</span><span>кг</span><span title="переделка/брак">брак</span><span></span>';
   box.appendChild(шапка);
   Д.факт.forEach((з, i) => {
     const row = document.createElement('div');
     row.className = 'mrow';
-    row.style.gridTemplateColumns = '86px 1fr 1fr 1fr 1fr 24px';
+    row.style.gridTemplateColumns = колонки;
     row.innerHTML = `
       <input type="date" data-df="дата" value="${з.дата || ''}" style="padding:7px 4px; font-size:12px">
       <input type="number" step="0.1" min="0" data-df="мп" value="${з.мп || ''}">
       <input type="number" step="0.01" min="0" data-df="выручка" value="${з.выручка || ''}">
       <input type="number" step="0.01" data-df="прибыль" value="${з.прибыль ?? ''}">
       <input type="number" step="0.1" min="0" data-df="кг" value="${з.кг || ''}">
+      <input type="checkbox" data-df="переделка" ${з.переделка ? 'checked' : ''} style="width:17px;height:17px;justify-self:center" title="Отметить как переделку/брак">
       <button type="button" title="Убрать" style="border:none;background:none;color:#b5aca0;font-size:17px;cursor:pointer">×</button>`;
     row.querySelectorAll('[data-df]').forEach(inp => {
       inp.oninput = () => {
-        з[inp.dataset.df] = inp.type === 'date' ? inp.value : (parseFloat(inp.value) || 0);
+        з[inp.dataset.df] = inp.type === 'date' ? inp.value
+          : inp.type === 'checkbox' ? inp.checked : (parseFloat(inp.value) || 0);
         сохранитьДаш(); рисоватьKPI();
       };
     });
-    row.querySelector('button').onclick = () => { Д.факт.splice(i, 1); сохранитьДаш(); рисоватьФакт(); рисоватьKPI(); };
+    row.querySelector('button').onclick = () => {
+      if (з.цвета) списатьСоСклада(з.цвета, -1);   // отмена записи возвращает металл на склад
+      Д.факт.splice(i, 1); сохранитьДаш(); рисоватьФакт(); рисоватьKPI();
+    };
     box.appendChild(row);
   });
 }
@@ -715,10 +756,17 @@ $('dash-fact-add').onclick = () => {
   Д.факт.push({ дата: new Date().toISOString().slice(0, 10), мп: 0, выручка: 0, прибыль: 0, кг: 0 });
   сохранитьДаш(); рисоватьФакт(); рисоватьKPI();
 };
+function списатьСоСклада(цвета, знак) {
+  for (const [id, кг] of Object.entries(цвета || {})) {
+    Д.склад[id] = r2((Д.склад[id] || 0) - знак * кг);
+  }
+}
 $('o-zapisat').onclick = () => {
   if (!ИтогЗаказа) { alert('Сначала заполните заказ.'); return; }
   Д.факт.push({ дата: new Date().toISOString().slice(0, 10), мп: r2(ИтогЗаказа.мп),
-    выручка: ИтогЗаказа.выручкаНДС, прибыль: ИтогЗаказа.прибыль, кг: ИтогЗаказа.кг });
+    выручка: ИтогЗаказа.выручкаНДС, прибыль: ИтогЗаказа.прибыль, кг: ИтогЗаказа.кг,
+    цвета: ИтогЗаказа.поЦветам, переделка: false });
+  списатьСоСклада(ИтогЗаказа.поЦветам, 1);
   сохранитьДаш(); рисоватьФакт(); рисоватьKPI();
   const b = $('o-zapisat'), t = b.textContent;
   b.textContent = '✓ Записано в факт месяца';
@@ -733,14 +781,17 @@ function рисоватьKPI() {
     box.innerHTML = `<div class="warn">Записи за ${МЕСЯЦА[parseInt(м, 10) - 1]} ${г}. Начать новый месяц?
       <button class="ns-mini" id="dash-new" type="button" style="margin-left:8px; border:1.5px solid #ead9a0; background:#fff; border-radius:9px; padding:6px 10px; font-size:12px; cursor:pointer">Начать (факт очистится)</button></div>`;
     $('dash-new').onclick = () => {
-      if (!confirm('Очистить записи факта и начать ' + МЕСЯЦА[new Date().getMonth()] + '? План останется.')) return;
+      if (!confirm('Закрыть ' + МЕСЯЦА[parseInt(м, 10) - 1] + ' в архив и начать ' + МЕСЯЦА[new Date().getMonth()] + '? План останется, записи уйдут в архив для сравнения.')) return;
+      Д.архив.push({ месяц: Д.месяц, план: JSON.parse(JSON.stringify(Д.план)), факт: Д.факт });
       Д.месяц = текМесяц(); Д.факт = [];
       сохранитьДаш(); рисоватьПлан(); рисоватьФакт(); рисоватьKPI();
     };
+    рисоватьГрафик(); рисоватьСклад(); рисоватьСравнение();
     return;
   }
   if (!п.прибыль && !п.выручка && !п.мп) {
     box.innerHTML = '<div class="d" style="color:#9a938a">Задайте план — и здесь появится план-факт.</div>';
+    рисоватьГрафик(); рисоватьСклад(); рисоватьСравнение();
     return;
   }
   const всего = п.дней || 22;
@@ -774,6 +825,10 @@ function рисоватьKPI() {
     : ф.прибыль >= должноПри * 0.97 ? '✅ Идём по плану'
     : `⚠ Отстаём: до графика не хватает ${fmt(r2(должноПри - ф.прибыль))} руб прибыли`;
   const нуженТемп = осталось > 0 ? (п.прибыль - ф.прибыль) / осталось : 0;
+  const заказы = Д.факт.filter(з => !з.переделка);
+  const переделки = Д.факт.filter(з => з.переделка);
+  const чек = заказы.length ? ф.выручка / заказы.length : 0;
+  const челДн = прошло * (п.человек || 2);
   box.innerHTML = `
     <div style="font-size:14.5px; font-weight:800; margin-bottom:12px">${статус}</div>
     <div class="d" style="margin-bottom:12px">Прошло ${прошло} из ${всего} раб. дней · заказов записано: ${Д.факт.length}${осталось > 0 && п.прибыль > ф.прибыль ? ` · чтобы выйти на план, нужно ${fmt(r2(нуженТемп))} руб прибыли в день` : ''}</div>
@@ -781,8 +836,190 @@ function рисоватьKPI() {
     ${метрика('Выручка', ф.выручка, п.выручка, 'руб')}
     ${метрика('Метры', ф.мп, п.мп, 'м.п.')}
     ${метрика('Металл', ф.кг, п.кг, 'кг')}
+    <div class="big" style="margin-top:4px">
+      <div class="kpi"><div class="l">Средний чек</div><div class="v">${fmt(r2(чек))}</div><div class="s">руб · заказов ${заказы.length}</div></div>
+      <div class="kpi"><div class="l">На человека в день</div><div class="v">${fmt(челДн > 0 ? r2(ф.мп / челДн) : 0)}</div><div class="s">м.п. · прибыль ${fmt(челДн > 0 ? r2(ф.прибыль / челДн) : 0)} руб</div></div>
+      <div class="kpi"><div class="l">Переделки / брак</div><div class="v ${переделки.length ? 'minus' : ''}">${переделки.length}</div><div class="s">${переделки.length ? 'металла ' + fmt(r2(переделки.reduce((s, з) => s + (з.кг || 0), 0))) + ' кг · прибыль ' + fmt(r2(переделки.reduce((s, з) => s + (з.прибыль || 0), 0))) + ' руб' : 'за месяц нет'}</div></div>
+    </div>
     <div class="hint">Чёрная риска на шкале — где мы должны быть сегодня. Прогноз — если продолжим текущим темпом.</div>`;
+  рисоватьГрафик(); рисоватьСклад(); рисоватьСравнение();
 }
+
+// суммы факта текущего месяца (или переданного списка записей)
+function суммыФакта(записи) {
+  const s = { мп: 0, выручка: 0, прибыль: 0, кг: 0, заказов: 0 };
+  (записи || Д.факт).forEach(з => {
+    s.мп += з.мп || 0; s.выручка += з.выручка || 0; s.прибыль += з.прибыль || 0; s.кг += з.кг || 0;
+    if (!з.переделка) s.заказов++;
+  });
+  return s;
+}
+
+// ── график: накопительная прибыль по дням против линии плана ──
+function рисоватьГрафик() {
+  const box = $('dash-chart');
+  const п = Д.план, всего = п.дней || 22;
+  const сег = new Date();
+  const днейВМес = new Date(сег.getFullYear(), сег.getMonth() + 1, 0).getDate();
+  if (!Д.факт.length && !п.прибыль) { box.innerHTML = '<div class="d" style="color:#9a938a">Появится после плана и первых записей.</div>'; return; }
+  // накопительный факт по датам
+  const поДням = {};
+  Д.факт.forEach(з => { const d = parseInt((з.дата || '').slice(8), 10) || 1; поДням[d] = (поДням[d] || 0) + (з.прибыль || 0); });
+  const фактТчк = []; let нак = 0;
+  for (let d = 1; d <= Math.min(сег.getDate(), днейВМес); d++) { нак += поДням[d] || 0; фактТчк.push([d, нак]); }
+  // план: накопительно по рабочим дням
+  const планТчк = []; let рд = 0;
+  for (let d = 1; d <= днейВМес; d++) {
+    const дн = new Date(сег.getFullYear(), сег.getMonth(), d).getDay();
+    if (дн >= 1 && дн <= 5) рд++;
+    планТчк.push([d, п.прибыль * Math.min(рд, всего) / всего]);
+  }
+  const максY = Math.max(п.прибыль || 0, нак, 1) * 1.05;
+  const W = 600, H = 190, L = 6, R = 6, T = 10, B = 22;
+  const px = d => L + (d - 1) / (днейВМес - 1) * (W - L - R);
+  const py = v => H - B - v / максY * (H - T - B);
+  const линия = тчк => тчк.map(([d, v], i) => (i ? 'L' : 'M') + px(d).toFixed(1) + ' ' + py(v).toFixed(1)).join(' ');
+  const метки = [1, 5, 10, 15, 20, 25, днейВМес].filter((v, i, a) => a.indexOf(v) === i && v <= днейВМес);
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block">
+    <line x1="${L}" y1="${py(0)}" x2="${W - R}" y2="${py(0)}" stroke="#E2DCD3" stroke-width="1"/>
+    ${п.прибыль ? `<path d="${линия(планТчк)}" fill="none" stroke="#b5aca0" stroke-width="2" stroke-dasharray="5 4"/>` : ''}
+    ${фактТчк.length ? `<path d="${линия(фактТчк)}" fill="none" stroke="#D4521E" stroke-width="3" stroke-linejoin="round"/>` : ''}
+    ${фактТчк.map(([d, v]) => (поДням[d] ? `<circle cx="${px(d).toFixed(1)}" cy="${py(v).toFixed(1)}" r="4" fill="#D4521E"/>` : '')).join('')}
+    ${метки.map(d => `<text x="${px(d).toFixed(1)}" y="${H - 6}" font-size="11" fill="#9a938a" text-anchor="middle">${d}</text>`).join('')}
+    ${п.прибыль ? `<text x="${W - R}" y="${py(п.прибыль) - 5}" font-size="11" fill="#9a938a" text-anchor="end">план ${fmt(r2(п.прибыль))}</text>` : ''}
+    ${фактТчк.length ? `<text x="${px(фактТчк[фактТчк.length - 1][0]).toFixed(1)}" y="${py(нак) - 8}" font-size="12" font-weight="800" fill="#D4521E" text-anchor="middle">${fmt(r2(нак))}</text>` : ''}
+  </svg>
+  <div class="hint">Пунктир — как должна расти прибыль по плану. Оранжевая линия — как растёт по факту.</div>`;
+}
+
+// ── склад: остатки по цветам, «хватит на N дней», докупка на следующий месяц ──
+function имяЦвета(id) { const c = ЦВЕТА.find(x => x.id === id); return c ? c.название : id; }
+function рисоватьСклад() {
+  const box = $('dash-sklad');
+  const ф = суммыФакта();
+  const прошло = рабДнейПрошло();
+  // расход по цветам за месяц
+  const расход = {};
+  Д.факт.forEach(з => { for (const [id, кг] of Object.entries(з.цвета || {})) расход[id] = (расход[id] || 0) + кг; });
+  const ids = [...new Set([...Object.keys(Д.склад).filter(id => Д.склад[id]), ...Object.keys(расход)])];
+  if (!ids.length) { box.innerHTML = '<div class="d" style="color:#9a938a">Добавьте приход металла — появятся остатки. Записи заказов будут списывать сами.</div>'; return; }
+  // потребность след. месяца: план по кг, разложенный по долям фактического расхода цветов
+  const планКг = Д.план.кг || 0;
+  const всегоРасход = Object.values(расход).reduce((s, x) => s + x, 0);
+  let html = '<table class="ctable"><tr><th>Цвет</th><th>Остаток, кг</th><th>Расход/мес</th><th>Нужно на след. мес</th><th>Докупить</th></tr>';
+  for (const id of ids) {
+    const ост = r2(Д.склад[id] || 0);
+    const расх = r2(расход[id] || 0);
+    const нужно = всегоРасход > 0 ? r2(планКг * расх / всегоРасход) : 0;
+    const докуп = Math.max(r2(нужно - ост), 0);
+    html += `<tr><td>${имяЦвета(id)}</td><td class="${ост < 0 ? 'minus' : ''}">${fmt(ост)}</td><td>${fmt(расх)}</td><td>${нужно ? fmt(нужно) : '—'}</td><td class="${докуп > 0 ? 'minus' : 'plus'}">${нужно ? (докуп > 0 ? fmt(докуп) : '✓ хватает') : '—'}</td></tr>`;
+  }
+  const остВсего = r2(ids.reduce((s, id) => s + (Д.склад[id] || 0), 0));
+  const темп = прошло > 0 ? ф.кг / прошло : 0;
+  html += `<tr class="total"><td>Итого</td><td>${fmt(остВсего)}</td><td>${fmt(r2(ф.кг))}</td><td>${планКг ? fmt(планКг) : '—'}</td><td></td></tr></table>`;
+  html += `<div class="hint">${темп > 0 && остВсего > 0 ? `При текущем расходе ${fmt(r2(темп))} кг/раб.день остатка хватит примерно на ${Math.floor(остВсего / темп)} раб. дней. ` : ''}«Нужно на след. мес» — план по металлу, разложенный по долям расхода цветов в этом месяце.</div>`;
+  box.innerHTML = html;
+}
+function заполнитьЦветаСклада() {
+  $('sk-color').innerHTML = ЦВЕТА.map(c => `<option value="${c.id}">${c.название}</option>`).join('') + '<option value="_other">Другой металл</option>';
+}
+$('sk-add').onclick = () => {
+  const кг = parseFloat($('sk-kg').value) || 0;
+  if (кг <= 0) { alert('Введите, сколько кг пришло.'); return; }
+  const id = $('sk-color').value;
+  Д.склад[id] = r2((Д.склад[id] || 0) + кг);
+  Д.приходы.push({ дата: new Date().toISOString().slice(0, 10), цвет: id, кг });
+  $('sk-kg').value = '';
+  сохранитьДаш(); рисоватьСклад();
+};
+
+// ── сравнение: с прошлым месяцем и с этим же месяцем прошлого года ──
+function рисоватьСравнение() {
+  const box = $('dash-compare');
+  if (!Д.архив.length) { box.innerHTML = '<div class="d" style="color:#9a938a">Появится после первого закрытого месяца: текущий месяц сравним с прошлым и с этим же месяцем прошлого года.</div>'; return; }
+  const тек = суммыФакта();
+  const [г, м] = Д.месяц.split('-');
+  const прошлый = Д.архив[Д.архив.length - 1];
+  const годНазад = Д.архив.find(a => a.месяц === (parseInt(г, 10) - 1) + '-' + м);
+  const блок = (заголовок, арх) => {
+    if (!арх) return '';
+    const s = суммыФакта(арх.факт);
+    const [аг, ам] = арх.месяц.split('-');
+    const стр = (имя, тек2, был, ед) => {
+      const д = был > 0 ? (тек2 - был) / был * 100 : 0;
+      const кл = д >= 0 ? 'plus' : 'minus';
+      return `<tr><td>${имя}</td><td class="r">${fmt(r2(тек2))}</td><td class="r">${fmt(r2(был))}</td><td class="r ${кл}">${был > 0 ? (д >= 0 ? '+' : '') + д.toFixed(0) + '%' : '—'}</td></tr>`;
+    };
+    return `<div class="sec-h">${заголовок}: ${МЕСЯЦА[parseInt(ам, 10) - 1]} ${аг}</div>
+      <table class="ctable"><tr><th></th><th>сейчас</th><th>тогда</th><th>±</th></tr>
+      ${стр('Прибыль, руб', тек.прибыль, s.прибыль)}
+      ${стр('Выручка, руб', тек.выручка, s.выручка)}
+      ${стр('Метры, м.п.', тек.мп, s.мп)}
+      ${стр('Металл, кг', тек.кг, s.кг)}
+      ${стр('Заказов', тек.заказов, s.заказов)}
+      </table>`;
+  };
+  box.innerHTML = блок('Прошлый месяц', прошлый) +
+    (годНазад && годНазад !== прошлый ? блок('Год назад', годНазад) : '') +
+    `<div class="hint">Сравнение честное после конца месяца; в середине месяца «сейчас» — только накопленное.</div>`;
+}
+
+// ── автозапись из калькулятора отливов ──
+// Калькулятор при выставлении счёта кладёт заказ в очередь; здесь считаем
+// его себестоимость по нашим ставкам и добавляем в факт месяца (дедуп по id).
+function принятьОчередь() {
+  let оч = [];
+  try { оч = JSON.parse(localStorage.getItem('dianast_sebest_queue_v1') || '[]') || []; } catch (e) {}
+  if (!оч.length) return;
+  Д.импорт = Д.импорт || [];
+  let новых = 0;
+  for (const з of оч) {
+    if (!з || !з.id || Д.импорт.includes(з.id)) continue;
+    let мп = 0, металл = 0, работа = 0, фот = 0, упаковка = 0, выручка = 0;
+    const цвета = {};
+    for (const p of (з.позиции || [])) {
+      // «своя» цена с ед 'мп' умножается на длину — передаём цену за метр
+      const rр = изделие(p.сложн ? 'slozh' : 'otliv', p.цвет, p.ш, p.дл, { цена: p.дл > 0 ? p.сумма / p.дл : 0, ед: 'мп' });
+      мп += p.дл; металл += rр.металл; работа += rр.работа; фот += rр.фот; упаковка += rр.упаковка;
+      выручка += rр.продажа;
+      const m = З.металл[p.цвет];
+      if (m && m.расход > 0) {
+        const кг = r2(p.ш / 1000 * p.дл * (1 + (З.отход || 0) / 100) * m.расход);
+        цвета[p.цвет] = r2((цвета[p.цвет] || 0) + кг);
+      }
+    }
+    const т = итог(r2(выручка), металл + работа + фот + упаковка);
+    const kНДС = З.вычет ? 1 + (З.ндс ?? НДС) / 100 : 1;
+    const кг = r2(Object.values(цвета).reduce((s, x) => s + x, 0));
+    Д.факт.push({ дата: з.дата || new Date().toISOString().slice(0, 10), мп: r2(мп),
+      выручка: r2(выручка * kНДС), прибыль: т.прибыль, кг, цвета, переделка: false, счёт: true });
+    списатьСоСклада(цвета, 1);
+    Д.импорт.push(з.id); новых++;
+  }
+  Д.импорт = Д.импорт.slice(-100);
+  if (новых) { сохранитьДаш(); localStorage.setItem('dianast_sebest_queue_v1', '[]'); }
+}
+
+// ── экспорт месяца в CSV (открывается в Excel) ──
+$('dash-csv').onclick = () => {
+  const s = суммыФакта();
+  const строки = [
+    ['Месяц', Д.месяц],
+    [],
+    ['Дата', 'М.п.', 'Выручка', 'Прибыль', 'Металл кг', 'Переделка'],
+    ...Д.факт.map(з => [з.дата, з.мп, з.выручка, з.прибыль, з.кг, з.переделка ? 'да' : '']),
+    [],
+    ['Итого факт', s.мп, s.выручка, s.прибыль, s.кг, ''],
+    ['План', Д.план.мп, Д.план.выручка, Д.план.прибыль, Д.план.кг, ''],
+  ];
+  const csv = '﻿' + строки.map(r => (r || []).map(x => String(x ?? '').replace('.', ',')).join(';')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dianast-цех-${Д.месяц}.csv`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+};
 
 // ── табы ──
 document.querySelectorAll('.tab').forEach(t => {
@@ -801,6 +1038,8 @@ $('u-manual-unit').onchange = () => { ценаСвоя = true; считатьЕ�
 заполнитьСелекты();
 подставитьЦену();
 рисоватьНастройки();
+заполнитьЦветаСклада();
+принятьОчередь();
 рисоватьПлан();
 рисоватьФакт();
 рисоватьKPI();

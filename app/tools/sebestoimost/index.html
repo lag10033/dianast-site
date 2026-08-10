@@ -47,6 +47,13 @@ details.card > summary::after{ content:'▾'; float:right; color:var(--текс�
 details.card[open] > summary::after{ content:'▴'; }
 .sec-h{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--текст2); margin:14px 0 8px; }
 .mrow{ display:grid; grid-template-columns:minmax(96px,1fr) 62px 78px 66px 70px; gap:7px; align-items:center; margin-bottom:7px; font-size:13px; }
+.mrow input[type=number]{ -moz-appearance:textfield; appearance:textfield; text-align:center; padding:8px 4px; }
+.mrow input[type=number]::-webkit-inner-spin-button, .mrow input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+@media (max-width:430px){
+  .mrow{ grid-template-columns:minmax(70px,1fr) 48px 58px 48px 54px; gap:5px; font-size:12px; }
+  .mrow input[type=number]{ font-size:13.5px; padding:7px 2px; }
+  .mrow .m2{ font-size:11px; }
+}
 .mrow .nm{ font-weight:700; }
 .mrow .m2{ text-align:right; font-size:12px; color:var(--текст2); white-space:nowrap; }
 .mhead{ font-size:10.5px; color:var(--текст2); font-weight:700; }
@@ -146,9 +153,10 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
       <div class="f"><label>НДС, %</label><input type="number" id="c-nds" step="1" min="0" inputmode="numeric"></div>
     </div>
     <label class="chk"><input type="checkbox" id="c-vychet">
-      <span><b>Фирма — плательщик НДС.</b> Металл считается без НДС (входящий идёт в зачёт),
-      а в итоге отдельной строкой показывается НДС к уплате: исходящий с выручки минус
-      входящий с металла. Если галки нет — к цене металла прибавится НДС.</span></label>
+      <span><b>Фирма — плательщик НДС.</b> Выручка и металл показываются с НДС,
+      как деньги идут по кассе, и отдельной строкой минусуется НДС к уплате:
+      исходящий с выручки − входящий с металла. Если галки нет — фирма без НДС,
+      к цене металла прибавляется НДС поставщика, а строки НДС нет.</span></label>
     <div class="hint">Накладные — аренда, свет, амортизация станка: процентом сверх прямых затрат.
        Налоги — эффективный процент от выручки без НДС (налог на прибыль и т.п., НДС сюда не входит).</div>
     <button class="savebtn" id="cfg-save" type="button">Сохранить</button>
@@ -189,7 +197,7 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
     <div class="card" style="margin-top:12px">
       <div class="irow">
         <div class="f"><label>Доставка по заказу, руб</label><input type="number" id="o-dost" step="1" min="0" inputmode="decimal" value="0"></div>
-        <div class="f"><label>Продажа по факту, руб <span style="font-weight:400">(можно пусто)</span></label>
+        <div class="f"><label>Продажа по факту, руб <span style="font-weight:400">(как заплатил клиент; можно пусто)</span></label>
           <input type="number" id="o-fact" step="0.01" min="0" inputmode="decimal" placeholder="иначе — по прайсу"></div>
       </div>
       <div class="res" id="o-res"></div>
@@ -240,11 +248,14 @@ function металлМ2(цветId) {
   if (!З.вычет) м2 *= 1 + (З.ндс ?? НДС) / 100;
   return м2;
 }
-// НДС к уплате (для плательщика): исходящий с выручки минус входящий с металла
-function ндсКУплате(выручка, металл) {
-  if (!З.вычет) return null;
-  const ставка = (З.ндс ?? НДС) / 100;
-  return { исх: r2(выручка * ставка), вх: r2(металл * ставка), итог: r2(выручка * ставка - металл * ставка) };
+// Витрина денег. Внутри всё считается в ценах без НДС (прибыль от этого не зависит),
+// а показывается кассой: для плательщика НДС выручка и металл идут с НДС,
+// и отдельной строкой — НДС к уплате (исходящий с выручки − входящий с металла).
+function витрина(продажа, металл) {
+  const k = З.вычет ? 1 + (З.ндс ?? НДС) / 100 : 1;
+  const ндс = З.вычет ? { исх: r2(продажа * (k - 1)), вх: r2(металл * (k - 1)) } : null;
+  if (ндс) ндс.итог = r2(ндс.исх - ндс.вх);
+  return { k, выручка: r2(продажа * k), металл: r2(металл * k), ндс };
 }
 function ценаПродажиМ2(цветId, колонка, ручнаяМ2) {
   if (цветId === '_ручной') return (ручнаяМ2 || 0) * idx;
@@ -362,32 +373,36 @@ function считатьЕдиницу() {
   const r = изделие($('u-type').value, цвет, ш, дл, ручная);
   const прямые = r.металл + r.работа + r.упаковка;
   const т = итог(r.продажа, прямые);
+  const в = витрина(r.продажа, r.металл);
+  const маржа = в.выручка > 0 ? r2(т.прибыль / в.выручка * 100) : 0;
   const кл = т.прибыль >= 0 ? 'plus' : 'minus';
   box.innerHTML = `
     <table>
-      <tr><td>Продажа по прайсу <span class="d">без НДС</span></td><td class="r">${fmt(r.продажа)} руб</td></tr>
-      <tr><td>Металл <span class="d">с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(r.металл)}</td></tr>
+      <tr><td>Продажа по прайсу ${в.ндс ? '<span class="d">с НДС</span>' : ''}</td><td class="r">${fmt(в.выручка)} руб</td></tr>
+      <tr><td>Металл <span class="d">${в.ндс ? 'с НДС, ' : ''}с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(в.металл)}</td></tr>
       ${r.работа ? `<tr><td>Работа</td><td class="r">−${fmt(r.работа)}</td></tr>` : ''}
       ${r.упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r.упаковка)}</td></tr>` : ''}
       ${т.накладные ? `<tr><td>Накладные ${З.накладные}%</td><td class="r">−${fmt(т.накладные)}</td></tr>` : ''}
-      ${т.налоги ? `<tr><td>Налоги ${З.налоги}% от выручки</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      ${т.налоги ? `<tr><td>Налоги ${З.налоги}%</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      ${в.ндс ? `<tr><td>НДС к уплате <span class="d">${fmt(в.ндс.исх)} исходящий − ${fmt(в.ндс.вх)} входящий</span></td><td class="r">−${fmt(в.ндс.итог)}</td></tr>` : ''}
       <tr class="total"><td>Прибыль с изделия</td><td class="r ${кл}">${fmt(т.прибыль)} руб</td></tr>
     </table>
     <div class="big">
-      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(т.маржа).replace('.', ',')}%</div></div>
+      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(маржа).replace('.', ',')}%</div>${в.ндс ? '<div class="s">от выручки с НДС</div>' : ''}</div>
       <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(дл > 0 ? т.прибыль / дл : 0)}</div><div class="s">руб/м.п.</div></div>
-      <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб/изделие</div></div>
-    </div>
-    ${(() => { const н = ндсКУплате(r.продажа, r.металл); return н ? `<div class="hint">НДС к уплате с изделия: ${fmt(н.исх)} исходящий − ${fmt(н.вх)} входящий с металла = <b>${fmt(н.итог)} руб</b>. Он платится сверх цен без НДС и прибыль выше не меняет.</div>` : ''; })()}`;
+      <div class="kpi"><div class="l">Все затраты</div><div class="v">${fmt(r2(в.выручка - т.прибыль))}</div><div class="s">руб/изделие${в.ндс ? ', с НДС к уплате' : ''}</div></div>
+    </div>`;
   // таблица по всем цветам
-  let html = '<tr><th>Цвет</th><th>Продажа</th><th>Себест.</th><th>Прибыль</th><th>Маржа</th></tr>';
+  let html = `<tr><th>Цвет</th><th>Продажа${в.ндс ? ' с НДС' : ''}</th><th>Затраты</th><th>Прибыль</th><th>Маржа</th></tr>`;
   for (const c of ЦВЕТА) {
     const rr = изделие($('u-type').value, c.id, ш, дл, 0);
     const пр = rr.металл + rr.работа + rr.упаковка;
     const tt = итог(rr.продажа, пр);
+    const вв = витрина(rr.продажа, rr.металл);
+    const мж = вв.выручка > 0 ? r2(tt.прибыль / вв.выручка * 100) : 0;
     const k = tt.прибыль >= 0 ? 'plus' : 'minus';
-    html += `<tr><td>${c.название}</td><td>${fmt(rr.продажа)}</td><td>${fmt(tt.себест)}</td>
-      <td class="${k}">${fmt(tt.прибыль)}</td><td class="${k}">${String(tt.маржа).replace('.', ',')}%</td></tr>`;
+    html += `<tr><td>${c.название}</td><td>${fmt(вв.выручка)}</td><td>${fmt(r2(вв.выручка - tt.прибыль))}</td>
+      <td class="${k}">${fmt(tt.прибыль)}</td><td class="${k}">${String(мж).replace('.', ',')}%</td></tr>`;
   }
   $('u-table').innerHTML = html;
 }
@@ -439,29 +454,33 @@ function считатьЗаказ() {
     мп += p.дл * p.шт;
   }
   const факт = parseFloat($('o-fact').value) || 0;
-  const выручка = r2(факт > 0 ? факт : продажа);
+  const kНДС = З.вычет ? 1 + (З.ндс ?? НДС) / 100 : 1;
+  // «по факту» вводится как заплатил клиент (для плательщика — с НДС) → внутрь без НДС
+  const выручка = r2(факт > 0 ? факт / kНДС : продажа);
   const доставка = parseFloat($('o-dost').value) || 0;
   const прямые = металл + работа + упаковка + доставка;
   const т = итог(выручка, прямые);
+  const в = витрина(выручка, r2(металл));
+  const маржа = в.выручка > 0 ? r2(т.прибыль / в.выручка * 100) : 0;
   const кл = т.прибыль >= 0 ? 'plus' : 'minus';
   box.innerHTML = `
     <table>
-      <tr><td>Выручка ${факт > 0 ? '<span class="d">по факту</span>' : '<span class="d">по прайсу, без НДС</span>'}</td><td class="r">${fmt(выручка)} руб</td></tr>
-      <tr><td>Металл <span class="d">с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(r2(металл))}</td></tr>
+      <tr><td>Выручка <span class="d">${факт > 0 ? 'по факту' : 'по прайсу'}${в.ндс ? ', с НДС' : ''}</span></td><td class="r">${fmt(в.выручка)} руб</td></tr>
+      <tr><td>Металл <span class="d">${в.ндс ? 'с НДС, ' : ''}с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(в.металл)}</td></tr>
       ${работа ? `<tr><td>Работа</td><td class="r">−${fmt(r2(работа))}</td></tr>` : ''}
       ${упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r2(упаковка))}</td></tr>` : ''}
       ${доставка ? `<tr><td>Доставка</td><td class="r">−${fmt(r2(доставка))}</td></tr>` : ''}
       ${т.накладные ? `<tr><td>Накладные ${З.накладные}%</td><td class="r">−${fmt(т.накладные)}</td></tr>` : ''}
-      ${т.налоги ? `<tr><td>Налоги ${З.налоги}% от выручки</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      ${т.налоги ? `<tr><td>Налоги ${З.налоги}%</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
+      ${в.ндс ? `<tr><td>НДС к уплате <span class="d">${fmt(в.ндс.исх)} исходящий − ${fmt(в.ндс.вх)} входящий</span></td><td class="r">−${fmt(в.ндс.итог)}</td></tr>` : ''}
       <tr class="total"><td>Прибыль по заказу</td><td class="r ${кл}">${fmt(т.прибыль)} руб</td></tr>
     </table>
     <div class="big">
-      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(т.маржа).replace('.', ',')}%</div></div>
+      <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(маржа).replace('.', ',')}%</div>${в.ндс ? '<div class="s">от выручки с НДС</div>' : ''}</div>
       <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(мп > 0 ? т.прибыль / мп : 0)}</div><div class="s">руб/м.п. · всего ${String(r2(мп)).replace('.', ',')} м.п.</div></div>
-      <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб на заказ</div></div>
+      <div class="kpi"><div class="l">Все затраты</div><div class="v">${fmt(r2(в.выручка - т.прибыль))}</div><div class="s">руб на заказ${в.ндс ? ', с НДС к уплате' : ''}</div></div>
     </div>
-    ${(() => { const н = ндсКУплате(выручка, r2(металл)); return н ? `<div class="hint">НДС к уплате по заказу: ${fmt(н.исх)} исходящий − ${fmt(н.вх)} входящий с металла = <b>${fmt(н.итог)} руб</b>. Он платится сверх цен без НДС и прибыль выше не меняет.</div>` : ''; })()}
-    ${факт > 0 && продажа > 0 ? `<div class="hint">По прайсу этот заказ стоил бы ${fmt(r2(продажа))} руб без НДС.</div>` : ''}`;
+    ${факт > 0 && продажа > 0 ? `<div class="hint">По прайсу этот заказ стоил бы ${fmt(r2(продажа * kНДС))} руб${в.ндс ? ' с НДС' : ''}.</div>` : ''}`;
 }
 $('o-dost').oninput = считатьЗаказ;
 $('o-fact').oninput = считатьЗаказ;

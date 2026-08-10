@@ -147,7 +147,7 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
       <div class="f"><label>Отход и обрезки, %</label><input type="number" id="c-othod" step="1" min="0" inputmode="numeric"></div>
       <div class="f"><label>Работа, руб за м.п.</label><input type="number" id="c-rab-mp" step="0.1" min="0" inputmode="decimal"></div>
       <div class="f"><label>Работа, руб за изделие</label><input type="number" id="c-rab-izd" step="0.1" min="0" inputmode="decimal"></div>
-      <div class="f"><label>Упаковка, руб за изделие</label><input type="number" id="c-upak" step="0.1" min="0" inputmode="decimal"></div>
+      <div class="f"><label>Упаковка, руб за м.п.</label><input type="number" id="c-upak" step="0.01" min="0" inputmode="decimal"></div>
       <div class="f"><label>Накладные, % к затратам</label><input type="number" id="c-nakl" step="1" min="0" inputmode="numeric"></div>
       <div class="f"><label>Налоги, % от выручки</label><input type="number" id="c-nalog" step="0.5" min="0" inputmode="decimal"></div>
       <div class="f"><label>НДС, %</label><input type="number" id="c-nds" step="1" min="0" inputmode="numeric"></div>
@@ -206,7 +206,7 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
   </section>
 </main>
 
-<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 6 от 10.08.2026</footer>
+<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 7 от 10.08.2026</footer>
 
 <script src="../../цены.js?v=2026-08-09a"></script>
 <script>
@@ -290,7 +290,7 @@ function изделие(типId, цветId, ш, дл, своя) {
   }
   const металл = м2 * (1 + (З.отход || 0) / 100) * металлМ2(цветId);
   const работа = дл * (З.работа_мп || 0) + (З.работа_изд || 0);
-  const упаковка = З.упаковка || 0;
+  const упаковка = дл * (З.упаковка || 0);   // упаковка — на каждый м.п. изделия
   return { продажа: r2(продажа), металл: r2(металл), работа: r2(работа), упаковка: r2(упаковка), м2 };
 }
 
@@ -508,7 +508,7 @@ function считатьЗаказ() {
       <tr><td>Металл <span class="d">${в.ндс ? 'с НДС, ' : ''}с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(в.металл)}</td></tr>
       ${работа ? `<tr><td>Работа</td><td class="r">−${fmt(r2(работа))}</td></tr>` : ''}
       ${упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r2(упаковка))}</td></tr>` : ''}
-      ${доставка ? `<tr><td>Доставка</td><td class="r">−${fmt(r2(доставка))}</td></tr>` : ''}
+      <tr><td>Доставка</td><td class="r">−${fmt(r2(доставка))}</td></tr>
       ${т.накладные ? `<tr><td>Накладные ${З.накладные}%</td><td class="r">−${fmt(т.накладные)}</td></tr>` : ''}
       ${т.налоги ? `<tr><td>Налоги ${З.налоги}%</td><td class="r">−${fmt(т.налоги)}</td></tr>` : ''}
       ${строкаНДС(в.ндс)}

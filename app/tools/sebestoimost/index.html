@@ -200,15 +200,13 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
     <div class="card" style="margin-top:12px">
       <div class="irow">
         <div class="f"><label>Доставка по заказу, руб</label><input type="number" id="o-dost" step="1" min="0" inputmode="decimal" value="0"></div>
-        <div class="f"><label>Цена по факту, руб за 1 м.п. без НДС <span style="font-weight:400">(можно пусто)</span></label>
-          <input type="number" id="o-fact" step="0.01" min="0" inputmode="decimal" placeholder="иначе — по прайсу"></div>
       </div>
       <div class="res" id="o-res"></div>
     </div>
   </section>
 </main>
 
-<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 5 от 10.08.2026</footer>
+<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 6 от 10.08.2026</footer>
 
 <script src="../../цены.js?v=2026-08-09a"></script>
 <script>
@@ -440,7 +438,7 @@ function считатьЕдиницу() {
 
 // ── режим «заказ» ──
 let позиции = [];
-function новаяПозиция() { return { тип: ИЗДЕЛИЯ[0]?.id || 'otliv', цвет: ЦВЕТА[0]?.id || '', ш: 200, дл: 2, шт: 1, ручная: 0, ручная_ед: 'м2' }; }
+function новаяПозиция() { return { тип: ИЗДЕЛИЯ[0]?.id || 'otliv', цвет: ЦВЕТА[0]?.id || '', ш: 200, дл: 2, шт: 1, факт: 0, ручная: 0, ручная_ед: 'м2' }; }
 function рисоватьПозиции() {
   const box = $('o-items'); box.innerHTML = '';
   позиции.forEach((p, i) => {
@@ -461,7 +459,9 @@ function рисоватьПозиции() {
         <div class="f"><label>Ширина, мм</label><input type="number" step="10" min="0" data-f="ш" value="${p.ш}"></div>
         <div class="f"><label>Длина, м</label><input type="number" step="0.1" min="0" data-f="дл" value="${p.дл}"></div>
         <div class="f"><label>Кол-во, шт</label><input type="number" step="1" min="0" data-f="шт" value="${p.шт}"></div>
-      </div>`;
+      </div>
+      ${p.цвет !== '_ручной' ? `<div class="f" style="margin-top:8px"><label>Цена по факту, руб за 1 м.п. без НДС <span style="font-weight:400">(пусто — по прайсу)</span></label>
+        <input type="number" step="0.01" min="0" data-f="факт" value="${p.факт || ''}" placeholder="по прайсу"></div>` : ''}`;
     el.querySelector('.del').onclick = () => { позиции.splice(i, 1); рисоватьПозиции(); считатьЗаказ(); };
     el.querySelectorAll('[data-f]').forEach(inp => {
       inp.oninput = () => {
@@ -480,18 +480,22 @@ function считатьЗаказ() {
   const box = $('o-res');
   const строки = позиции.filter(p => p.ш > 0 && p.дл > 0 && p.шт > 0);
   if (!строки.length) { box.innerHTML = '<div class="d" style="color:#9a938a">Добавьте позиции — итог посчитается сам.</div>'; return; }
-  let продажа = 0, металл = 0, работа = 0, упаковка = 0, мп = 0;
+  // выручка — по каждой позиции своя цена: «по факту» (руб/м.п. без НДС),
+  // у «Другого цвета…» — его цена, иначе — прайс
+  let выручка = 0, поПрайсу = 0, металл = 0, работа = 0, упаковка = 0, мп = 0, естьФакт = false;
   for (const p of строки) {
-    const r = изделие(p.тип, p.цвет, p.ш, p.дл,
-      p.цвет === '_ручной' ? { цена: p.ручная || 0, ед: p.ручная_ед || 'м2' } : null);
-    продажа += r.продажа * p.шт; металл += r.металл * p.шт;
+    const ручной = p.цвет === '_ручной';
+    let своя = null;
+    if (ручной) своя = { цена: p.ручная || 0, ед: p.ручная_ед || 'м2' };
+    else if (p.факт > 0) { своя = { цена: p.факт, ед: 'мп' }; естьФакт = true; }
+    const r = изделие(p.тип, p.цвет, p.ш, p.дл, своя);
+    выручка += r.продажа * p.шт; металл += r.металл * p.шт;
     работа += r.работа * p.шт; упаковка += r.упаковка * p.шт;
     мп += p.дл * p.шт;
+    поПрайсу += изделие(p.тип, p.цвет, p.ш, p.дл, ручной ? своя : null).продажа * p.шт;
   }
-  const факт = parseFloat($('o-fact').value) || 0;
+  выручка = r2(выручка);
   const kНДС = З.вычет ? 1 + (З.ндс ?? НДС) / 100 : 1;
-  // «по факту» — цена за 1 м.п. без НДС: выручка = цена × все метры заказа
-  const выручка = r2(факт > 0 ? факт * мп : продажа);
   const доставка = parseFloat($('o-dost').value) || 0;
   const прямые = металл + работа + упаковка + доставка;
   const т = итог(выручка, прямые);
@@ -500,7 +504,7 @@ function считатьЗаказ() {
   const кл = т.прибыль >= 0 ? 'plus' : 'minus';
   box.innerHTML = `
     <table>
-      <tr><td>Выручка <span class="d">${факт > 0 ? `${fmt(факт)} руб/м.п. × ${String(r2(мп)).replace('.', ',')} м.п.` : 'по прайсу'}${в.ндс ? ', с НДС' : ''}</span></td><td class="r">${fmt(в.выручка)} руб</td></tr>
+      <tr><td>Выручка <span class="d">${естьФакт ? 'по ценам позиций' : 'по прайсу'}${в.ндс ? ', с НДС' : ''}</span></td><td class="r">${fmt(в.выручка)} руб</td></tr>
       <tr><td>Металл <span class="d">${в.ндс ? 'с НДС, ' : ''}с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(в.металл)}</td></tr>
       ${работа ? `<tr><td>Работа</td><td class="r">−${fmt(r2(работа))}</td></tr>` : ''}
       ${упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r2(упаковка))}</td></tr>` : ''}
@@ -515,10 +519,9 @@ function считатьЗаказ() {
       <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(мп > 0 ? т.прибыль / мп : 0)}</div><div class="s">руб/м.п. · всего ${String(r2(мп)).replace('.', ',')} м.п.</div></div>
       <div class="kpi"><div class="l">Все затраты</div><div class="v">${fmt(r2(в.выручка - т.прибыль))}</div><div class="s">руб на заказ${в.ндс ? ', с НДС к уплате' : ''}</div></div>
     </div>
-    ${факт > 0 && продажа > 0 ? `<div class="hint">По вашей цене: ${fmt(выручка)} руб без НДС. По прайсу этот заказ стоил бы ${fmt(r2(продажа * kНДС))} руб${в.ндс ? ' с НДС' : ''}.</div>` : ''}`;
+    ${естьФакт ? `<div class="hint">По вашим ценам: ${fmt(выручка)} руб без НДС. По прайсу этот заказ стоил бы ${fmt(r2(поПрайсу * kНДС))} руб${в.ндс ? ' с НДС' : ''}.</div>` : ''}`;
 }
 $('o-dost').oninput = считатьЗаказ;
-$('o-fact').oninput = считатьЗаказ;
 
 // ── табы ──
 document.querySelectorAll('.tab').forEach(t => {

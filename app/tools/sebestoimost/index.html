@@ -174,10 +174,13 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
         <div class="f"><label>Что считаем</label><select id="u-type"></select></div>
         <div class="f"><label>Цвет</label><select id="u-color"></select></div>
       </div>
-      <div class="irow" id="u-manual-wrap" hidden>
-        <div class="f" style="grid-column:1/-1"><label>Цена продажи, руб/м² без НДС</label>
-          <input type="number" id="u-manual" step="1" min="0" inputmode="decimal"></div>
+      <div class="irow">
+        <div class="f"><label>Цена продажи, без НДС</label>
+          <input type="number" id="u-manual" step="0.01" min="0" inputmode="decimal"></div>
+        <div class="f"><label>За единицу</label>
+          <select id="u-manual-unit"><option value="м2">руб/м²</option><option value="мп">руб/м.п.</option></select></div>
       </div>
+      <div class="hint" id="u-manual-hint" style="margin:-4px 0 10px"></div>
       <div class="irow">
         <div class="f"><label>Ширина, мм</label><input type="number" id="u-w" step="10" min="0" inputmode="numeric" value="200"></div>
         <div class="f"><label>Длина, м</label><input type="number" id="u-l" step="0.1" min="0" inputmode="decimal" value="2"></div>
@@ -205,7 +208,7 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
   </section>
 </main>
 
-<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 3 от 10.08.2026</footer>
+<footer>DIANAST · рабочее место жестянщика · себестоимость, версия 4 от 10.08.2026</footer>
 
 <script src="../../цены.js?v=2026-08-09a"></script>
 <script>
@@ -257,21 +260,29 @@ function витрина(продажа, металл) {
   if (ндс) ндс.итог = r2(ндс.исх - ндс.вх);
   return { k, выручка: r2(продажа * k), металл: r2(металл * k), ндс };
 }
-function ценаПродажиМ2(цветId, колонка, ручнаяМ2) {
-  if (цветId === '_ручной') return (ручнаяМ2 || 0) * idx;
+function прайсМ2(цветId, колонка) {
   const c = ЦВЕТА.find(x => x.id === цветId);
-  return c ? (c[колонка] || 0) * idx : 0;
+  return c ? (c[колонка] || 0) : 0;
 }
 
 // ── расчёт одного изделия ──
-// тип: элемент из ЦЕНЫ.изделия; ш мм, дл м; возвращает продажу и затраты без НДС
-function изделие(типId, цветId, ш, дл, ручнаяМ2) {
+// тип: элемент из ЦЕНЫ.изделия; ш мм, дл м. своя = null (прайсовая логика:
+// наценка, коэф. до 1500, минималка) или {цена, ед:'м2'|'мп'} — конечная цена
+// как в счёте: без наценки, коэффициентов и минималки.
+function изделие(типId, цветId, ш, дл, своя) {
   const тип = ИЗДЕЛИЯ.find(t => t.id === типId) || ИЗДЕЛИЯ[0];
   const колонка = тип.колонка || 'обычное';
   const м2 = ш / 1000 * дл;
-  const кор = (тип.сложный && дл > 0 && дл * 1000 < 1500) ? (ЦЕНЫ.коэф_до_1500 || 1) : 1;
-  let продажа = м2 * ценаПродажиМ2(цветId, колонка, ручнаяМ2) * кор;
-  продажа = Math.max(продажа, (ЦЕНЫ.минималка || 0) * idx);
+  let продажа;
+  if (своя && своя.цена > 0) {
+    продажа = своя.ед === 'мп' ? дл * своя.цена : м2 * своя.цена;
+  } else if (своя) {
+    продажа = 0; // «Другой цвет…» без введённой цены
+  } else {
+    const кор = (тип.сложный && дл > 0 && дл * 1000 < 1500) ? (ЦЕНЫ.коэф_до_1500 || 1) : 1;
+    продажа = м2 * прайсМ2(цветId, колонка) * idx * кор;
+    продажа = Math.max(продажа, (ЦЕНЫ.минималка || 0) * idx);
+  }
   const металл = м2 * (1 + (З.отход || 0) / 100) * металлМ2(цветId);
   const работа = дл * (З.работа_мп || 0) + (З.работа_изд || 0);
   const упаковка = З.упаковка || 0;
@@ -363,14 +374,27 @@ function заполнитьСелекты() {
     (ЦВЕТ_РУЧНОЙ ? `<option value="_ручной">${ЦВЕТ_РУЧНОЙ.название}</option>` : '');
   $('u-color').innerHTML = оц;
 }
+// поле цены: при смене цвета/типа подставляется прайсовая цена (руб/м²);
+// правка руками переводит расчёт на «свою» цену — как в конкретном счёте
+let ценаСвоя = false;
+function подставитьЦену() {
+  ценаСвоя = false;
+  const цвет = $('u-color').value;
+  const тип = ИЗДЕЛИЯ.find(t => t.id === $('u-type').value) || ИЗДЕЛИЯ[0];
+  $('u-manual-unit').value = 'м2';
+  $('u-manual').value = цвет === '_ручной' ? '' : r2(прайсМ2(цвет, тип.колонка || 'обычное') * idx) || '';
+}
 function считатьЕдиницу() {
   const ш = parseFloat($('u-w').value) || 0, дл = parseFloat($('u-l').value) || 0;
   const цвет = $('u-color').value;
-  $('u-manual-wrap').hidden = цвет !== '_ручной';
-  const ручная = parseFloat($('u-manual').value) || 0;
   const box = $('u-res');
+  $('u-manual-hint').textContent = ценаСвоя || цвет === '_ручной'
+    ? 'Считается по вашей цене — без наценки, коэффициентов и минималки, как в счёте.'
+    : 'Цена из прайса. Впишите свою (например, из счёта) — расчёт пойдёт по ней.';
   if (ш <= 0 || дл <= 0) { box.innerHTML = '<div class="d" style="color:#9a938a">Укажите ширину и длину.</div>'; $('u-table').innerHTML = ''; return; }
-  const r = изделие($('u-type').value, цвет, ш, дл, ручная);
+  const своя = (ценаСвоя || цвет === '_ручной')
+    ? { цена: parseFloat($('u-manual').value) || 0, ед: $('u-manual-unit').value } : null;
+  const r = изделие($('u-type').value, цвет, ш, дл, своя);
   const прямые = r.металл + r.работа + r.упаковка;
   const т = итог(r.продажа, прямые);
   const в = витрина(r.продажа, r.металл);
@@ -378,7 +402,7 @@ function считатьЕдиницу() {
   const кл = т.прибыль >= 0 ? 'plus' : 'minus';
   box.innerHTML = `
     <table>
-      <tr><td>Продажа по прайсу ${в.ндс ? '<span class="d">с НДС</span>' : ''}</td><td class="r">${fmt(в.выручка)} руб</td></tr>
+      <tr><td>Продажа ${своя ? 'по вашей цене' : 'по прайсу'} ${в.ндс ? '<span class="d">с НДС</span>' : ''}</td><td class="r">${fmt(в.выручка)} руб</td></tr>
       <tr><td>Металл <span class="d">${в.ндс ? 'с НДС, ' : ''}с отходом ${З.отход || 0}%</span></td><td class="r">−${fmt(в.металл)}</td></tr>
       ${r.работа ? `<tr><td>Работа</td><td class="r">−${fmt(r.работа)}</td></tr>` : ''}
       ${r.упаковка ? `<tr><td>Упаковка</td><td class="r">−${fmt(r.упаковка)}</td></tr>` : ''}
@@ -395,7 +419,7 @@ function считатьЕдиницу() {
   // таблица по всем цветам
   let html = `<tr><th>Цвет</th><th>Продажа${в.ндс ? ' с НДС' : ''}</th><th>Затраты</th><th>Прибыль</th><th>Маржа</th></tr>`;
   for (const c of ЦВЕТА) {
-    const rr = изделие($('u-type').value, c.id, ш, дл, 0);
+    const rr = изделие($('u-type').value, c.id, ш, дл, null);
     const пр = rr.металл + rr.работа + rr.упаковка;
     const tt = итог(rr.продажа, пр);
     const вв = витрина(rr.продажа, rr.металл);
@@ -409,7 +433,7 @@ function считатьЕдиницу() {
 
 // ── режим «заказ» ──
 let позиции = [];
-function новаяПозиция() { return { тип: ИЗДЕЛИЯ[0]?.id || 'otliv', цвет: ЦВЕТА[0]?.id || '', ш: 200, дл: 2, шт: 1, ручная: 0 }; }
+function новаяПозиция() { return { тип: ИЗДЕЛИЯ[0]?.id || 'otliv', цвет: ЦВЕТА[0]?.id || '', ш: 200, дл: 2, шт: 1, ручная: 0, ручная_ед: 'м2' }; }
 function рисоватьПозиции() {
   const box = $('o-items'); box.innerHTML = '';
   позиции.forEach((p, i) => {
@@ -422,7 +446,10 @@ function рисоватьПозиции() {
         <div class="f"><label>Изделие</label><select data-f="тип">${ИЗДЕЛИЯ.map(t => `<option value="${t.id}" ${p.тип === t.id ? 'selected' : ''}>${t.название}</option>`).join('')}</select></div>
         <div class="f"><label>Цвет</label><select data-f="цвет">${оц}</select></div>
       </div>
-      ${p.цвет === '_ручной' ? `<div class="irow"><div class="f" style="grid-column:1/-1"><label>Цена продажи, руб/м² без НДС</label><input type="number" step="1" min="0" data-f="ручная" value="${p.ручная || ''}"></div></div>` : ''}
+      ${p.цвет === '_ручной' ? `<div class="irow">
+        <div class="f"><label>Цена продажи, без НДС</label><input type="number" step="0.01" min="0" data-f="ручная" value="${p.ручная || ''}"></div>
+        <div class="f"><label>За единицу</label><select data-f="ручная_ед"><option value="м2" ${p.ручная_ед !== 'мп' ? 'selected' : ''}>руб/м²</option><option value="мп" ${p.ручная_ед === 'мп' ? 'selected' : ''}>руб/м.п.</option></select></div>
+      </div>` : ''}
       <div class="irow3">
         <div class="f"><label>Ширина, мм</label><input type="number" step="10" min="0" data-f="ш" value="${p.ш}"></div>
         <div class="f"><label>Длина, м</label><input type="number" step="0.1" min="0" data-f="дл" value="${p.дл}"></div>
@@ -448,7 +475,8 @@ function считатьЗаказ() {
   if (!строки.length) { box.innerHTML = '<div class="d" style="color:#9a938a">Добавьте позиции — итог посчитается сам.</div>'; return; }
   let продажа = 0, металл = 0, работа = 0, упаковка = 0, мп = 0;
   for (const p of строки) {
-    const r = изделие(p.тип, p.цвет, p.ш, p.дл, p.ручная);
+    const r = изделие(p.тип, p.цвет, p.ш, p.дл,
+      p.цвет === '_ручной' ? { цена: p.ручная || 0, ед: p.ручная_ед || 'м2' } : null);
     продажа += r.продажа * p.шт; металл += r.металл * p.шт;
     работа += r.работа * p.шт; упаковка += r.упаковка * p.шт;
     мп += p.дл * p.шт;
@@ -494,9 +522,13 @@ document.querySelectorAll('.tab').forEach(t => {
 });
 
 function считатьВсё() { считатьЕдиницу(); считатьЗаказ(); }
-['u-type', 'u-color', 'u-w', 'u-l', 'u-manual'].forEach(id => { $(id).oninput = считатьЕдиницу; $(id).onchange = считатьЕдиницу; });
+['u-w', 'u-l'].forEach(id => { $(id).oninput = считатьЕдиницу; });
+['u-type', 'u-color'].forEach(id => { $(id).onchange = () => { подставитьЦену(); считатьЕдиницу(); }; });
+$('u-manual').oninput = () => { ценаСвоя = true; считатьЕдиницу(); };
+$('u-manual-unit').onchange = () => { ценаСвоя = true; считатьЕдиницу(); };
 
 заполнитьСелекты();
+подставитьЦену();
 рисоватьНастройки();
 предупреждения();
 if (З.демо) $('cfg').open = true;

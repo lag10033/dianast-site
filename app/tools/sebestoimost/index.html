@@ -46,7 +46,7 @@ details.card > summary::-webkit-details-marker{ display:none; }
 details.card > summary::after{ content:'▾'; float:right; color:var(--текст2); }
 details.card[open] > summary::after{ content:'▴'; }
 .sec-h{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--текст2); margin:14px 0 8px; }
-.mrow{ display:grid; grid-template-columns:minmax(120px,1fr) 84px 74px 76px; gap:8px; align-items:center; margin-bottom:7px; font-size:13px; }
+.mrow{ display:grid; grid-template-columns:minmax(96px,1fr) 62px 78px 66px 70px; gap:7px; align-items:center; margin-bottom:7px; font-size:13px; }
 .mrow .nm{ font-weight:700; }
 .mrow .m2{ text-align:right; font-size:12px; color:var(--текст2); white-space:nowrap; }
 .mhead{ font-size:10.5px; color:var(--текст2); font-weight:700; }
@@ -124,14 +124,15 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
   <details class="card" id="cfg">
     <summary>⚙ Закупка металла и затраты</summary>
     <div class="sec-h">Металл — закупка без НДС</div>
-    <div class="mrow mhead"><span></span><span>руб/кг</span><span>кг/м²</span><span style="text-align:right">руб/м²</span></div>
+    <div class="mrow mhead"><span>цвет</span><span>толщ., мм</span><span>руб/кг</span><span>кг/м²</span><span style="text-align:right">руб/м²</span></div>
     <div id="metal-rows"></div>
     <div class="mrow">
       <span class="nm">Другой металл</span>
-      <input type="number" id="m-other" step="0.01" min="0" inputmode="decimal" style="grid-column:2/4">
+      <input type="number" id="m-other" step="0.01" min="0" inputmode="decimal" style="grid-column:2/5">
       <span class="m2">руб/м²</span>
     </div>
-    <div class="hint">Цена за килограмм и расход в кг на квадрат — из накладной поставщика.
+    <div class="hint">Цена за килограмм и расход в кг на квадрат — из накладной поставщика;
+       толщина — справочно, на расход она уже заложена в кг/м².
        Для цвета без своей цены берётся строка «Другой металл».</div>
 
     <div class="sec-h">Затраты сверх металла</div>
@@ -142,12 +143,14 @@ footer{ text-align:center; font-size:12px; color:var(--текст2); padding:18p
       <div class="f"><label>Упаковка, руб за изделие</label><input type="number" id="c-upak" step="0.1" min="0" inputmode="decimal"></div>
       <div class="f"><label>Накладные, % к затратам</label><input type="number" id="c-nakl" step="1" min="0" inputmode="numeric"></div>
       <div class="f"><label>Налоги, % от выручки</label><input type="number" id="c-nalog" step="0.5" min="0" inputmode="decimal"></div>
+      <div class="f"><label>НДС, %</label><input type="number" id="c-nds" step="1" min="0" inputmode="numeric"></div>
     </div>
     <label class="chk"><input type="checkbox" id="c-vychet">
-      <span><b>НДС из закупки беру к вычету</b> (фирма — плательщик НДС).
-      Если галки нет — к цене металла прибавится НДС {{ндс}}%.</span></label>
+      <span><b>Фирма — плательщик НДС.</b> Металл считается без НДС (входящий идёт в зачёт),
+      а в итоге отдельной строкой показывается НДС к уплате: исходящий с выручки минус
+      входящий с металла. Если галки нет — к цене металла прибавится НДС.</span></label>
     <div class="hint">Накладные — аренда, свет, амортизация станка: процентом сверх прямых затрат.
-       Налоги — эффективный процент от выручки без НДС.</div>
+       Налоги — эффективный процент от выручки без НДС (налог на прибыль и т.п., НДС сюда не входит).</div>
     <button class="savebtn" id="cfg-save" type="button">Сохранить</button>
   </details>
 
@@ -212,9 +215,9 @@ const idx = 1 + (НАЦЕНКА_ПРОЦЕНТ || 0) / 100;
 const НДС = ЦЕНЫ.ндс_процент || 20;
 
 const ДЕМО_ЗАКУПКА = {
-  демо: true, вычет: true, отход: 12,
+  демо: true, вычет: true, отход: 12, ндс: НДС,
   работа_мп: 0, работа_изд: 0, упаковка: 0, накладные: 0, налоги: 0,
-  другой_м2: 20, металл: {}   // металл[цветId] = { кг: руб/кг, расход: кг/м² }
+  другой_м2: 20, металл: {}   // металл[цветId] = { кг: руб/кг, расход: кг/м², толщина: мм }
 };
 
 let З = загрузить();
@@ -234,8 +237,14 @@ const ИЗДЕЛИЯ = ЦЕНЫ.изделия || [];
 function металлМ2(цветId) {
   const m = З.металл[цветId];
   let м2 = (m && m.кг > 0 && m.расход > 0) ? m.кг * m.расход : (З.другой_м2 || 0);
-  if (!З.вычет) м2 *= 1 + НДС / 100;
+  if (!З.вычет) м2 *= 1 + (З.ндс ?? НДС) / 100;
   return м2;
+}
+// НДС к уплате (для плательщика): исходящий с выручки минус входящий с металла
+function ндсКУплате(выручка, металл) {
+  if (!З.вычет) return null;
+  const ставка = (З.ндс ?? НДС) / 100;
+  return { исх: r2(выручка * ставка), вх: r2(металл * ставка), итог: r2(выручка * ставка - металл * ставка) };
 }
 function ценаПродажиМ2(цветId, колонка, ручнаяМ2) {
   if (цветId === '_ручной') return (ручнаяМ2 || 0) * idx;
@@ -275,6 +284,7 @@ function рисоватьНастройки() {
     const m = З.металл[c.id] || {};
     const row = document.createElement('div'); row.className = 'mrow';
     row.innerHTML = `<span class="nm">${c.название}</span>
+      <input type="number" step="0.01" min="0" inputmode="decimal" data-metal="${c.id}" data-f="толщина" value="${m.толщина ?? ''}" placeholder="0,5">
       <input type="number" step="0.01" min="0" inputmode="decimal" data-metal="${c.id}" data-f="кг" value="${m.кг ?? ''}">
       <input type="number" step="0.1" min="0" inputmode="decimal" data-metal="${c.id}" data-f="расход" value="${m.расход ?? ''}">
       <span class="m2" data-m2="${c.id}"></span>`;
@@ -287,6 +297,7 @@ function рисоватьНастройки() {
   $('c-upak').value = З.упаковка ?? 0;
   $('c-nakl').value = З.накладные ?? 0;
   $('c-nalog').value = З.налоги ?? 0;
+  $('c-nds').value = З.ндс ?? НДС;
   $('c-vychet').checked = !!З.вычет;
   обновитьМ2();
   box.oninput = обновитьМ2;
@@ -303,11 +314,13 @@ $('cfg-save').onclick = () => {
   for (const c of ЦВЕТА) {
     const кг = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="кг"]`).value) || 0;
     const рх = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="расход"]`).value) || 0;
-    if (кг > 0 && рх > 0) металл[c.id] = { кг, расход: рх };
+    const тл = parseFloat(document.querySelector(`[data-metal="${c.id}"][data-f="толщина"]`).value) || 0;
+    if (кг > 0 && рх > 0) металл[c.id] = { кг, расход: рх, ...(тл > 0 ? { толщина: тл } : {}) };
   }
   З = {
     демо: false, металл,
     другой_м2: parseFloat($('m-other').value) || 0,
+    ндс: parseFloat($('c-nds').value) || 0,
     отход: parseFloat($('c-othod').value) || 0,
     работа_мп: parseFloat($('c-rab-mp').value) || 0,
     работа_изд: parseFloat($('c-rab-izd').value) || 0,
@@ -364,7 +377,8 @@ function считатьЕдиницу() {
       <div class="kpi"><div class="l">Маржа</div><div class="v ${кл}">${String(т.маржа).replace('.', ',')}%</div></div>
       <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(дл > 0 ? т.прибыль / дл : 0)}</div><div class="s">руб/м.п.</div></div>
       <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб/изделие</div></div>
-    </div>`;
+    </div>
+    ${(() => { const н = ндсКУплате(r.продажа, r.металл); return н ? `<div class="hint">НДС к уплате с изделия: ${fmt(н.исх)} исходящий − ${fmt(н.вх)} входящий с металла = <b>${fmt(н.итог)} руб</b>. Он платится сверх цен без НДС и прибыль выше не меняет.</div>` : ''; })()}`;
   // таблица по всем цветам
   let html = '<tr><th>Цвет</th><th>Продажа</th><th>Себест.</th><th>Прибыль</th><th>Маржа</th></tr>';
   for (const c of ЦВЕТА) {
@@ -446,6 +460,7 @@ function считатьЗаказ() {
       <div class="kpi"><div class="l">Прибыль с 1 м.п.</div><div class="v ${кл}">${fmt(мп > 0 ? т.прибыль / мп : 0)}</div><div class="s">руб/м.п. · всего ${String(r2(мп)).replace('.', ',')} м.п.</div></div>
       <div class="kpi"><div class="l">Себестоимость</div><div class="v">${fmt(т.себест)}</div><div class="s">руб на заказ</div></div>
     </div>
+    ${(() => { const н = ндсКУплате(выручка, r2(металл)); return н ? `<div class="hint">НДС к уплате по заказу: ${fmt(н.исх)} исходящий − ${fmt(н.вх)} входящий с металла = <b>${fmt(н.итог)} руб</b>. Он платится сверх цен без НДС и прибыль выше не меняет.</div>` : ''; })()}
     ${факт > 0 && продажа > 0 ? `<div class="hint">По прайсу этот заказ стоил бы ${fmt(r2(продажа))} руб без НДС.</div>` : ''}`;
 }
 $('o-dost').oninput = считатьЗаказ;
@@ -461,9 +476,6 @@ document.querySelectorAll('.tab').forEach(t => {
 
 function считатьВсё() { считатьЕдиницу(); считатьЗаказ(); }
 ['u-type', 'u-color', 'u-w', 'u-l', 'u-manual'].forEach(id => { $(id).oninput = считатьЕдиницу; $(id).onchange = считатьЕдиницу; });
-
-// подпись про НДС в чекбоксе
-document.querySelector('.chk span').innerHTML = document.querySelector('.chk span').innerHTML.replace('{{ндс}}', НДС);
 
 заполнитьСелекты();
 рисоватьНастройки();

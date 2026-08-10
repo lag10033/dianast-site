@@ -3,7 +3,7 @@
 //            дальше: страницы и скрипты → сначала сеть (свежий код), кэш как запас;
 //            картинки → сначала кэш (быстро).
 // Чтение из кэша идёт с ignoreSearch, поэтому смена версии ?v= не обнуляет оффлайн.
-const CACHE = 'dianast-app-v14';
+const CACHE = 'dianast-app-v15';
 
 const ФАЙЛЫ = [
   './', './index.html', './manifest.webmanifest',

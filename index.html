@@ -1419,10 +1419,7 @@ function calcHero(){
 
 function showCalcResult(){
   var name = document.getElementById('c-name').value.trim();
-  // Номер шлём в CRM единообразно, без пробелов: дедуп заявок за 24 часа
-  // сверяет телефоны, и «+375 29 797 43 62» с «+375297974362» не совпадут.
   var phoneRaw = document.getElementById('c-phone').value.trim();
-  var phone = phoneRaw ? '+375' + phoneDigitsOf(phoneRaw) : '';
   if(!name){alert('Введите ваше имя');document.getElementById('c-name').focus();return;}
   if(phoneRaw === '+375' || phoneRaw === '+375 ' || phoneRaw.length < 10){alert('Введите номер телефона');document.getElementById('c-phone').focus();return;}
   calcFence();
@@ -1443,6 +1440,10 @@ function showCalcResult(){
   var angPcs = document.getElementById('r-ang-pcs').textContent;
   var rowPcs = document.getElementById('r-row-pcs').textContent;
   var total = document.getElementById('r-total-sum').textContent;
+  // Номер в CRM — без пробелов: дедуп заявок за 24 часа сверяет телефоны,
+  // и «+375 29 797 43 62» с «+375297974362» не совпадут.
+  var phone = (typeof phoneDigitsOf === 'function' && phoneRaw)
+    ? '+375' + phoneDigitsOf(phoneRaw) : phoneRaw;
   var text = '\u{1F9F1} Заявка с калькулятора\n\nИмя: ' + name + '\nТелефон: ' + phone +
     '\n\nПараметры забора:' +
     '\n\u2014 Длина: ' + len + ' м' +

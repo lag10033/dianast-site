@@ -313,6 +313,10 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 #db-client-pick:focus-visible{ outline:none; border-color:var(--терракота); }
 .db-client-price{ display:none; margin-top:8px; padding:10px 11px; background:#faf8f5; border:1px solid var(--рамка); border-radius:9px; }
 .db-client-price.show{ display:block; }
+.db-color{ margin-bottom:10px; }
+#db-color{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
+#db-color:focus-visible{ outline:none; border-color:var(--терракота); }
+#db-own-price{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
 .db-tariff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .db-tariff-row label{ font-size:12px; font-weight:700; color:var(--текст2); white-space:nowrap; }
 .db-tariff-row input{ width:88px; font-size:14px; padding:6px 8px; border:1.5px solid var(--рамка); border-radius:8px; font-family:inherit; }
@@ -560,8 +564,16 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
     <div id="order-list"></div>
     <div class="order-total" id="order-total"></div>
     <button class="order-tpl-btn" id="order-tpl-print" type="button">🗂 Печать шаблонов разметки (0)</button>
+    <div class="db-color">
+      <label class="db-client-lbl" for="db-color">Цвет металла <span>— задаёт цену по прайсу</span></label>
+      <select id="db-color"></select>
+      <div id="db-own-wrap" style="display:none;margin-top:6px">
+        <label class="db-client-lbl">Своя цена, руб/м² без НДС</label>
+        <input type="number" id="db-own-price" min="1" step="0.01" inputmode="decimal">
+      </div>
+    </div>
     <div class="db-client">
-      <label class="db-client-lbl" for="db-client-pick">Клиент <span>— возьмём его тариф для доборных</span></label>
+      <label class="db-client-lbl" for="db-client-pick">Клиент <span>— если есть свой тариф, заменит прайс</span></label>
       <select id="db-client-pick"></select>
       <div class="db-client-price" id="db-client-price"></div>
     </div>
@@ -596,6 +608,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   </div>
 </div>
 
+<script src="../../цены.js?v=2026-08-18a"></script>
+<script src="../../прайс.js?v=2026-08-18a"></script>
 <script src="../../заявка-бухгалтеру.js?v=2026-08-17g"></script>
 <script src="../../заказы.js?v=2026-08-17d"></script>
 <script>
@@ -1897,23 +1911,30 @@ document.getElementById('parts-order').onclick=()=>{
 // не ниже минималки, ×наценка (припуск доборным не добавляется). Тариф берём у выбранного
 // клиента; нет клиента или тарифа — базовый (дефолт заявки без спец-условий, счёт №8).
 const _r2 = n => Math.round((parseFloat(n)||0)*100)/100;
-const БАЗ_ТАРИФ = 60, БАЗ_МИН = 6.40;
 let КЛИЕНТ_DB = null;
+let цветDB = '';                          // выбранный цвет прайса
 const естьЗаявка = () => typeof ЗаявкаБухгалтеру !== 'undefined' && ЗаявкаБухгалтеру;
 const справочникDB = () => естьЗаявка() ? (ЗаявкаБухгалтеру.клиенты()||[]) : [];
-const ставкаDB  = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? КЛИЕНТ_DB.tariff : БАЗ_ТАРИФ;
-const минDB     = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? (parseFloat(КЛИЕНТ_DB.minp)||0) : БАЗ_МИН;
-const наценкаDB = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? (parseFloat(КЛИЕНТ_DB.markup)||0) : 0;
-function ценаДоборного(razv){
-  const p = _r2(((parseFloat(razv)||0)/1000) * ставкаDB());
-  const m = минDB();
-  const base = (m>0 && p<m) ? m : p;
-  return _r2(base * (1 + наценкаDB()/100));
+const цветаDB = () => (typeof ЦЕНЫ!=='undefined' && ЦЕНЫ.цвета) ? ЦЕНЫ.цвета : [];
+const текущийЦветDB = () => цветаDB().find(c=>c.id===цветDB) || null;
+const ручнойDB = () => { const c=текущийЦветDB(); return !!(c && c.ручной); };
+const свояDB = () => { const el=document.getElementById('db-own-price'); return ручнойDB() ? (parseFloat(el&&el.value)||0) : null; };
+// доборные — колонка «сложное», надбавка +15% коротким (≤1,5 м); минималка по прайсу или клиенту
+const базаDB = () => ({ колонка:'сложное', цветId:цветDB, своя:свояDB(), клиент:КЛИЕНТ_DB, сложное:true });
+const ценаПогмDB = (razv, len) => Прайс.ценаПогМетра(Object.assign({}, базаDB(),
+  { ширинаМ:(parseFloat(razv)||0)/1000, длинаМ: len||0 }));
+// средневзвешенная цена/пог.м профиля: у строк разная длина → разный +15% на коротких
+function ценаДоборного(it){
+  const razv = it.razv||0;
+  if(it.flex) return ценаПогмDB(razv, 0);                 // метраж — без надбавки за короткие
+  let сум=0, pm=0;
+  (it.rows||[]).forEach(r=>{ const l=r.len*r.qty; сум += l*ценаПогмDB(razv, r.len); pm += l; });
+  return pm>0 ? _r2(сум/pm) : ценаПогмDB(razv, 0);
 }
 function рисоватьКлиентовDB(){
   const sel=document.getElementById('db-client-pick'); if(!sel) return;
   const было = КЛИЕНТ_DB?КЛИЕНТ_DB.id:'';
-  sel.innerHTML='<option value="">— базовый тариф '+fmt(БАЗ_ТАРИФ)+' руб/м² —</option>'+
+  sel.innerHTML='<option value="">— по прайсу цвета —</option>'+
     справочникDB().map(c=>'<option value="'+escHtml(c.id)+'">'+escHtml(c.name)+'</option>').join('');
   sel.value=было;                         // если выбранного клиента удалили — сбросится на базовый
   if(sel.value!==было){ КЛИЕНТ_DB=null; плашкаКлиентаDB(); }
@@ -1931,12 +1952,12 @@ function плашкаКлиентаDB(){
   if(КЛИЕНТ_DB.minp)   доп.push('не ниже '+fmt(КЛИЕНТ_DB.minp,2)+' руб/пог.м');
   box.innerHTML =
     '<div class="db-tariff-row"><label>Тариф, руб/м²</label>'+
-    '<input type="number" id="db-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="'+fmt(БАЗ_ТАРИФ)+'">'+
+    '<input type="number" id="db-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="по прайсу">'+
     '<button id="db-tariff-save" type="button">Сохранить</button></div>'+
     (доп.length?'<div class="db-tariff-info">'+доп.join(' · ')+'</div>':'')+
     '<div class="db-tariff-hint">'+(КЛИЕНТ_DB.tariff>0
-      ? 'Доборные считаем по тарифу клиента.'
-      : 'Своего тарифа нет — считаем по базовому '+fmt(БАЗ_ТАРИФ)+'. Впиши и сохрани, чтобы закрепить за клиентом.')+'</div>';
+      ? 'Доборные считаем по тарифу клиента (цвет не влияет).'
+      : 'Своего тарифа нет — считаем по прайсу выбранного цвета. Впиши тариф и сохрани, чтобы закрепить за клиентом.')+'</div>';
   box.classList.add('show');
   const save=document.getElementById('db-tariff-save');
   if(save) save.onclick=()=>{
@@ -1951,14 +1972,16 @@ function плашкаКлиентаDB(){
   };
 }
 function dbOrderItems(){
+  const цн = текущийЦветDB();
+  const цветПодпись = (цн && !ручнойDB()) ? (', '+цн.название) : '';
   return order.map(it=>{
     const pogm = it.flex ? (parseFloat(it.meters)||0) : (it.rows||[]).reduce((s,r)=>s+r.len*r.qty,0);
-    const наимен = (it.name||'Доборный') + (it.razv?(' '+fmt(it.razv)+' мм'):'');
+    const наимен = (it.name||'Доборный') + (it.razv?(' '+fmt(it.razv)+' мм'):'') + цветПодпись;
     return {
-      тип:'доборный', наимен, ед:'пог.м', кол:_r2(pogm), цена:ценаДоборного(it.razv||0),
+      тип:'доборный', наимен, ед:'пог.м', кол:_r2(pogm), цена:ценаДоборного(it),
       парам:{ разв:it.razv, толщ:it.thickness, ral:it.ral||'', pogm:_r2(pogm),
               pcs: it.flex?0:(it.rows||[]).reduce((s,r)=>s+r.qty,0), flex:!!it.flex,
-              тариф:ставкаDB(), клиент: КЛИЕНТ_DB?КЛИЕНТ_DB.name:'' }
+              цвет:цветDB, клиент: КЛИЕНТ_DB?КЛИЕНТ_DB.name:'' }
     };
   });
 }
@@ -1969,6 +1992,19 @@ if(genBtn) genBtn.onclick=()=>{
   const t0=genBtn.textContent; genBtn.textContent='В заказе ✓ ('+n+')';
   setTimeout(()=>{ genBtn.textContent=t0; },1600);
 };
+function drawColorsDB(){
+  const sel=document.getElementById('db-color'); if(!sel || typeof ЦЕНЫ==='undefined') return;
+  sel.innerHTML = цветаDB().map(c=>'<option value="'+escHtml(c.id)+'">'+escHtml(c.название)+'</option>').join('');
+  if(!цветDB && цветаDB()[0]) цветDB = цветаDB()[0].id;
+  sel.value = цветDB;
+  toggleOwnDB();
+}
+function toggleOwnDB(){
+  const wrap=document.getElementById('db-own-wrap'); if(wrap) wrap.style.display = ручнойDB() ? 'block' : 'none';
+}
+drawColorsDB();
+const dbColor=document.getElementById('db-color');
+if(dbColor){ dbColor.onchange=()=>{ цветDB=dbColor.value; toggleOwnDB(); }; }
 рисоватьКлиентовDB();
 const dbPick=document.getElementById('db-client-pick');
 if(dbPick){
@@ -2285,20 +2321,27 @@ setupArrowDrag();
 loadElement();
 
 // ── Заявка бухгалтеру: позиции заказа → счёт (форма в ../../заявка-бухгалтеру.js) ──
-// Цену модуль считает сам: цена за пог. м = развёртка (м) × тариф (руб/м² без НДС).
+// Цены идут ГОТОВЫМИ по прайсу цвета (тариф:false) — те же, что в общем заказе,
+// чтобы счёт и заказ не расходились.
 function позицииДляЗаявки(){
-  return order.map(it=>({
-    base:      it.name || 'Позиция',
-    razv:      it.razv,
-    thickness: it.thickness,
-    ral:       it.ral || '',
-    unit:      'пог.м',
-    pogm:      it.flex ? (parseFloat(it.meters)||0) : (it.rows||[]).reduce((s,r)=>s+r.len*r.qty, 0),
-    pcs:       it.flex ? 0 : (it.rows||[]).reduce((s,r)=>s+r.qty, 0)
-  }));
+  return order.map(it=>{
+    const pogm = it.flex ? (parseFloat(it.meters)||0) : (it.rows||[]).reduce((s,r)=>s+r.len*r.qty, 0);
+    return {
+      base:      it.name || 'Позиция',
+      razv:      it.razv,
+      thickness: it.thickness,
+      ral:       it.ral || '',
+      unit:      'пог.м',
+      qty:       _r2(pogm),
+      price:     ценаДоборного(it),
+      pogm:      _r2(pogm),
+      pcs:       it.flex ? 0 : (it.rows||[]).reduce((s,r)=>s+r.qty, 0)
+    };
+  });
 }
 document.getElementById('order-invoice').onclick=()=>{
-  ЗаявкаБухгалтеру.открыть({ источник:позицииДляЗаявки, ключЧерновика:'dianast_invoice_v1', тариф:true });
+  ЗаявкаБухгалтеру.открыть({ источник:позицииДляЗаявки, ключЧерновика:'dianast_invoice_v1',
+                             тариф:false, клиентId: КЛИЕНТ_DB?КЛИЕНТ_DB.id:'' });
 };
 </script>
 </body>

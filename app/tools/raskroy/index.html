@@ -89,6 +89,9 @@ input:focus-visible{ outline:none; border-color:var(--терракота); }
 #rk-client-pick:focus-visible{ outline:none; border-color:var(--терракота); }
 .rk-client-price{ display:none; margin-top:8px; padding:10px 11px; background:#faf8f5; border:1px solid var(--рамка); border-radius:9px; }
 .rk-client-price.show{ display:block; }
+#rk-color{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
+#rk-color:focus-visible{ outline:none; border-color:var(--терракота); }
+#rk-own-price{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
 .rk-tariff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .rk-tariff-row label{ font-size:12px; font-weight:700; color:var(--текст2); white-space:nowrap; }
 .rk-tariff-row input{ width:88px; font-size:14px; padding:6px 8px; border:1.5px solid var(--рамка); border-radius:8px; font-family:inherit; }
@@ -206,6 +209,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 </style>
 <script src="../../vendor/supabase-2.110.8.js"></script>
 <script src="../../облако.js?v=2026-07-23d"></script>
+<script src="../../цены.js?v=2026-08-18a"></script>
+<script src="../../прайс.js?v=2026-08-18a"></script>
 <script src="../../заявка-бухгалтеру.js?v=2026-08-17g"></script>
 <script src="../../заказы.js?v=2026-08-17e"></script>
 </head>
@@ -262,11 +267,17 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 
   <div class="card" id="rk-order-card">
     <div class="lbl-small">Плоские листы — в общий заказ</div>
-    <label class="f" for="rk-client-pick" style="margin-top:8px">Клиент <span>— возьмём его тариф для листов</span></label>
+    <label class="f" for="rk-color" style="margin-top:8px">Цвет металла <span>— задаёт цену по прайсу</span></label>
+    <select id="rk-color"></select>
+    <div id="rk-own-wrap" style="display:none;margin-top:6px">
+      <label class="f">Своя цена, руб/м² без НДС</label>
+      <input type="number" id="rk-own-price" min="1" step="0.01" inputmode="decimal">
+    </div>
+    <label class="f" for="rk-client-pick" style="margin-top:8px">Клиент <span>— если есть свой тариф, он заменит прайс</span></label>
     <select id="rk-client-pick"></select>
     <div class="rk-client-price" id="rk-client-price"></div>
     <button class="rk-order-btn" id="rk-order-btn" type="button">🛒 В общий заказ</button>
-    <div class="hintline" style="margin-top:8px">Заготовки уйдут в раздел «Заказы» как плоский лист в м² (площадь × тариф). Рядом с доборными и отливами.</div>
+    <div class="hintline" style="margin-top:8px">Заготовки уйдут в раздел «Заказы» как плоский лист в м² (площадь × цена по цвету, не ниже минималки). Рядом с доборными и отливами.</div>
   </div>
 
   <div id="scheme"></div>
@@ -955,18 +966,21 @@ if(!handoffApplied) maybeShowPendingOrderBanner();
   const r2 = n => Math.round((parseFloat(n)||0)*100)/100;
   const r3 = n => Math.round((parseFloat(n)||0)*1000)/1000;
   const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const BASE = 60;
   let rkClient = null;
+  let rkColorId = '';                       // выбранный цвет прайса
   const hasZ = () => typeof ЗаявкаБухгалтеру!=='undefined' && ЗаявкаБухгалтеру;
   const clients = () => hasZ() ? (ЗаявкаБухгалтеру.клиенты()||[]) : [];
-  const rate = () => (rkClient && rkClient.tariff>0) ? rkClient.tariff : BASE;
-  const markup = () => (rkClient && rkClient.tariff>0) ? (parseFloat(rkClient.markup)||0) : 0;
-  const priceM2 = () => r2(rate() * (1 + markup()/100));
+  const цвета = () => (typeof ЦЕНЫ!=='undefined' && ЦЕНЫ.цвета) ? ЦЕНЫ.цвета : [];
+  const текущийЦвет = () => цвета().find(c=>c.id===rkColorId) || null;
+  const ручной = () => { const c=текущийЦвет(); return !!(c && c.ручной); };
+  const своя = () => { const el=document.getElementById('rk-own-price'); return ручной() ? (parseFloat(el&&el.value)||0) : null; };
+  // база расчёта: плоский лист = колонка «обычное», не сложный (надбавки за короткие нет)
+  const базаЦены = () => ({ колонка:'обычное', цветId:rkColorId, своя:своя(), клиент:rkClient, сложное:false });
 
   function drawClients(){
     const sel=document.getElementById('rk-client-pick'); if(!sel) return;
     const was = rkClient?rkClient.id:'';
-    sel.innerHTML='<option value="">— базовый тариф '+fmt(BASE)+' руб/м² —</option>'+
+    sel.innerHTML='<option value="">— по прайсу цвета —</option>'+
       clients().map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
     sel.value=was;
     if(sel.value!==was){ rkClient=null; plashka(); }
@@ -979,12 +993,12 @@ if(!handoffApplied) maybeShowPendingOrderBanner();
     const extra=[]; if(rkClient.markup) extra.push('наценка '+fmt(rkClient.markup,1)+' %');
     box.innerHTML =
       '<div class="rk-tariff-row"><label>Тариф, руб/м²</label>'+
-      '<input type="number" id="rk-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="'+fmt(BASE)+'">'+
+      '<input type="number" id="rk-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="по прайсу">'+
       '<button id="rk-tariff-save" type="button">Сохранить</button></div>'+
       (extra.length?'<div class="rk-tariff-info">'+extra.join(' · ')+'</div>':'')+
       '<div class="rk-tariff-hint">'+(rkClient.tariff>0
-        ? 'Листы считаем по тарифу клиента.'
-        : 'Своего тарифа нет — считаем по базовому '+fmt(BASE)+'. Впиши и сохрани, чтобы закрепить.')+'</div>';
+        ? 'Листы считаем по тарифу клиента (цвет не влияет).'
+        : 'Своего тарифа нет — считаем по прайсу выбранного цвета. Впиши тариф и сохрани, чтобы закрепить за клиентом.')+'</div>';
     box.classList.add('show');
     const save=document.getElementById('rk-tariff-save');
     if(save) save.onclick=()=>{
@@ -995,19 +1009,26 @@ if(!handoffApplied) maybeShowPendingOrderBanner();
     };
   }
   // заготовки раскроя → позиции листа в м² (каждая строка = позиция)
+  // цена/м² — по прайсу цвета (или тарифу клиента); минималка — на один лист (штуку)
   function items(){
-    const pm2 = priceM2();
+    const баз = базаЦены();
+    const ставка = Прайс.ставкаМ2(баз), мин = Прайс.минимум(баз);
+    const цветНаим = (текущийЦвет() && !ручной()) ? (', '+текущийЦвет().название) : '';
     const out=[];
     (state.items||[]).forEach(it=>{
       const w=parseFloat(it.w)||0; if(w<=0) return;
       if(it.flex){
         const m=parseFloat(it.meters)||0; if(m<=0) return;
-        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+' мм × '+fmt(m,2)+' пог.м', 'ед':'м²',
-          'кол':r3((w/1000)*m), 'цена':pm2, 'парам':{ширина:w, метраж:m, flex:true} });
+        // непрерывный метраж — минималку за штуку не применяем
+        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+' мм × '+fmt(m,2)+' пог.м'+цветНаим, 'ед':'м²',
+          'кол':r3((w/1000)*m), 'цена':ставка, 'парам':{ширина:w, метраж:m, flex:true, цвет:rkColorId} });
       } else {
         const l=parseFloat(it.l)||0, q=parseInt(it.qty,10)||0; if(l<=0||q<=0) return;
-        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+'×'+Math.round(l*1000)+' мм', 'ед':'м²',
-          'кол':r3((w/1000)*l*q), 'цена':pm2, 'парам':{ширина:w, длина:l, шт:q} });
+        const площ1=(w/1000)*l;                                            // м² одного листа
+        const perPiece=Прайс.ценаШтуки(Object.assign({},баз,{площадьКускаМ2:площ1}));
+        const ставкаЭфф=(площ1>0 && Прайс.r2(ставка*площ1)<мин) ? Прайс.r2(perPiece/площ1) : ставка;   // минималка задрала цену листа → эффективная цена/м²
+        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+'×'+Math.round(l*1000)+' мм'+цветНаим, 'ед':'м²',
+          'кол':r3((w/1000)*l*q), 'цена':ставкаЭфф, 'парам':{ширина:w, длина:l, шт:q, цвет:rkColorId} });
       }
     });
     return out;
@@ -1021,11 +1042,24 @@ if(!handoffApplied) maybeShowPendingOrderBanner();
     const t0=btn.textContent; btn.textContent='В заказе ✓ ('+n+')';
     setTimeout(()=>{ btn.textContent=t0; updateBtn(); },1600);
   };
+  function drawColors(){
+    const sel=document.getElementById('rk-color'); if(!sel || typeof ЦЕНЫ==='undefined') return;
+    sel.innerHTML = цвета().map(c=>'<option value="'+esc(c.id)+'">'+esc(c.название)+'</option>').join('');
+    if(!rkColorId && цвета()[0]) rkColorId = цвета()[0].id;
+    sel.value = rkColorId;
+    toggleOwn();
+  }
+  function toggleOwn(){
+    const wrap=document.getElementById('rk-own-wrap'); if(wrap) wrap.style.display = ручной() ? 'block' : 'none';
+  }
+  drawColors();
+  const csel=document.getElementById('rk-color');
+  if(csel){ csel.onchange=()=>{ rkColorId=csel.value; toggleOwn(); updateBtn(); }; }
   drawClients();
   const sel=document.getElementById('rk-client-pick');
   if(sel){ sel.addEventListener('focus', drawClients); sel.onchange=e=>pick(e.target.value); }
   updateBtn();
-  document.addEventListener('input', updateBtn);   // ввод заготовок включает/выключает кнопку
+  document.addEventListener('input', updateBtn);   // ввод заготовок/цены включает/выключает кнопку
 })();
 </script>
 </body>

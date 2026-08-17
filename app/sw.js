@@ -3,13 +3,13 @@
 //            дальше: страницы и скрипты → сначала сеть (свежий код), кэш как запас;
 //            картинки → сначала кэш (быстро).
 // Чтение из кэша идёт с ignoreSearch, поэтому смена версии ?v= не обнуляет оффлайн.
-const CACHE = 'dianast-app-v27';
+const CACHE = 'dianast-app-v28';
 
 const ФАЙЛЫ = [
   './', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-512-maskable.png', './icons/logo.png',
   './vendor/supabase-2.110.8.js',
-  './облако.js', './цены.js', './настройки.js', './данные.js', './заявка-бухгалтеру.js', './заказы.js',
+  './облако.js', './цены.js', './прайс.js', './настройки.js', './данные.js', './заявка-бухгалтеру.js', './заказы.js',
   './tools/dobornye/index.html', './tools/dobornye/лого-знак.png',
   './tools/raskroy/index.html', './tools/raskroy/лого-знак.png',
   './tools/otlivy/index.html', './tools/otlivy/app.js', './tools/otlivy/лого-знак.png',

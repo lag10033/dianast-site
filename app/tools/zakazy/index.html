@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заказы — DIANAST</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{ --терракота:#D4521E; --кирпич:#C1440E; --чёрный:#1A1A1A; --текст2:#4a4a4a; --фон:#F7F5F2; --рамка:#E2DCD3; --акцент:#FF9A6B; }
+html{ scroll-behavior:smooth; }
+body{ font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--фон); color:var(--чёрный); line-height:1.5; min-height:100vh; }
+button{ cursor:pointer; font-family:inherit; }
+a{ color:inherit; }
+header{ background:#fff; border-bottom:1px solid var(--рамка); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand img{ height:40px; }
+.bn{ font-size:20px; font-weight:900; letter-spacing:2px; color:var(--кирпич); line-height:1; }
+.bn .a{ color:#2B2B2B; }
+.bs{ font-size:9px; color:var(--текст2); letter-spacing:.4px; margin-top:3px; }
+.back{ font-size:13px; font-weight:700; color:var(--текст2); text-decoration:none; white-space:nowrap; }
+main{ max-width:680px; margin:0 auto; padding:20px 16px 60px; }
+h1{ font-size:clamp(19px,5vw,24px); font-weight:800; margin:4px 0 14px; }
+.card{ background:#fff; border:1px solid var(--рамка); border-radius:14px; padding:14px; margin-bottom:14px; }
+.card h2{ font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--терракота); margin-bottom:10px; }
+label.f{ display:block; font-size:12px; font-weight:700; margin:9px 0 4px; }
+label.f span{ font-weight:400; color:var(--текст2); }
+input[type=text], input[type=email], input[type=number], textarea{ width:100%; font-size:16px; padding:9px 11px; border:1.5px solid var(--рамка); border-radius:10px; background:#fff; color:var(--чёрный); font-family:inherit; }
+input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--терракота); }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.btn{ border:none; border-radius:10px; font-size:14px; font-weight:800; padding:12px; transition:all .15s; }
+.btn.primary{ background:var(--терракота); color:#fff; } .btn.primary:hover{ background:var(--кирпич); }
+.btn.ghost{ background:#eee; color:#333; } .btn.ghost:hover{ background:#e2e2e2; }
+.btn.danger{ background:#fff; color:#b3261e; border:1.5px solid #f0c8ae; }
+.btn[disabled]{ opacity:.45; cursor:default; }
+.btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.btns .btn{ flex:1; min-width:120px; }
+/* позиции */
+.poz{ display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px dashed var(--рамка); }
+.poz:last-child{ border-bottom:none; }
+.poz-body{ flex:1; min-width:0; }
+.poz-name{ font-size:13.5px; font-weight:600; }
+.poz-meta{ font-size:11.5px; color:var(--текст2); margin-top:2px; }
+.poz-type{ display:inline-block; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; padding:1px 6px; border-radius:999px; background:#eef7f0; color:#5aa469; margin-right:6px; }
+.poz-type.dob{ background:#fdf1ea; color:var(--терракота); }
+.poz-qty{ width:70px; text-align:center; }
+.poz-sum{ font-weight:700; font-size:13.5px; white-space:nowrap; min-width:92px; text-align:right; }
+.poz-del{ background:none; border:none; font-size:19px; color:#b5aca0; padding:0 2px; line-height:1; }
+.poz-del:hover{ color:var(--кирпич); }
+.tot{ display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; }
+.tot .l{ font-size:13px; color:var(--текст2); } .tot .v{ font-weight:700; }
+.tot.big{ margin-top:6px; padding-top:10px; border-top:1px solid var(--рамка); }
+.tot.big .l{ font-size:14px; color:#000; font-weight:700; } .tot.big .v{ font-size:20px; font-weight:900; color:var(--терракота); }
+/* список */
+.zcard{ display:flex; align-items:center; gap:12px; padding:13px 14px; border:1px solid var(--рамка); border-radius:12px; margin-bottom:9px; background:#fff; cursor:pointer; transition:border-color .15s; }
+.zcard:hover{ border-color:var(--акцент); }
+.zcard .n{ font-size:15px; font-weight:900; color:var(--терракота); min-width:44px; }
+.zcard .info{ flex:1; min-width:0; }
+.zcard .cl{ font-size:14px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.zcard .sub{ font-size:11.5px; color:var(--текст2); margin-top:2px; }
+.zcard .amt{ font-size:15px; font-weight:800; white-space:nowrap; }
+.empty{ text-align:center; color:var(--текст2); font-size:13.5px; padding:26px 10px; line-height:1.5; }
+.based{ font-size:11.5px; color:var(--текст2); font-weight:400; }
+.flash{ background:#eef7f0; color:#2e7d32; border:1px solid #cfe6d0; border-radius:10px; padding:9px 12px; font-size:13px; font-weight:700; margin-bottom:12px; display:none; }
+.hide{ display:none !important; }
+.hint{ font-size:12px; color:var(--текст2); margin-top:8px; line-height:1.45; }
+@media print{ .obl-chip{ display:none; } }
+</style>
+<script src="../../vendor/supabase-2.110.8.js?v=2026-08-10z"></script>
+<script src="../../облако.js?v=2026-08-10z"></script>
+<script src="../../цены.js?v=2026-08-10z"></script>
+<script src="../../заказы.js?v=2026-08-10z"></script>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="лого-знак.png" alt="">
+    <div><div class="bn">DI<span class="a">A</span>NAST</div><div class="bs">ОТЛИВЫ ОТ ПРОИЗВОДИТЕЛЯ И НЕ ТОЛЬКО!</div></div>
+  </div>
+  <a class="back" href="../../index.html">← На главную</a>
+</header>
+
+<main>
+  <div class="flash" id="flash"></div>
+
+  <!-- ЭКРАН СПИСКА -->
+  <section id="screen-list">
+    <h1>Заказы</h1>
+
+    <!-- собираемый заказ (черновик) -->
+    <div class="card hide" id="draft-card">
+      <h2>Собираемый заказ</h2>
+      <div id="draft-poz"></div>
+      <div class="tot big"><div class="l">Итого с НДС</div><div class="v" id="draft-total">—</div></div>
+      <label class="f">Клиент <span>(организация или ФИО)</span></label>
+      <input type="text" id="draft-client" placeholder="ООО «Окна Плюс» / Иванов И.И.">
+      <div class="row2">
+        <div><label class="f">Телефон</label><input type="text" id="draft-tel" placeholder="+375 29 …"></div>
+        <div><label class="f">Email</label><input type="email" id="draft-mail" placeholder="pochta@example.com"></div>
+      </div>
+      <label class="f">Комментарий</label>
+      <textarea id="draft-note" rows="2" placeholder="Пожелания, адрес, сроки…"></textarea>
+      <div class="btns">
+        <button class="btn primary" id="draft-save" type="button">💾 Сохранить заказ</button>
+        <button class="btn ghost" id="draft-clear" type="button">Очистить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>История заказов</h2>
+      <div id="list"></div>
+    </div>
+    <p class="hint">Заказ собирается кнопкой «В заказ» в калькуляторах отливов и доборных.
+      Открой сохранённый заказ, чтобы посмотреть или поправить.</p>
+  </section>
+
+  <!-- ЭКРАН ЗАКАЗА -->
+  <section id="screen-order" class="hide">
+    <a class="back" href="#" id="to-list" style="display:inline-block;margin-bottom:10px">← К списку заказов</a>
+    <h1 id="order-title">Заказ</h1>
+
+    <div class="card">
+      <h2>Состав заказа</h2>
+      <div id="order-poz"></div>
+      <div class="tot"><div class="l">Без НДС</div><div class="v" id="order-base">—</div></div>
+      <div class="tot"><div class="l" id="order-vat-l">НДС</div><div class="v" id="order-vat">—</div></div>
+      <div class="tot big"><div class="l">Всего с НДС</div><div class="v" id="order-total">—</div></div>
+      <div class="btns" id="poz-actions" style="display:none">
+        <button class="btn primary" id="save-new" type="button">Сохранить изменения новым заказом</button>
+        <button class="btn ghost" id="poz-reset" type="button">Отменить правки</button>
+      </div>
+      <p class="hint" id="poz-hint" style="display:none">Ты изменил состав — по нашему правилу это новый заказ, исходный останется как был.</p>
+    </div>
+
+    <div class="card">
+      <h2>Контакты</h2>
+      <label class="f">Клиент</label>
+      <input type="text" id="o-client">
+      <div class="row2">
+        <div><label class="f">Телефон</label><input type="text" id="o-tel"></div>
+        <div><label class="f">Email</label><input type="email" id="o-mail"></div>
+      </div>
+      <label class="f">Комментарий</label>
+      <textarea id="o-note" rows="2"></textarea>
+      <div class="btns">
+        <button class="btn ghost" id="save-contacts" type="button" disabled>💾 Сохранить контакты</button>
+      </div>
+      <p class="hint">Контакты и комментарий правятся в этом же заказе — номер не меняется.</p>
+    </div>
+
+    <div class="card">
+      <div class="btns">
+        <button class="btn ghost" id="dup" type="button">📋 Дублировать заказ</button>
+        <button class="btn danger" id="del" type="button">Удалить заказ</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmtДата = ts => { const d = new Date(ts); const p = n => String(n).padStart(2,'0'); return `${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const скл = (n,a,b,c) => { const m=Math.abs(n)%100, u=m%10; return (m>10&&m<20)?c : u===1?a : (u>1&&u<5)?b : c; };
+
+function покажи(flash){ const f=$('flash'); f.textContent=flash; f.style.display='block'; setTimeout(()=>f.style.display='none', 1800); }
+
+// ── СПИСОК ──
+function рисоватьЧерновик(){
+  const d = Заказы.получитьЧерновик();
+  const card = $('draft-card');
+  if (!d || !d.позиции.length) { card.classList.add('hide'); return; }
+  card.classList.remove('hide');
+  $('draft-poz').innerHTML = d.позиции.map((p,i)=>строкаПозиции(p,i,true)).join('');
+  const t = Заказы.итоги(d.позиции);
+  $('draft-total').textContent = Заказы.money(t.сНДС) + ' руб.';
+  // удаление из черновика
+  $('draft-poz').querySelectorAll('.poz-del').forEach(b=> b.onclick=()=>{
+    d.позиции.splice(+b.dataset.i,1);
+    if (!d.позиции.length) { Заказы.очиститьЧерновик(); } else { localStorage.setItem('dianast_zakaz_draft_v1', JSON.stringify(d)); }
+    рисоватьЧерновик();
+  });
+  $('draft-poz').querySelectorAll('.poz-qty').forEach(inp=> inp.oninput=()=>{
+    d.позиции[+inp.dataset.i].кол = parseFloat(inp.value)||0;
+    localStorage.setItem('dianast_zakaz_draft_v1', JSON.stringify(d));
+    const t=Заказы.итоги(d.позиции); $('draft-total').textContent=Заказы.money(t.сНДС)+' руб.';
+    inp.closest('.poz').querySelector('.poz-sum').textContent = Заказы.money(Заказы.суммаПоз(d.позиции[+inp.dataset.i]))+' р.';
+  });
+}
+function строкаПозиции(p,i,editable){
+  const cls = p.тип==='доборный' ? 'dob' : '';
+  const метка = p.тип==='доборный' ? 'доборный' : 'отлив';
+  const qty = editable
+    ? `<input type="number" class="poz-qty" data-i="${i}" value="${p.кол}" min="0" step="0.01" inputmode="decimal">`
+    : `<span>${p.кол} ${esc(p.ед)}</span>`;
+  return `<div class="poz">
+    <div class="poz-body">
+      <div class="poz-name"><span class="poz-type ${cls}">${метка}</span>${esc(p.наимен)}</div>
+      <div class="poz-meta">${Заказы.money(p.цена)} руб/${esc(p.ед)}</div>
+    </div>
+    ${qty}
+    <div class="poz-sum">${Заказы.money(Заказы.суммаПоз(p))} р.</div>
+    ${editable?`<button class="poz-del" data-i="${i}" title="Убрать">×</button>`:''}
+  </div>`;
+}
+function рисоватьСписок(){
+  const zs = Заказы.список();
+  const box = $('list');
+  if (!zs.length) { box.innerHTML = '<div class="empty">Пока нет сохранённых заказов.<br>Собери заказ в калькуляторе и нажми «Сохранить заказ».</div>'; return; }
+  box.innerHTML = zs.map(z=>{
+    const n = z.позиции.length;
+    const based = z.наОснове ? `<span class="based"> · на основе №${z.наОснове}</span>` : '';
+    return `<div class="zcard" data-id="${z.id}">
+      <div class="n">№${z.num}</div>
+      <div class="info">
+        <div class="cl">${esc(z.клиент||'Без клиента')}</div>
+        <div class="sub">${fmtДата(z.создан)} · ${n} ${скл(n,'позиция','позиции','позиций')}${based}</div>
+      </div>
+      <div class="amt">${Заказы.money(z.итог.сНДС)} р.</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.zcard').forEach(c=> c.onclick=()=>открыть(c.dataset.id));
+}
+
+// ── ЗАКАЗ ──
+let тек = null;          // {id, позиции:[рабочая копия], оригПозJSON}
+function открыть(id){
+  const z = Заказы.получить(id); if (!z) return;
+  тек = { id, позиции: JSON.parse(JSON.stringify(z.позиции)), оригПоз: JSON.stringify(z.позиции) };
+  $('order-title').innerHTML = `Заказ №${z.num}` + (z.наОснове?` <span class="based">на основе №${z.наОснове}</span>`:'');
+  $('o-client').value = z.клиент||''; $('o-tel').value = z.тел||''; $('o-mail').value = z.почта||''; $('o-note').value = z.коммент||'';
+  $('save-contacts').disabled = true;
+  рисоватьЗаказПозиции();
+  $('screen-list').classList.add('hide'); $('screen-order').classList.remove('hide');
+  window.scrollTo(0,0);
+}
+function рисоватьЗаказПозиции(){
+  $('order-poz').innerHTML = тек.позиции.map((p,i)=>строкаПозиции(p,i,true)).join('') || '<div class="empty">Все позиции удалены.</div>';
+  const t = Заказы.итоги(тек.позиции);
+  $('order-base').textContent = Заказы.money(t.безНДС)+' руб.';
+  $('order-vat-l').textContent = `НДС ${t.ндсПроц}%`;
+  $('order-vat').textContent = Заказы.money(t.ндс)+' руб.';
+  $('order-total').textContent = Заказы.money(t.сНДС)+' руб.';
+  $('order-poz').querySelectorAll('.poz-del').forEach(b=> b.onclick=()=>{ тек.позиции.splice(+b.dataset.i,1); рисоватьЗаказПозиции(); отметитьПравки(); });
+  $('order-poz').querySelectorAll('.poz-qty').forEach(inp=> inp.oninput=()=>{ тек.позиции[+inp.dataset.i].кол = parseFloat(inp.value)||0; рисоватьЗаказПозиции(); отметитьПравки(); });
+  отметитьПравки();
+}
+function позицииТронуты(){ return JSON.stringify(тек.позиции) !== тек.оригПоз; }
+function отметитьПравки(){
+  const тронуто = позицииТронуты();
+  $('poz-actions').style.display = тронуто ? 'flex' : 'none';
+  $('poz-hint').style.display = тронуто ? 'block' : 'none';
+  $('save-new').disabled = !тек.позиции.length;
+}
+
+$('to-list').onclick = e => { e.preventDefault(); тек=null; вСписок(); };
+function вСписок(){ $('screen-order').classList.add('hide'); $('screen-list').classList.remove('hide'); рисоватьВсё(); window.scrollTo(0,0); }
+
+$('save-new').onclick = () => {
+  if (!тек || !тек.позиции.length) return;
+  const c = { клиент:$('o-client').value.trim(), тел:$('o-tel').value.trim(), почта:$('o-mail').value.trim(), коммент:$('o-note').value.trim() };
+  const нов = Заказы.сохранитьКакНовый(тек.id, тек.позиции, c);
+  покажи(`Создан новый заказ №${нов.num}`);
+  открыть(нов.id);
+};
+$('poz-reset').onclick = () => { const z=Заказы.получить(тек.id); тек.позиции=JSON.parse(JSON.stringify(z.позиции)); рисоватьЗаказПозиции(); };
+
+['o-client','o-tel','o-mail','o-note'].forEach(id=> $(id).addEventListener('input', ()=>{ $('save-contacts').disabled=false; }));
+$('save-contacts').onclick = () => {
+  Заказы.обновитьКонтакты(тек.id, { клиент:$('o-client').value.trim(), тел:$('o-tel').value.trim(), почта:$('o-mail').value.trim(), коммент:$('o-note').value.trim() });
+  $('save-contacts').disabled = true; покажи('Контакты сохранены');
+};
+$('dup').onclick = () => { const нов=Заказы.дублировать(тек.id); if(нов){ покажи(`Заказ продублирован — №${нов.num}`); открыть(нов.id); } };
+$('del').onclick = () => {
+  const z=Заказы.получить(тек.id); if(!z) return;
+  if (!confirm(`Удалить заказ №${z.num}? Это необратимо.`)) return;
+  Заказы.удалить(тек.id); тек=null; вСписок(); покажи('Заказ удалён');
+};
+
+// ── черновик: сохранить / очистить ──
+$('draft-save').onclick = () => {
+  const d = Заказы.получитьЧерновик(); if (!d || !d.позиции.length) return;
+  d.клиент=$('draft-client').value.trim(); d.тел=$('draft-tel').value.trim(); d.почта=$('draft-mail').value.trim(); d.коммент=$('draft-note').value.trim();
+  localStorage.setItem('dianast_zakaz_draft_v1', JSON.stringify(d));
+  const z = Заказы.сохранитьЧерновик();
+  покажи(`Заказ №${z.num} сохранён`);
+  рисоватьВсё();
+};
+$('draft-clear').onclick = () => { if (!confirm('Очистить собираемый заказ?')) return; Заказы.очиститьЧерновик(); рисоватьВсё(); };
+
+function рисоватьВсё(){ рисоватьЧерновик(); рисоватьСписок(); }
+рисоватьВсё();
+</script>
+</body>
+</html>

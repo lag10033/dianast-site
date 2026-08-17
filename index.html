@@ -245,12 +245,18 @@ footer{position:relative;background:#111;padding:25px 5%}
 .phone-label{background:rgba(0,0,0,0.75);color:white;font-family:"Montserrat",sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all 0.2s}.phone-float{width:60px;height:60px;border-radius:50%;background:var(--orange);box-shadow:0 4px 20px rgba(212,82,30,0.45);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s}
 .phone-float:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(212,82,30,0.6)}
 .phone-float svg{width:26px;height:26px;fill:white}
+
+/* Количество видно сразу, цена — после контакта: то же правило, что в конструкторе замера */
+.pricerow{display:none !important}
+#calc-result-block.withprice .pricerow{display:flex !important}
 </style>
 <meta property="og:image" content="https://dianast.by/assets/img/hero-bg.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Колотый кирпич для забора от производителя | Dianast">
 <meta name="twitter:description" content="Производим колотый кирпич с 2014 года. Угловой 3,40 руб, рядовой 3,60 руб. 4 цвета. Доставка по всей Беларуси. Расчёт бесплатно.">
 <meta name="twitter:image" content="https://dianast.by/assets/img/hero-bg.jpg">
+<!-- расчёт кирпича: один движок на квиз, калькулятор и конструктор -->
+<script src="/js/brick.js?v=1"></script>
 </head>
 <body>
 
@@ -713,7 +719,7 @@ function submitLead(e){
           </div>
         </div>
 
-        <button onclick="showCalcResult()" style="width:100%;background:var(--orange);color:white;border:none;border-radius:8px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;margin-top:8px;margin-bottom:0;transition:background 0.2s" onmouseover="this.style.background='#b83d10'" onmouseout="this.style.background='var(--orange)'">Получить мгновенный расчёт →</button>
+        <button onclick="showCalcResult()" style="width:100%;background:var(--orange);color:white;border:none;border-radius:8px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;margin-top:8px;margin-bottom:0;transition:background 0.2s" onmouseover="this.style.background='#b83d10'" onmouseout="this.style.background='var(--orange)'">Узнать цену и доставку →</button>
 
             <!-- Results -->
       <div>
@@ -730,7 +736,7 @@ function submitLead(e){
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Поддонов (по 288 шт)</span>
               <span id="r-ang-pal" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:rgba(255,255,255,0.8)">—</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div class="pricerow" style="display:flex;justify-content:space-between;align-items:baseline">
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Стоимость (3,40 руб/шт)</span>
               <span id="r-ang-sum" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#FF6B35">—</span>
             </div>
@@ -746,7 +752,7 @@ function submitLead(e){
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Поддонов (по 210 шт)</span>
               <span id="r-row-pal" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:rgba(255,255,255,0.8)">—</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div class="pricerow" style="display:flex;justify-content:space-between;align-items:baseline">
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Стоимость (3,60 руб/шт)</span>
               <span id="r-row-sum" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#FF6B35">—</span>
             </div>
@@ -757,16 +763,16 @@ function submitLead(e){
             <span id="r-total-pcs" style="font-family:Montserrat,sans-serif;font-weight:800;font-size:20px;color:white">—</span>
           </div>
           <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:16px;padding-top:16px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+            <div class="pricerow" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
               <span style="font-size:14px;color:rgba(255,255,255,0.6)">Поддоны (<span id="r-pal-count">—</span> шт × 10 руб)</span>
               <span id="r-pal-sum" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:rgba(255,255,255,0.8)">—</span>
             </div>
-            <div id="r-delivery-wrap" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+            <div class="pricerow" id="r-delivery-wrap" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
               <span id="r-delivery-label" style="font-size:14px;color:rgba(255,255,255,0.6)">Доставка (<span id="r-trips">—</span> рейс, <span id="r-km">—</span> км)</span>
               <span id="r-delivery-sum" style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:rgba(255,255,255,0.8)">—</span>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px">
+          <div class="pricerow" style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px">
             <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:rgba(255,255,255,0.7)">Итого с доставкой</span>
             <span id="r-total-sum" style="font-family:Montserrat,sans-serif;font-weight:800;font-size:28px;color:#FF6B35">—</span>
           </div>
@@ -923,27 +929,15 @@ function calcFence(){
   var wicket = parseFloat(document.getElementById('c-wicket').value)    || 0;
 
   // Angular (pillar) bricks: 4 per ring × rings × pillars
-  var angRaw = cols * pilRows * 4;
-  var ang = Math.ceil(angRaw * 1.05);
-
-  // Row bricks
-  var spanLen = Math.max(0, len - gate - wicket - 0.38 * cols);
-  var bricksPerMeter = 4;
-  var rowRaw = rowRows * Math.ceil(spanLen * bricksPerMeter);
-  var row = Math.ceil(rowRaw * 1.05);
-
-  // Поддоны: если остаток < 30% от поддона — не считаем неполный поддон
-  var angFull = Math.floor(ang / 288);
-  var angRem  = ang % 288;
-  var angPal  = angRem > 0 && angRem >= 288 * 0.3 ? angFull + 1 : angFull;
-  if(angPal === 0 && ang > 0) angPal = 1; // минимум 1 если есть кирпич
-
-  var rowFull = Math.floor(row / 210);
-  var rowRem  = row % 210;
-  var rowPal  = rowRem > 0 && rowRem >= 210 * 0.3 ? rowFull + 1 : rowFull;
-  if(rowPal === 0 && row > 0) rowPal = 1;
-  var angSum = (ang * 3.40).toFixed(2);
-  var rowSum = (row * 3.60).toFixed(2);
+  // Кирпич считает общий модуль js/brick.js — тот же, что в квизе и конструкторе.
+  // Раньше здесь был свой расчёт с запасом 5%, хотя 20.07.2026 договорились
+  // считать запас штуками: 3 шт углового на столб и 20 шт рядового на забор.
+  var BK = brickCalc({ len: len, gate: gate, wicket: wicket,
+                       posts: cols, rows: pilRows, fillRows: rowRows });
+  var ang = BK.ang, row = BK.row;
+  var angPal = BK.billedAng, rowPal = BK.billedRow;
+  var angSum = BK.sumAng.toFixed(2);
+  var rowSum = BK.sumRow.toFixed(2);
   var totalSum = (ang * 3.40 + row * 3.60).toFixed(2);
 
   // City & delivery
@@ -1000,6 +994,11 @@ function calcFence(){
   }
 
   document.getElementById('r-total-sum').textContent = parseFloat(grandTotal) > 0 ? grandTotal + ' руб' : '—';
+
+  // Количество показываем сразу, как только введена длина: человек видит пользу
+  // до того, как оставит номер. Цену открывает кнопка ниже — правило конструктора.
+  var resBox = document.getElementById('calc-result-block');
+  if (resBox) resBox.style.display = (len > 0) ? 'block' : 'none';
 }
 document.getElementById('c-city').addEventListener('change', calcFence);
 calcFence();
@@ -1420,12 +1419,16 @@ function calcHero(){
 
 function showCalcResult(){
   var name = document.getElementById('c-name').value.trim();
-  var phone = document.getElementById('c-phone').value.trim();
+  // Номер шлём в CRM единообразно, без пробелов: дедуп заявок за 24 часа
+  // сверяет телефоны, и «+375 29 797 43 62» с «+375297974362» не совпадут.
+  var phoneRaw = document.getElementById('c-phone').value.trim();
+  var phone = phoneRaw ? '+375' + phoneDigitsOf(phoneRaw) : '';
   if(!name){alert('Введите ваше имя');document.getElementById('c-name').focus();return;}
-  if(phone === '+375' || phone === '+375 ' || phone.length < 10){alert('Введите номер телефона');document.getElementById('c-phone').focus();return;}
+  if(phoneRaw === '+375' || phoneRaw === '+375 ' || phoneRaw.length < 10){alert('Введите номер телефона');document.getElementById('c-phone').focus();return;}
   calcFence();
   if(typeof ym==='function'){ym(110181067,'reachGoal','calc_lead');}
   document.getElementById('calc-result-block').style.display = 'block';
+  document.getElementById('calc-result-block').classList.add('withprice');
   document.getElementById('calc-disclaimer').style.display = 'block';
   setTimeout(function(){ document.getElementById('calc-result-block').scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
   // Send to Telegram

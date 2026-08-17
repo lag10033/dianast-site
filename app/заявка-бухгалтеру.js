@@ -48,6 +48,7 @@ const ЗаявкаБухгалтеру = (function () {
 
   // ── свои утилиты: на страницах хоста fmt/plural могут быть другими ──
   const r2 = n => Math.round((parseFloat(n) || 0) * 100) / 100;
+  const r3 = n => Math.round((parseFloat(n) || 0) * 1000) / 1000;   // кол-во: м² бывают дробные (0,413)
   const money = n => r2(n).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const чис = (n, d = 0) => (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('ru-RU');
   const escHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -130,7 +131,7 @@ const ЗаявкаБухгалтеру = (function () {
         unit: п.unit || 'пог.м', razv: п.razv || 0,
         thickness: п.thickness != null ? п.thickness : null, ral: п.ral || '',
         pogm: r2(п.pogm || 0), pcs: п.pcs || 0,
-        qtyBase: п.qty != null ? r2(п.qty) : null, priceBase: п.price != null ? r2(п.price) : null,
+        qtyBase: п.qty != null ? r3(п.qty) : null, priceBase: п.price != null ? r2(п.price) : null,
         note: п.note || '',
         tariff: null, gap: null, qty: null, price: null, minApplied: false
       };

@@ -72,6 +72,7 @@ input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--т
 <script src="../../облако.js?v=2026-08-10z"></script>
 <script src="../../цены.js?v=2026-08-10z"></script>
 <script src="../../заказы.js?v=2026-08-17e"></script>
+<script src="../../заявка-бухгалтеру.js?v=2026-08-17f"></script>
 </head>
 <body>
 <header>
@@ -151,6 +152,7 @@ input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--т
     </div>
 
     <div class="card">
+      <button class="btn primary" id="invoice" type="button" style="width:100%;margin-bottom:10px">📋 Выставить счёт (заявка бухгалтеру)</button>
       <div class="btns">
         <button class="btn ghost" id="dup" type="button">📋 Дублировать заказ</button>
         <button class="btn danger" id="del" type="button">Удалить заказ</button>
@@ -274,6 +276,30 @@ $('save-contacts').onclick = () => {
   $('save-contacts').disabled = true; покажи('Контакты сохранены');
 };
 $('dup').onclick = () => { const нов=Заказы.дублировать(тек.id); if(нов){ покажи(`Заказ продублирован — №${нов.num}`); открыть(нов.id); } };
+
+// Выставить счёт из заказа: открыть «Заявку бухгалтеру» с позициями заказа.
+// Цены берём готовые (тариф:false — заказ уже зафиксирован). Клиент — из справочника
+// по имени, а нет такого — заводим карточку из контактов заказа.
+$('invoice').onclick = () => {
+  const z = Заказы.получить(тек.id); if (!z) return;
+  if (typeof ЗаявкаБухгалтеру === 'undefined') { alert('Модуль заявки не загрузился — обновите страницу.'); return; }
+  if (!z.позиции || !z.позиции.length) { alert('В заказе нет позиций.'); return; }
+  let клиентId = '';
+  const имя = (z.клиент || '').trim();
+  if (имя && ЗаявкаБухгалтеру.клиенты) {
+    const есть = ЗаявкаБухгалтеру.клиенты().find(c => (c.name || '').trim().toLowerCase() === имя.toLowerCase());
+    if (есть) клиентId = есть.id;
+    else if (ЗаявкаБухгалтеру.добавитьКлиента) {
+      const c = ЗаявкаБухгалтеру.добавитьКлиента({ name: имя, tel: z.тел || '', email: z.почта || '' });
+      if (c) клиентId = c.id;
+    }
+  }
+  const поз = z.позиции.map(p => ({
+    base: p.наимен, unit: (p.ед === 'м.п.' ? 'пог.м' : p.ед),
+    qty: p.кол, price: p.цена, note: ''
+  }));
+  ЗаявкаБухгалтеру.открыть({ позиции: поз, тариф: false, ключЧерновика: 'dianast_invoice_zakaz_v1', клиентId });
+};
 $('del').onclick = () => {
   const z=Заказы.получить(тек.id); if(!z) return;
   if (!confirm(`Удалить заказ №${z.num}? Это необратимо.`)) return;

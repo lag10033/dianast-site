@@ -84,6 +84,22 @@ input:focus-visible{ outline:none; border-color:var(--терракота); }
   border-radius:12px; font-size:14.5px; font-weight:800; padding:12px; margin-bottom:14px; transition:background .15s;
 }
 .add:hover{ background:#fdf1ea; }
+/* блок «в общий заказ» */
+#rk-client-pick{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
+#rk-client-pick:focus-visible{ outline:none; border-color:var(--терракота); }
+.rk-client-price{ display:none; margin-top:8px; padding:10px 11px; background:#faf8f5; border:1px solid var(--рамка); border-radius:9px; }
+.rk-client-price.show{ display:block; }
+.rk-tariff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.rk-tariff-row label{ font-size:12px; font-weight:700; color:var(--текст2); white-space:nowrap; }
+.rk-tariff-row input{ width:88px; font-size:14px; padding:6px 8px; border:1.5px solid var(--рамка); border-radius:8px; font-family:inherit; }
+.rk-tariff-row input:focus-visible{ outline:none; border-color:var(--терракота); }
+#rk-tariff-save{ background:var(--терракота); color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:800; padding:7px 12px; cursor:pointer; }
+#rk-tariff-save:hover{ background:var(--кирпич); }
+.rk-tariff-info{ margin-top:6px; font-size:11.5px; color:var(--терракота); font-weight:700; }
+.rk-tariff-hint{ margin-top:5px; font-size:11px; color:#9a938a; line-height:1.4; }
+.rk-order-btn{ width:100%; margin-top:12px; background:var(--терракота); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; padding:12px; cursor:pointer; }
+.rk-order-btn:hover{ background:var(--кирпич); }
+.rk-order-btn:disabled{ background:#d9d2c8; cursor:not-allowed; }
 
 .result{ background:var(--чёрный); color:#fff; border-radius:14px; padding:18px 16px; margin-bottom:14px; }
 .result .t{ font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:#9a9a9a; margin-bottom:10px; }
@@ -190,6 +206,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 </style>
 <script src="../../vendor/supabase-2.110.8.js"></script>
 <script src="../../облако.js?v=2026-07-23d"></script>
+<script src="../../заявка-бухгалтеру.js?v=2026-08-17e"></script>
+<script src="../../заказы.js?v=2026-08-17e"></script>
 </head>
 <body>
 
@@ -240,6 +258,15 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   <div class="result">
     <div class="t">Результат раскроя</div>
     <div id="res-main"></div>
+  </div>
+
+  <div class="card" id="rk-order-card">
+    <div class="lbl-small">Плоские листы — в общий заказ</div>
+    <label class="f" for="rk-client-pick" style="margin-top:8px">Клиент <span>— возьмём его тариф для листов</span></label>
+    <select id="rk-client-pick"></select>
+    <div class="rk-client-price" id="rk-client-price"></div>
+    <button class="rk-order-btn" id="rk-order-btn" type="button">🛒 В общий заказ</button>
+    <div class="hintline" style="margin-top:8px">Заготовки уйдут в раздел «Заказы» как плоский лист в м² (площадь × тариф). Рядом с доборными и отливами.</div>
   </div>
 
   <div id="scheme"></div>
@@ -920,6 +947,86 @@ renderItems();
 computeAuto();
 renderAll();
 if(!handoffApplied) maybeShowPendingOrderBanner();
+
+// ── Плоские листы из раскроя → общий заказ (раздел «Заказы») ──
+// Лист считаем в м²: площадь заготовок × цена/м². Тариф — у выбранного клиента
+// (общий справочник), без клиента — базовый 60 (как у доборных, счёт №8).
+(function(){
+  const r2 = n => Math.round((parseFloat(n)||0)*100)/100;
+  const r3 = n => Math.round((parseFloat(n)||0)*1000)/1000;
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const BASE = 60;
+  let rkClient = null;
+  const hasZ = () => typeof ЗаявкаБухгалтеру!=='undefined' && ЗаявкаБухгалтеру;
+  const clients = () => hasZ() ? (ЗаявкаБухгалтеру.клиенты()||[]) : [];
+  const rate = () => (rkClient && rkClient.tariff>0) ? rkClient.tariff : BASE;
+  const markup = () => (rkClient && rkClient.tariff>0) ? (parseFloat(rkClient.markup)||0) : 0;
+  const priceM2 = () => r2(rate() * (1 + markup()/100));
+
+  function drawClients(){
+    const sel=document.getElementById('rk-client-pick'); if(!sel) return;
+    const was = rkClient?rkClient.id:'';
+    sel.innerHTML='<option value="">— базовый тариф '+fmt(BASE)+' руб/м² —</option>'+
+      clients().map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
+    sel.value=was;
+    if(sel.value!==was){ rkClient=null; plashka(); }
+  }
+  function pick(id){ rkClient = clients().find(c=>c.id===id)||null; plashka(); }
+  function plashka(){
+    const box=document.getElementById('rk-client-price'); if(!box) return;
+    if(!rkClient){ box.classList.remove('show'); box.innerHTML=''; return; }
+    const t = rkClient.tariff>0 ? fmt(rkClient.tariff,2) : '';
+    const extra=[]; if(rkClient.markup) extra.push('наценка '+fmt(rkClient.markup,1)+' %');
+    box.innerHTML =
+      '<div class="rk-tariff-row"><label>Тариф, руб/м²</label>'+
+      '<input type="number" id="rk-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="'+fmt(BASE)+'">'+
+      '<button id="rk-tariff-save" type="button">Сохранить</button></div>'+
+      (extra.length?'<div class="rk-tariff-info">'+extra.join(' · ')+'</div>':'')+
+      '<div class="rk-tariff-hint">'+(rkClient.tariff>0
+        ? 'Листы считаем по тарифу клиента.'
+        : 'Своего тарифа нет — считаем по базовому '+fmt(BASE)+'. Впиши и сохрани, чтобы закрепить.')+'</div>';
+    box.classList.add('show');
+    const save=document.getElementById('rk-tariff-save');
+    if(save) save.onclick=()=>{
+      const v=parseFloat(document.getElementById('rk-tariff').value)||0;
+      if(hasZ() && ЗаявкаБухгалтеру.обновитьКлиента){ ЗаявкаБухгалтеру.обновитьКлиента(rkClient.id,{tariff:v}); rkClient.tariff=v; }
+      plashka();
+      const s=document.getElementById('rk-tariff-save'); if(s){ s.textContent='Сохранено ✓'; setTimeout(()=>{ const s2=document.getElementById('rk-tariff-save'); if(s2)s2.textContent='Сохранить'; },1300); }
+    };
+  }
+  // заготовки раскроя → позиции листа в м² (каждая строка = позиция)
+  function items(){
+    const pm2 = priceM2();
+    const out=[];
+    (state.items||[]).forEach(it=>{
+      const w=parseFloat(it.w)||0; if(w<=0) return;
+      if(it.flex){
+        const m=parseFloat(it.meters)||0; if(m<=0) return;
+        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+' мм × '+fmt(m,2)+' пог.м', 'ед':'м²',
+          'кол':r3((w/1000)*m), 'цена':pm2, 'парам':{ширина:w, метраж:m, flex:true} });
+      } else {
+        const l=parseFloat(it.l)||0, q=parseInt(it.qty,10)||0; if(l<=0||q<=0) return;
+        out.push({ 'тип':'лист', 'наимен':'Плоский лист '+fmt(w)+'×'+Math.round(l*1000)+' мм', 'ед':'м²',
+          'кол':r3((w/1000)*l*q), 'цена':pm2, 'парам':{ширина:w, длина:l, шт:q} });
+      }
+    });
+    return out;
+  }
+  const btn=document.getElementById('rk-order-btn');
+  function updateBtn(){ if(btn) btn.disabled = items().length===0; }
+  if(btn) btn.onclick=()=>{
+    if(typeof Заказы==='undefined') return;
+    const list=items(); if(!list.length) return;
+    const n=Заказы.добавить(list,{'источник':'раскрой'});
+    const t0=btn.textContent; btn.textContent='В заказе ✓ ('+n+')';
+    setTimeout(()=>{ btn.textContent=t0; updateBtn(); },1600);
+  };
+  drawClients();
+  const sel=document.getElementById('rk-client-pick');
+  if(sel){ sel.addEventListener('focus', drawClients); sel.onchange=e=>pick(e.target.value); }
+  updateBtn();
+  document.addEventListener('input', updateBtn);   // ввод заготовок включает/выключает кнопку
+})();
 </script>
 </body>
 </html>

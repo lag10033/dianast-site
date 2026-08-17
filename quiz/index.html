@@ -1047,11 +1047,11 @@ button { font-family: inherit; cursor: pointer; }
     <div class="ty-timer">⏱ Работаем с 8:00 до 20:00</div>
     <div class="ty-divider"></div>
     <p class="ty-bonus-label">🎁 Ваш подарок</p>
-    <a class="ty-download" href="../assets/10%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BE%D0%BA%20%D0%BF%D1%80%D0%B8%20%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%B5%20%D0%B7%D0%B0%D0%B1%D0%BE%D1%80%D0%B0.txt" download="10 ошибок при строительстве забора.txt" style="text-decoration:none">
+    <a class="ty-download" href="/assets/7-voprosov-brigade-do-predoplaty.pdf" download="7 вопросов бригаде до предоплаты — Dianast.pdf" style="text-decoration:none" onclick="if(typeof ym==='function')ym(110181067,'reachGoal','checklist_download')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      10 ошибок при строительстве забора
+      7 вопросов бригаде до предоплаты
     </a>
-    <p class="ty-caption">Бесплатно · PDF · 5 минут чтения</p>
+    <p class="ty-caption">Бесплатно · PDF · 1 страница, проверить перед оплатой</p>
     <div class="ty-divider"></div>
     <a class="ty-download" href="/konstruktor-proto/zamer.html" style="text-decoration:none" onclick="if(typeof ym==='function')ym(110181067,'reachGoal','konstruktor_click')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><line x1="2" y1="2" x2="9.586" y2="9.586"/></svg>
@@ -1788,6 +1788,30 @@ function updateNav() {
   }
 }
 
+// ── Замеры прохождения (Метрика) ───────────────────────
+// Набор шагов зависит от ветки (боковая/лицевая), поэтому номер шага сам по себе
+// ничего не говорит. Шлём позицию в пути + имя экрана: в отчёте по параметрам
+// сразу видно, на каком вопросе человек бросил квиз.
+const QUIZ_STEP_NAMES = {
+  0:'сторона забора', 1:'длина', 2:'высота', 3:'что на участке',
+  4:'ворота', 5:'калитка', 6:'тип забора', 7:'тип заполнения',
+  8:'город', 9:'контакты', 10:'высота (боковой)', 11:'тип бокового забора',
+  12:'что на участке (боковой)', 13:'фундамент', 14:'смета'
+};
+let quizStarted = false;
+function trackStep(idx) {
+  if (typeof ym !== 'function') return;
+  const code = getSteps()[idx];
+  if (code === undefined) return;
+  // Цель старта — один раз за проход, даже если ходить назад и снова вперёд
+  if (!quizStarted && idx > 0) {
+    quizStarted = true;
+    ym(110181067, 'reachGoal', 'quiz_start');
+  }
+  const pos = String(idx + 1).padStart(2, '0');
+  ym(110181067, 'params', { quiz: { step: pos + ' ' + (QUIZ_STEP_NAMES[code] || 'шаг ' + code) } });
+}
+
 // ── Navigation ─────────────────────────────────────────
 function showStep(idx) {
   const steps = getSteps();
@@ -1813,6 +1837,7 @@ function showStep(idx) {
     if (steps[idx] === 14) initCalc();
   }
 
+  trackStep(idx);
   updateNav();
 }
 
@@ -2443,6 +2468,11 @@ function showQuoteLink(url){
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/110181067" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
+<script>
+/* Первый экран квиза показан статически — showStep для него не вызывается,
+   поэтому отмечаем его отдельно. Стоит после счётчика: ym уже определён. */
+if (typeof trackStep === 'function') trackStep(stepIdx);
+</script>
 <script>
 document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('a[href^="tel:"]');

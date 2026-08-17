@@ -402,6 +402,16 @@ const ЗаявкаБухгалтеру = (function () {
                 markup: ДЕФОЛТ.markup, vat: ДЕФОЛТ.vat };
     clients.push(c); saveClients(); return c;
   }
+  // Обновить поля карточки клиента прямо из калькулятора (напр. задать доборным
+  // индивидуальный тариф). Пишем только переданные поля — остальное не трогаем.
+  function обновитьКлиента(id, поля) {
+    const c = clients.find(x => x.id === id); if (!c || !поля) return null;
+    ['tariff', 'gap', 'minp', 'markup', 'vat', 'tel', 'email', 'name', 'agent', 'fee'].forEach(k => {
+      if (поля[k] !== undefined) c[k] = поля[k];
+    });
+    saveClients();
+    return c;
+  }
   function рисоватьКлиентов() {
     const sel = $('zb-client');
     sel.innerHTML = clients.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('')
@@ -803,5 +813,5 @@ ${строки}
   }
   function закрыть() { const o = $('zb-overlay'); if (o) o.classList.remove('show'); }
 
-  return { открыть, закрыть, клиенты: () => clients, добавитьКлиента, поставщик, суммаПрописью };
+  return { открыть, закрыть, клиенты: () => clients, добавитьКлиента, обновитьКлиента, поставщик, суммаПрописью };
 })();

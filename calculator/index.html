@@ -232,7 +232,7 @@ footer a{color:rgba(255,255,255,0.6)}
       </div>
       <div>
         <label class="label">Телефон</label>
-        <div class="field"><input type="tel" id="c-phone" aria-label="Номер телефона" value="+375 " oninput="(function(el){var v=el.value;var prefix='+375 ';if(!v.startsWith(prefix)){el.value=prefix;return;}var d=v.slice(prefix.length).replace(/\D/g,'').slice(0,9);var f='';if(d.length>0)f+=d.slice(0,2);if(d.length>2)f+=' '+d.slice(2,5);if(d.length>5)f+=' '+d.slice(5,7);if(d.length>7)f+=' '+d.slice(7,9);el.value=prefix+f;})(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)"></div>
+        <div class="field"><input type="tel" id="c-phone" aria-label="Номер телефона" value="+375 " oninput="phoneMaskFull(this)" onfocus="(function(el){if(el.value==='+375')el.value='+375 ';})(this)"></div>
           <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
       </div>
     </div>

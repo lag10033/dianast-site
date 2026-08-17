@@ -274,7 +274,7 @@ footer{background:#111;padding:40px 5%}
         <label for="lz-phone">Телефон</label>
         <div class="lz-tel">
           <span>+375</span>
-          <input type="tel" id="lz-phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder=" XX XXX XX XX" required oninput="lzMask(this)">
+          <input type="tel" id="lz-phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder=" XX XXX XX XX" required oninput="phoneMask(this)">
           <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
         </div>
       </div>
@@ -375,18 +375,6 @@ document.addEventListener('click',function(e){
 
 <script src="/js/lead.js?v=1"></script>
 <script>
-function lzMask(el){
-  var d=el.value.replace(/\D/g,'');
-  if(d.slice(0,3)==='375')d=d.slice(3);          /* вставили +375297974362 */
-  else if(d.slice(0,2)==='80')d=d.slice(2);      /* вставили 80297974362 */
-  d=d.slice(0,9);
-  var f='';
-  if(d.length>0)f+=d.slice(0,2);
-  if(d.length>2)f+=' '+d.slice(2,5);
-  if(d.length>5)f+=' '+d.slice(5,7);
-  if(d.length>7)f+=' '+d.slice(7,9);
-  el.value=f;
-}
 function lzSend(e){
   e.preventDefault();
   var tel=document.getElementById('lz-phone');

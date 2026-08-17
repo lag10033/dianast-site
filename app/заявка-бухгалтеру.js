@@ -209,6 +209,135 @@ const ЗаявкаБухгалтеру = (function () {
     return (позиции || []).map(п => [п.base, п.razv, п.unit, п.qty, п.price, п.pogm, п.pcs].join('|')).join(';');
   }
 
+  // ── быстрый ввод реквизитов: разбор вставленного текста / файла в поля карточки ──
+  // Кириллические двойники латиницы: в BIC из документов латиница часто подменена
+  // кириллицей (визуально не отличить), а банк и 1С примут только латиницу.
+  const КИР2ЛАТ = { А: 'A', В: 'B', Е: 'E', К: 'K', М: 'M', Н: 'H', О: 'O', Р: 'P', С: 'C', Т: 'T', У: 'Y', Х: 'X',
+                    а: 'a', в: 'b', е: 'e', к: 'k', м: 'm', н: 'h', о: 'o', р: 'p', с: 'c', т: 't', у: 'y', х: 'x' };
+  const латиница = s => String(s).replace(/[А-Яа-я]/g, ch => КИР2ЛАТ[ch] || ch);
+
+  // текст после метки-двоеточия; если человек вставил всё одной строкой — режем по следующей метке
+  function послеМетки(строка) {
+    const i = строка.indexOf(':');
+    let s = i >= 0 ? строка.slice(i + 1) : строка;
+    s = s.split(/\s(?:УНП|ОКПО|Реквизиты\s+банка|Банк|BIC|БИК|Код\s+банка|Почтовый|Контактн|Директор|Адрес\s+электронной|e-?mail)/i)[0];
+    return s.replace(/\s{2,}/g, ' ').replace(/[\s.;]+$/, '').trim();
+  }
+
+  // Разбор реквизитов РБ. Возвращает ТОЛЬКО распознанные поля — частичный текст
+  // не должен затирать уже введённое. Метки распознаём мягко (двоеточие/регистр/варианты).
+  function разобратьРеквизиты(сырой) {
+    const текст = String(сырой || '').replace(/[   ]/g, ' ');
+    const строки = текст.split(/\r?\n/).map(s => s.replace(/[ \t]+/g, ' ').trim()).filter(Boolean);
+    const всё = строки.join('\n');
+    const out = {};
+
+    const em = всё.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/);
+    if (em) out.email = em[0];
+    let m = всё.match(/УНП[^\d]{0,6}(\d{9})/i);      if (m) out.unp = m[1];
+    m = всё.match(/ОКПО[^\d]{0,6}(\d{8,14})/i);       if (m) out.okpo = m[1];
+    m = всё.match(/\bBY\d{2}\s?[A-Za-z]{4}\s?(?:\d\s?){20}/i);
+    if (m) out.rs = m[0].replace(/\s+/g, '').toUpperCase();
+    m = всё.match(/(?:BIC|SWIFT|БИК|Код\s*банка)[:\s\-–—]*([A-Za-zА-Яа-я0-9]{8}(?:[A-Za-zА-Яа-я0-9]{3})?)/i);
+    if (m) out.bic = латиница(m[1]).toUpperCase();
+
+    for (const ln of строки) {
+      if (!out.addr && /(юридическ\w*|юр\.?)\s*адрес/i.test(ln)) out.addr = послеМетки(ln);
+      if (!out.tel && /(тел(ефон)?\.?|факс)/i.test(ln)) {
+        const t = ln.match(/\+?\d[\d\-()\s]{4,}\d/);
+        if (t) out.tel = t[0].replace(/\s+/g, ' ').trim();
+      }
+      if (!out.bank && /(банк|беларусбанк)/i.test(ln) && /(ОАО|ЗАО|ОДО|ООО|УП|филиал|отделение)/i.test(ln)
+          && !/^код\s*банка/i.test(ln) && !/^адрес\s*банка/i.test(ln)) {
+        let b = ln.replace(/.*?р\/с\s*BY\w+\s*/i, '')
+                  .replace(/[,;]?\s*(?:BIC|SWIFT|БИК|Код\s*банка).*$/i, '')
+                  .replace(/^реквизиты\s+банка\s*:?\s*/i, '')
+                  .replace(/^в\s+/i, '').replace(/^банк\s*:?\s*/i, '')
+                  .replace(/[\s,;.]+$/, '').trim();
+        if (b) out.bank = b;
+      }
+    }
+    if (!out.addr) {
+      const p = строки.find(l => /почтов\w*\s*адрес/i.test(l)) ||
+                строки.find(l => /адрес/i.test(l) && !/электрон|e-?mail|банк/i.test(l));
+      if (p) out.addr = послеМетки(p);
+    }
+
+    const полнаяФорма = /(Общество с ограниченной|Открытое акционерное|Закрытое акционерное|Дополнительное общество|Унитарное|Частное|Совместное|Иностранное|Производственн|Республиканское|Индивидуальный предприниматель|Крестьянское)/i;
+    const аббрев = /(?:^|[\s"«»().,;])(ООО|ОАО|ЗАО|ОДО|ЧУП|ЧПУП|ЧТУП|ЧПТУП|СООО|ИООО|СЗАО|ИЗАО|РУП|УП|ГП|ТУП|ИП|ПК)(?=$|[\s"«»().,;])/;
+    let ns = строки.find(l => /(наименовани|плательщик|организаци)/i.test(l) && /:/.test(l));
+    if (ns) out.name = послеМетки(ns);
+    else {
+      // строку с адресом/банком/контактами именем не берём; УНП/ОКПО в той же строке
+      // допускаем (частая вёрстка «ООО «Х», УНП …») и отрезаем от имени хвостом ниже
+      ns = строки.find(l => (полнаяФорма.test(l) || аббрев.test(l)) &&
+                            !/(адрес|банк|р\/с|BIC|тел|email|почт)/i.test(l));
+      if (ns) out.name = ns.replace(/[,;]?\s*(?:УНП|ОКПО|р\/с|ОГРН|BIC)[\s:№#].*$/i, '').replace(/[\s,;]+$/, '').trim();
+    }
+    return out;
+  }
+
+  // .docx = zip; достаём word/document.xml по central directory и разжимаем deflate-raw.
+  async function текстИзDocx(буфер) {
+    const dv = new DataView(буфер), bytes = new Uint8Array(буфер), dec = new TextDecoder();
+    let eocd = -1;
+    for (let i = bytes.length - 22; i >= 0 && i > bytes.length - 22 - 65557; i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('файл не похож на .docx');
+    let p = dv.getUint32(eocd + 16, true);
+    const count = dv.getUint16(eocd + 10, true);
+    let tgt = null;
+    for (let n = 0; n < count; n++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const method = dv.getUint16(p + 10, true), compSize = dv.getUint32(p + 20, true);
+      const nameLen = dv.getUint16(p + 28, true), extraLen = dv.getUint16(p + 30, true), commLen = dv.getUint16(p + 32, true);
+      const off = dv.getUint32(p + 42, true);
+      const name = dec.decode(bytes.subarray(p + 46, p + 46 + nameLen));
+      if (name === 'word/document.xml') { tgt = { method, compSize, off }; break; }
+      p += 46 + nameLen + extraLen + commLen;
+    }
+    if (!tgt) throw new Error('в .docx нет word/document.xml');
+    if (dv.getUint32(tgt.off, true) !== 0x04034b50) throw new Error('битый .docx');
+    const nl = dv.getUint16(tgt.off + 26, true), xl = dv.getUint16(tgt.off + 28, true);
+    const start = tgt.off + 30 + nl + xl, comp = bytes.subarray(start, start + tgt.compSize);
+    let xmlBytes;
+    if (tgt.method === 0) xmlBytes = comp;
+    else if (tgt.method === 8) {
+      if (typeof DecompressionStream === 'undefined') throw new Error('браузер не умеет распаковку — вставьте текстом');
+      const s = new Response(comp).body.pipeThrough(new DecompressionStream('deflate-raw'));
+      xmlBytes = new Uint8Array(await new Response(s).arrayBuffer());
+    } else throw new Error('неизвестный метод сжатия в .docx');
+    return документXmlВТекст(new TextDecoder('utf-8').decode(xmlBytes));
+  }
+  // из document.xml: каждый абзац <w:p> — своя строка, куски <w:t> склеиваем без пробела
+  function документXmlВТекст(xml) {
+    return xml.split(/<\/w:p>/).map(абз => {
+      const части = [];
+      абз.replace(/<w:t[^>]*>([^<]*)<\/w:t>/g, (_, t) => { части.push(t); return ''; });
+      const s = части.join('')
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d))
+        .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+      return s.replace(/ /g, ' ').replace(/\s{2,}/g, ' ').trim();
+    }).filter(Boolean).join('\n');
+  }
+  // .txt: пробуем UTF-8, при мусоре (�) перечитываем как windows-1251
+  function текстИзTxt(буфер) {
+    let s = new TextDecoder('utf-8').decode(буфер);
+    if (/�/.test(s)) { try { s = new TextDecoder('windows-1251').decode(буфер); } catch (e) {} }
+    return s;
+  }
+  // применить распознанные поля в форму карточки; не трогаем то, что не распознано
+  function разнестиВКарточку(данные) {
+    const карта = { name: 'zb-cl-name', unp: 'zb-cl-unp', okpo: 'zb-cl-okpo', addr: 'zb-cl-addr',
+                    tel: 'zb-cl-tel', email: 'zb-cl-email', rs: 'zb-cl-rs', bank: 'zb-cl-bank', bic: 'zb-cl-bic' };
+    let n = 0;
+    Object.keys(карта).forEach(k => { if (данные[k] && $(карта[k])) { $(карта[k]).value = данные[k]; n++; } });
+    return n;
+  }
+
   // ── разметка и стили (монтируются один раз) ──
   const CSS = `
   #zb-overlay{ display:none; position:fixed; inset:0; background:rgba(20,15,10,.55); z-index:120; overflow:auto; padding:24px 12px;
@@ -272,7 +401,21 @@ const ЗаявкаБухгалтеру = (function () {
   .zb-cl-act{ display:flex; gap:8px; }
   .zb-cl-act .save{ background:#D4521E; color:#fff; border:none; border-radius:9px; font-size:13px; font-weight:800; padding:9px 15px; }
   .zb-cl-act .del{ margin-left:auto; border:1.5px solid #E2DCD3; background:#fff; color:#4a4a4a; border-radius:9px; font-size:13px; font-weight:700; padding:9px 13px; }
-  .zb-cl-act .del:hover{ border-color:#C1440E; color:#C1440E; }`;
+  .zb-cl-act .del:hover{ border-color:#C1440E; color:#C1440E; }
+  .zb-quick{ border:1.5px dashed #D4521E; background:#fff9f4; border-radius:11px; padding:11px 12px; margin-bottom:12px; }
+  .zb-quick-head{ margin-bottom:8px; }
+  .zb-quick-head b{ font-size:13px; color:#1A1A1A; }
+  .zb-quick-head span{ display:block; font-size:11.5px; color:#9a938a; margin-top:2px; line-height:1.4; }
+  #zb-cl-paste{ width:100%; min-height:74px; resize:vertical; font-size:13px; padding:8px 10px; border:1.5px solid #E2DCD3;
+    border-radius:9px; font-family:inherit; background:#fff; color:#1A1A1A; line-height:1.45; }
+  #zb-cl-paste:focus-visible{ outline:none; border-color:#D4521E; }
+  .zb-quick-act{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+  .zb-quick-act .go{ background:#D4521E; color:#fff; border:none; }
+  .zb-quick-act .go:hover{ background:#C1440E; color:#fff; }
+  .zb-filelbl{ cursor:pointer; }
+  .zb-quick-msg{ font-size:11.5px; font-weight:700; color:#4a4a4a; flex:1 1 100%; line-height:1.4; }
+  .zb-quick-msg.ok{ color:#2e7d32; }
+  .zb-quick-msg.err{ color:#C1440E; }`;
 
   const HTML = `
   <div id="zb-box">
@@ -288,9 +431,21 @@ const ЗаявкаБухгалтеру = (function () {
         <button class="zb-mini" id="zb-cl-new" type="button">+ Новый</button>
       </div>
       <div class="zb-cl-edit" id="zb-cl-edit">
+        <div class="zb-quick">
+          <div class="zb-quick-head"><b>⚡ Быстрый ввод реквизитов</b>
+            <span>Вставьте реквизиты одним куском или загрузите файл — УНП, адрес, р/с, банк, BIC разнесутся по полям сами. Проверьте и «Сохранить клиента».</span></div>
+          <textarea id="zb-cl-paste" placeholder="Вставьте сюда реквизиты клиента (из письма, карточки, договора)…"></textarea>
+          <div class="zb-quick-act">
+            <button class="zb-mini go" id="zb-cl-parse" type="button">↧ Разнести по полям</button>
+            <label class="zb-mini zb-filelbl" for="zb-cl-file">📎 Из файла (.txt, .docx)</label>
+            <input id="zb-cl-file" type="file" accept=".txt,.docx" style="display:none">
+            <span class="zb-quick-msg" id="zb-cl-parse-msg"></span>
+          </div>
+        </div>
         <div class="zb-row">
           <div class="zb-f grow"><label>Наименование</label><input id="zb-cl-name" placeholder='ООО "Ромашка"'></div>
           <div class="zb-f"><label>УНП</label><input id="zb-cl-unp" class="num" placeholder="123456789" inputmode="numeric"></div>
+          <div class="zb-f"><label>ОКПО</label><input id="zb-cl-okpo" class="num" placeholder="—" inputmode="numeric"></div>
         </div>
         <div class="zb-row">
           <div class="zb-f grow"><label>Адрес</label><input id="zb-cl-addr" placeholder="РБ 220019 г. Минск ул. ..."></div>
@@ -421,7 +576,8 @@ const ЗаявкаБухгалтеру = (function () {
   }
   function заполнитьКарточку() {
     const c = клиент(), v = (id, val) => { $(id).value = val == null ? '' : val; };
-    v('zb-cl-name', c ? c.name : ''); v('zb-cl-unp', c ? c.unp : ''); v('zb-cl-addr', c ? c.addr : '');
+    v('zb-cl-name', c ? c.name : ''); v('zb-cl-unp', c ? c.unp : ''); v('zb-cl-okpo', c ? c.okpo : '');
+    v('zb-cl-addr', c ? c.addr : '');
     v('zb-cl-tel', c ? c.tel : ''); v('zb-cl-email', c ? c.email : '');
     v('zb-cl-rs', c ? c.rs : ''); v('zb-cl-bank', c ? c.bank : ''); v('zb-cl-bic', c ? c.bic : '');
     v('zb-cl-goal', c ? c.goal : ''); v('zb-cl-extra', c ? c.extra : '');
@@ -567,6 +723,39 @@ const ЗаявкаБухгалтеру = (function () {
     };
 
     $('zb-cl-toggle').onclick = () => $('zb-cl-edit').classList.toggle('show');
+
+    // быстрый ввод: разнести вставленный текст / файл по полям карточки
+    const показатьСообщ = (t, cls) => {
+      const e = $('zb-cl-parse-msg'); if (!e) return;
+      e.textContent = t || ''; e.className = 'zb-quick-msg' + (cls ? ' ' + cls : '');
+    };
+    $('zb-cl-parse').onclick = () => {
+      const txt = $('zb-cl-paste').value;
+      if (!txt.trim()) { показатьСообщ('Сначала вставьте текст реквизитов в поле выше.', 'err'); return; }
+      const n = разнестиВКарточку(разобратьРеквизиты(txt));
+      показатьСообщ(n ? `Распознано полей: ${n}. Проверьте их и нажмите «Сохранить клиента».`
+                      : 'Не удалось распознать реквизиты — заполните поля вручную.', n ? 'ok' : 'err');
+    };
+    $('zb-cl-file').onchange = async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      if (/\.docx$/i.test(f.name) === false && /\.doc$/i.test(f.name)) {
+        показатьСообщ('Старый формат .doc в браузере не читается. Пересохраните файл как .docx или вставьте текст.', 'err');
+        e.target.value = ''; return;
+      }
+      показатьСообщ('Читаю файл…');
+      try {
+        const buf = await f.arrayBuffer();
+        const текст = /\.docx$/i.test(f.name) ? await текстИзDocx(buf) : текстИзTxt(buf);
+        $('zb-cl-paste').value = текст;
+        const n = разнестиВКарточку(разобратьРеквизиты(текст));
+        показатьСообщ(n ? `Файл разобран, распознано полей: ${n}. Проверьте и «Сохранить клиента».`
+                        : 'Файл прочитан (текст выше), но реквизиты не распознаны — проверьте вручную.', n ? 'ok' : 'err');
+      } catch (err) {
+        показатьСообщ('Не смог прочитать файл: ' + ((err && err.message) || err) + '. Откройте его и вставьте текст.', 'err');
+      }
+      e.target.value = '';
+    };
+
     $('zb-cl-new').onclick = () => {
       const id = 'cl' + Date.now();
       clients.push({ id, name: 'Новый клиент', addr: '', tel: '', email: '', unp: '', rs: '', bank: '', bic: '', goal: '', extra: '',
@@ -579,7 +768,7 @@ const ЗаявкаБухгалтеру = (function () {
     $('zb-cl-save').onclick = () => {
       const c = клиент(); if (!c) return;
       const g = id => $(id).value.trim();
-      c.name = g('zb-cl-name') || 'Без названия'; c.unp = g('zb-cl-unp'); c.addr = g('zb-cl-addr');
+      c.name = g('zb-cl-name') || 'Без названия'; c.unp = g('zb-cl-unp'); c.okpo = g('zb-cl-okpo'); c.addr = g('zb-cl-addr');
       c.tel = g('zb-cl-tel'); c.email = g('zb-cl-email');
       c.rs = g('zb-cl-rs'); c.bank = g('zb-cl-bank'); c.bic = g('zb-cl-bic');
       c.goal = g('zb-cl-goal'); c.extra = g('zb-cl-extra');

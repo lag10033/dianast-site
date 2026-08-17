@@ -43,7 +43,9 @@ input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--т
 .poz-meta{ font-size:11.5px; color:var(--текст2); margin-top:2px; }
 .poz-type{ display:inline-block; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; padding:1px 6px; border-radius:999px; background:#eef7f0; color:#5aa469; margin-right:6px; }
 .poz-type.dob{ background:#fdf1ea; color:var(--терракота); }
-.poz input.poz-qty{ width:72px; flex:0 0 auto; text-align:center; }
+.poz-type.lst{ background:#eef2fb; color:#5a7bbf; }
+.poz input.poz-qty{ width:82px; flex:0 0 auto; text-align:center; -moz-appearance:textfield; appearance:textfield; }
+.poz input.poz-qty::-webkit-outer-spin-button, .poz input.poz-qty::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 .poz-sum{ font-weight:700; font-size:13.5px; white-space:nowrap; min-width:92px; text-align:right; }
 .poz-del{ background:none; border:none; font-size:19px; color:#b5aca0; padding:0 2px; line-height:1; }
 .poz-del:hover{ color:var(--кирпич); }
@@ -69,7 +71,7 @@ input:focus-visible, textarea:focus-visible{ outline:none; border-color:var(--т
 <script src="../../vendor/supabase-2.110.8.js?v=2026-08-10z"></script>
 <script src="../../облако.js?v=2026-08-10z"></script>
 <script src="../../цены.js?v=2026-08-10z"></script>
-<script src="../../заказы.js?v=2026-08-10z"></script>
+<script src="../../заказы.js?v=2026-08-17e"></script>
 </head>
 <body>
 <header>
@@ -188,10 +190,11 @@ function рисоватьЧерновик(){
   });
 }
 function строкаПозиции(p,i,editable){
-  const cls = p.тип==='доборный' ? 'dob' : '';
-  const метка = p.тип==='доборный' ? 'доборный' : 'отлив';
+  const cls = p.тип==='доборный' ? 'dob' : (p.тип==='лист' ? 'lst' : '');
+  const метка = p.тип==='доборный' ? 'доборный' : (p.тип==='лист' ? 'лист' : 'отлив');
+  const шаг = p.ед==='м²' ? '0.001' : '0.01';   // площадь бывает дробной (0,825) — иначе поле округлит до 0,82
   const qty = editable
-    ? `<input type="number" class="poz-qty" data-i="${i}" value="${p.кол}" min="0" step="0.01" inputmode="decimal">`
+    ? `<input type="number" class="poz-qty" data-i="${i}" value="${p.кол}" min="0" step="${шаг}" inputmode="decimal">`
     : `<span>${p.кол} ${esc(p.ед)}</span>`;
   return `<div class="poz">
     <div class="poz-body">

@@ -21,6 +21,7 @@ const Заказы = (function () {
   const SEQKEY = 'dianast_zakaz_seq_v1';
 
   const r2 = n => Math.round((parseFloat(n) || 0) * 100) / 100;
+  const r3 = n => Math.round((parseFloat(n) || 0) * 1000) / 1000;   // количество: м² бывают дробные (0,825)
   const money = n => r2(n).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const ндсПроцент = () => (typeof ЦЕНЫ !== 'undefined' && ЦЕНЫ && ЦЕНЫ.ндс_процент != null) ? ЦЕНЫ.ндс_процент : 20;
 
@@ -46,7 +47,7 @@ const Заказы = (function () {
       тип: p.тип || 'позиция',
       наимен: String(p.наимен || 'без названия'),
       ед: p.ед || 'шт',
-      кол: r2(p.кол != null ? p.кол : (p.колво != null ? p.колво : 0)),
+      кол: r3(p.кол != null ? p.кол : (p.колво != null ? p.колво : 0)),
       цена: r2(p.цена || 0),
       парам: p.парам || null,          // исходные данные калькулятора — для будущей правки размеров
     };

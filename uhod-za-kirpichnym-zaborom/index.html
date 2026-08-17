@@ -142,6 +142,78 @@ footer a{color:rgba(255,255,255,0.6)}
     <a href="/foto-zaborov" style="display:block;font-size:15px;color:#E8600A;text-decoration:none">→ Фото заборов из колотого кирпича Dianast</a>
   </div>
 
+
+<!-- lead-capture -->
+<style>
+.lz-sec{background:var(--orange,#D4521E);padding:80px 5%}
+.lz-in{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.lz-txt h2{font-family:'Montserrat',sans-serif;font-size:clamp(26px,3vw,40px);font-weight:800;color:#fff;line-height:1.15;margin:0 0 16px}
+.lz-txt p{font-size:17px;color:rgba(255,255,255,.85);line-height:1.7;margin:0}
+.lz-perks{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+.lz-perk{display:flex;align-items:flex-start;gap:10px;font-size:15px;color:rgba(255,255,255,.92);line-height:1.5}
+.lz-perk::before{content:'\2713';font-weight:800;color:#fff;font-size:16px;flex-shrink:0;line-height:1.5}
+.lz-form{background:#fff;border-radius:16px;padding:32px}
+.lz-ttl{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;color:var(--dark,#1A1A1A);margin-bottom:6px}
+.lz-sub{font-size:13px;color:var(--mid,#6b6b6b);margin-bottom:24px}
+.lz-g{margin-bottom:14px}
+.lz-g label{display:block;font-size:12px;font-weight:600;color:var(--mid,#6b6b6b);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.lz-g input,.lz-g select{width:100%;padding:11px 14px;border:1.5px solid #E8E3DC;border-radius:8px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark,#1A1A1A);outline:none;background:#fff;transition:border-color .2s}
+.lz-g input:focus,.lz-g select:focus{border-color:var(--orange,#D4521E)}
+.lz-tel{display:flex;align-items:center;border:1.5px solid #E8E3DC;border-radius:8px;background:#fff;position:relative;transition:border-color .2s}
+.lz-tel:focus-within{border-color:var(--orange,#D4521E)}
+.lz-tel span{padding:11px 0 11px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--dark,#1A1A1A);user-select:none}
+.lz-tel input{border:none;padding-left:4px}
+.lz-tel input:focus{border-color:transparent}
+.lz-btn{width:100%;background:var(--orange,#D4521E);color:#fff;border:none;padding:14px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-top:4px}
+.lz-btn:hover{opacity:.88}
+.lz-btn:disabled{opacity:.6;cursor:default}
+.lz-note{font-size:11px;color:var(--mid,#6b6b6b);text-align:center;margin-top:10px;line-height:1.5}
+@media(max-width:768px){.lz-sec{padding:56px 5%}.lz-in{grid-template-columns:1fr;gap:32px}.lz-form{padding:24px}}
+</style>
+<section class="lz-sec" id="zayavka">
+  <div class="lz-in">
+    <div class="lz-txt">
+      <h2>Есть вопрос по своему забору?</h2>
+      <p>Расскажите, что с ним: высолы, скол, потемнел цвет. Подскажем, что делать, и посчитаем работу, если она нужна.</p>
+      <div class="lz-perks">
+        <div class="lz-perk">Ответим и по чужому кирпичу, не только по своему</div>
+        <div class="lz-perk">Скажем честно, если ничего делать не надо</div>
+        <div class="lz-perk">Чистка и гидрофобизация — под ключ</div>
+        <div class="lz-perk">Фото можно прислать в Viber</div>
+      </div>
+    </div>
+    <form class="lz-form" onsubmit="lzSend(event)">
+      <div class="lz-ttl">Оставьте номер — перезвоним</div>
+      <div class="lz-sub">Консультация без обязательств</div>
+      <div class="lz-g">
+        <label for="lz-name">Ваше имя</label>
+        <input type="text" id="lz-name" name="name" autocomplete="name" placeholder="Иван Иванов">
+      </div>
+      <div class="lz-g">
+        <label for="lz-phone">Телефон</label>
+        <div class="lz-tel">
+          <span>+375</span>
+          <input type="tel" id="lz-phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder=" XX XXX XX XX" required oninput="phoneMask(this)">
+          <input type="text" class="hp-f" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;width:0;border:0;padding:0;overflow:hidden">
+        </div>
+      </div>
+      <div class="lz-g">
+        <label for="lz-when">Когда удобно принять звонок</label>
+        <select id="lz-when" name="when">
+          <option>Как можно скорее</option>
+          <option>Сегодня после 18:00</option>
+          <option>Завтра утром</option>
+          <option>Завтра днём</option>
+          <option>В выходной</option>
+        </select>
+      </div>
+      <button type="submit" class="lz-btn">Отправить заявку &rarr;</button>
+      <div class="lz-note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</div>
+    </form>
+  </div>
+</section>
+<!-- /lead-capture -->
+
 <footer>
   <div>© 2026 Dianast — производство колотого кирпича, Кобрин, Беларусь</div>
   <div style="margin-top:8px"><a href="/">Главная</a> · <a href="/zabor">Статьи</a> · <a href="tel:+375297974362">+375 29 797-43-62</a></div>
@@ -290,6 +362,29 @@ body{padding-top:72px}
   function upd(){var b=document.getElementById('back-to-top');if(!b)return;var s=window.pageYOffset||document.documentElement.scrollTop||0;b.style.display=s>400?'flex':'none';}
   window.addEventListener('scroll',upd,{passive:true});window.addEventListener('touchmove',upd,{passive:true});
 })();
+</script>
+
+<script src="/js/lead.js?v=1"></script>
+<script>
+function lzSend(e){
+  e.preventDefault();
+  var tel=document.getElementById('lz-phone');
+  var d=tel.value.replace(/\D/g,'');
+  if(d.length<9){alert('Введите номер телефона полностью: 9 цифр после +375');tel.focus();return;}
+  var btn=document.querySelector('.lz-btn');
+  var name=(document.getElementById('lz-name').value||'').trim();
+  var when=document.getElementById('lz-when').value;
+  btn.disabled=true;btn.textContent='Отправляем...';
+  var text='\u{1F4CB} Заявка: Уход за забором\n\nИмя: '+(name||'не указано')+'\nТелефон: +375'+d+'\nЗвонить: '+when;
+  sendLead(text,function(){
+    if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
+    var f=document.querySelector('.lz-form');
+    f.innerHTML='<div style="text-align:center;padding:44px 12px"><div style="font-size:56px;margin-bottom:12px">\u2705</div><h3 style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Заявка отправлена</h3><p style="font-size:15px;color:#666;line-height:1.6">Перезвоним: '+when.toLowerCase()+'</p></div>';
+  },function(){
+    btn.disabled=false;btn.innerHTML='Отправить заявку &rarr;';
+    alert('Не отправилось. Позвоните нам: +375 29 797-43-62');
+  });
+}
 </script>
 </body>
 </html>

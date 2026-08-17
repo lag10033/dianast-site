@@ -303,6 +303,24 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 .order-inv-btn{ width:100%; margin:9px 0 0; background:var(--чёрный); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:800; padding:12px; }
 .order-inv-btn:hover{ background:var(--терракота); }
 .order-inv-btn:disabled{ background:#d9d2c8; cursor:not-allowed; }
+.order-gen-btn{ width:100%; margin:9px 0 0; background:var(--терракота); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:800; padding:12px; }
+.order-gen-btn:hover{ background:var(--кирпич); }
+.order-gen-btn:disabled{ background:#d9d2c8; cursor:not-allowed; }
+.db-client{ margin-top:14px; }
+.db-client-lbl{ display:block; font-size:12px; font-weight:700; color:var(--текст2); margin-bottom:5px; }
+.db-client-lbl span{ font-weight:400; color:#9a938a; }
+#db-client-pick{ width:100%; font-size:15px; padding:9px 10px; border:1.5px solid var(--рамка); border-radius:9px; background:#fff; color:var(--чёрный); font-family:inherit; }
+#db-client-pick:focus-visible{ outline:none; border-color:var(--терракота); }
+.db-client-price{ display:none; margin-top:8px; padding:10px 11px; background:#faf8f5; border:1px solid var(--рамка); border-radius:9px; }
+.db-client-price.show{ display:block; }
+.db-tariff-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.db-tariff-row label{ font-size:12px; font-weight:700; color:var(--текст2); white-space:nowrap; }
+.db-tariff-row input{ width:88px; font-size:14px; padding:6px 8px; border:1.5px solid var(--рамка); border-radius:8px; font-family:inherit; }
+.db-tariff-row input:focus-visible{ outline:none; border-color:var(--терракота); }
+#db-tariff-save{ background:var(--терракота); color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:800; padding:7px 12px; cursor:pointer; }
+#db-tariff-save:hover{ background:var(--кирпич); }
+.db-tariff-info{ margin-top:6px; font-size:11.5px; color:var(--терракота); font-weight:700; }
+.db-tariff-hint{ margin-top:5px; font-size:11px; color:#9a938a; line-height:1.4; }
 /* ── Визуальный редактор формы ── */
 .edit-shape-btn{ width:100%; margin:2px 0 8px; background:#fff; color:var(--терракота); border:1.5px solid var(--терракота); border-radius:10px; font-size:13.5px; font-weight:800; padding:9px; }
 .save-row{ display:flex; gap:8px; margin:-4px 0 8px; }
@@ -542,6 +560,12 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
     <div id="order-list"></div>
     <div class="order-total" id="order-total"></div>
     <button class="order-tpl-btn" id="order-tpl-print" type="button">🗂 Печать шаблонов разметки (0)</button>
+    <div class="db-client">
+      <label class="db-client-lbl" for="db-client-pick">Клиент <span>— возьмём его тариф для доборных</span></label>
+      <select id="db-client-pick"></select>
+      <div class="db-client-price" id="db-client-price"></div>
+    </div>
+    <button class="order-gen-btn" id="order-general" type="button">🛒 В общий заказ (история)</button>
     <button class="order-inv-btn" id="order-invoice" type="button">📋 Заявка бухгалтеру (счёт)</button>
     <div class="order-actions">
       <button class="order-clear" id="order-clear" type="button">Очистить</button>
@@ -572,7 +596,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   </div>
 </div>
 
-<script src="../../заявка-бухгалтеру.js?v=2026-07-23d"></script>
+<script src="../../заявка-бухгалтеру.js?v=2026-08-17d"></script>
+<script src="../../заказы.js?v=2026-08-17d"></script>
 <script>
 // ── Библиотека профилей ──
 // segs: полки (key, label, def). turns: загибы между полками (mag=°, dir=±1 направление, edit=редактируемый угол).
@@ -1775,11 +1800,12 @@ function renderOrder(){
   const box=document.getElementById('order-list');
   const toR=document.getElementById('order-to-raskroy');
   const toInv=document.getElementById('order-invoice');
+  const toGen=document.getElementById('order-general');
   if(!order.length){
     box.innerHTML='<div class="order-empty">Заказ пуст.<br>На нужном профиле задай детали и нажми «🛒 Добавить профиль в заказ» — он появится здесь.</div>';
-    document.getElementById('order-total').textContent=''; toR.disabled=true; if(toInv) toInv.disabled=true; return;
+    document.getElementById('order-total').textContent=''; toR.disabled=true; if(toInv) toInv.disabled=true; if(toGen) toGen.disabled=true; return;
   }
-  toR.disabled=false; if(toInv) toInv.disabled=false;
+  toR.disabled=false; if(toInv) toInv.disabled=false; if(toGen) toGen.disabled=false;
   box.innerHTML = order.map((it,i)=>{
     const chips = it.flex
       ? `<span class="chip-r" style="background:#fdf1ea;color:var(--терракота)">≈ ${fmt(it.meters,2)} пог. м · по метражу</span>`
@@ -1822,7 +1848,7 @@ function updateOrderTplBtn(){
   b.textContent=`🗂 Печать шаблонов разметки (${n})`; b.disabled=n===0;
 }
 const orderOverlay=document.getElementById('order-overlay');
-function openOrder(){ renderOrder(); orderOverlay.classList.add('show'); }
+function openOrder(){ renderOrder(); рисоватьКлиентовDB(); orderOverlay.classList.add('show'); }
 function closeOrder(){ orderOverlay.classList.remove('show'); }
 document.getElementById('cart-fab').onclick=openOrder;
 document.getElementById('order-x').onclick=closeOrder;
@@ -1846,6 +1872,90 @@ document.getElementById('parts-order').onclick=()=>{
     setTimeout(()=>{ f.style.display='none'; b.textContent=t; }, 1400);
   }
 };
+
+// ── Клиент и тариф для сборного заказа («В общий заказ» → раздел «Заказы») ──
+// У доборных прайсовой цены нет — считаем как «Заявка бухгалтеру»: (развёртка/1000)×тариф,
+// не ниже минималки, ×наценка (припуск доборным не добавляется). Тариф берём у выбранного
+// клиента; нет клиента или тарифа — базовый (дефолт заявки без спец-условий, счёт №8).
+const _r2 = n => Math.round((parseFloat(n)||0)*100)/100;
+const БАЗ_ТАРИФ = 60, БАЗ_МИН = 6.40;
+let КЛИЕНТ_DB = null;
+const естьЗаявка = () => typeof ЗаявкаБухгалтеру !== 'undefined' && ЗаявкаБухгалтеру;
+const справочникDB = () => естьЗаявка() ? (ЗаявкаБухгалтеру.клиенты()||[]) : [];
+const ставкаDB  = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? КЛИЕНТ_DB.tariff : БАЗ_ТАРИФ;
+const минDB     = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? (parseFloat(КЛИЕНТ_DB.minp)||0) : БАЗ_МИН;
+const наценкаDB = () => (КЛИЕНТ_DB && КЛИЕНТ_DB.tariff>0) ? (parseFloat(КЛИЕНТ_DB.markup)||0) : 0;
+function ценаДоборного(razv){
+  const p = _r2(((parseFloat(razv)||0)/1000) * ставкаDB());
+  const m = минDB();
+  const base = (m>0 && p<m) ? m : p;
+  return _r2(base * (1 + наценкаDB()/100));
+}
+function рисоватьКлиентовDB(){
+  const sel=document.getElementById('db-client-pick'); if(!sel) return;
+  const было = КЛИЕНТ_DB?КЛИЕНТ_DB.id:'';
+  sel.innerHTML='<option value="">— базовый тариф '+fmt(БАЗ_ТАРИФ)+' руб/м² —</option>'+
+    справочникDB().map(c=>'<option value="'+escHtml(c.id)+'">'+escHtml(c.name)+'</option>').join('');
+  sel.value=было;                         // если выбранного клиента удалили — сбросится на базовый
+  if(sel.value!==было){ КЛИЕНТ_DB=null; плашкаКлиентаDB(); }
+}
+function выбратьКлиентаDB(id){
+  КЛИЕНТ_DB = справочникDB().find(c=>c.id===id) || null;
+  плашкаКлиентаDB();
+}
+function плашкаКлиентаDB(){
+  const box=document.getElementById('db-client-price'); if(!box) return;
+  if(!КЛИЕНТ_DB){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const t = КЛИЕНТ_DB.tariff>0 ? fmt(КЛИЕНТ_DB.tariff,2) : '';
+  const доп=[];
+  if(КЛИЕНТ_DB.markup) доп.push('наценка '+fmt(КЛИЕНТ_DB.markup,1)+' %');
+  if(КЛИЕНТ_DB.minp)   доп.push('не ниже '+fmt(КЛИЕНТ_DB.minp,2)+' руб/пог.м');
+  box.innerHTML =
+    '<div class="db-tariff-row"><label>Тариф, руб/м²</label>'+
+    '<input type="number" id="db-tariff" step="0.01" inputmode="decimal" value="'+t+'" placeholder="'+fmt(БАЗ_ТАРИФ)+'">'+
+    '<button id="db-tariff-save" type="button">Сохранить</button></div>'+
+    (доп.length?'<div class="db-tariff-info">'+доп.join(' · ')+'</div>':'')+
+    '<div class="db-tariff-hint">'+(КЛИЕНТ_DB.tariff>0
+      ? 'Доборные считаем по тарифу клиента.'
+      : 'Своего тарифа нет — считаем по базовому '+fmt(БАЗ_ТАРИФ)+'. Впиши и сохрани, чтобы закрепить за клиентом.')+'</div>';
+  box.classList.add('show');
+  const save=document.getElementById('db-tariff-save');
+  if(save) save.onclick=()=>{
+    const v=parseFloat(document.getElementById('db-tariff').value)||0;
+    if(естьЗаявка() && ЗаявкаБухгалтеру.обновитьКлиента){
+      ЗаявкаБухгалтеру.обновитьКлиента(КЛИЕНТ_DB.id,{tariff:v});
+      КЛИЕНТ_DB.tariff=v;                 // локальная копия — плашка и расчёт сразу по новому тарифу
+    }
+    плашкаКлиентаDB();
+    const s=document.getElementById('db-tariff-save');
+    if(s){ s.textContent='Сохранено ✓'; setTimeout(()=>{ const s2=document.getElementById('db-tariff-save'); if(s2)s2.textContent='Сохранить'; },1300); }
+  };
+}
+function dbOrderItems(){
+  return order.map(it=>{
+    const pogm = it.flex ? (parseFloat(it.meters)||0) : (it.rows||[]).reduce((s,r)=>s+r.len*r.qty,0);
+    const наимен = (it.name||'Доборный') + (it.razv?(' '+fmt(it.razv)+' мм'):'');
+    return {
+      тип:'доборный', наимен, ед:'пог.м', кол:_r2(pogm), цена:ценаДоборного(it.razv||0),
+      парам:{ разв:it.razv, толщ:it.thickness, ral:it.ral||'', pogm:_r2(pogm),
+              pcs: it.flex?0:(it.rows||[]).reduce((s,r)=>s+r.qty,0), flex:!!it.flex,
+              тариф:ставкаDB(), клиент: КЛИЕНТ_DB?КЛИЕНТ_DB.name:'' }
+    };
+  });
+}
+const genBtn=document.getElementById('order-general');
+if(genBtn) genBtn.onclick=()=>{
+  if(!order.length || typeof Заказы==='undefined') return;
+  const n=Заказы.добавить(dbOrderItems(),{источник:'доборные'});
+  const t0=genBtn.textContent; genBtn.textContent='В заказе ✓ ('+n+')';
+  setTimeout(()=>{ genBtn.textContent=t0; },1600);
+};
+рисоватьКлиентовDB();
+const dbPick=document.getElementById('db-client-pick');
+if(dbPick){
+  dbPick.addEventListener('focus', рисоватьКлиентовDB);   // справочник могли пополнить в отливах/заявке
+  dbPick.onchange = e => выбратьКлиентаDB(e.target.value);
+}
 renderCartCount();
 
 // ── Визуальный редактор формы (правка болванки под эскиз, абсолютные направления полок) ──

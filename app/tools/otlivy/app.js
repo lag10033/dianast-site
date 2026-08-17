@@ -35,12 +35,6 @@ function addItem() {
     <button class="del" type="button" title="Удалить">×</button>
     <label class="f">Изделие</label>
     <select class="pos">${ЦЕНЫ.изделия.map((p, i) => `<option value="${i}">${p.название}</option>`).join('')}</select>
-    <label class="f">Цвет</label>
-    <select class="color">${ЦЕНЫ.цвета.map((c, i) => `<option value="${i}">${c.название}</option>`).join('')}</select>
-    <div class="other-wrap">
-      <div><label class="f">Название цвета</label><input type="text" class="other-name" placeholder="например, RAL 6005"></div>
-      <div><label class="f">Руб/м² без НДС</label><input type="number" class="other-price" min="1" step="0.01" inputmode="decimal"></div>
-    </div>
     <div class="mode-row">
       <button class="chip mode-btn" type="button" data-m="meter">Метраж (погонаж)</button>
       <button class="chip mode-btn" type="button" data-m="piece">Порезка в размер</button>
@@ -89,12 +83,11 @@ function addItem() {
 
 function calcItem(el, k) {
   const p = ЦЕНЫ.изделия[+el.querySelector('.pos').value];
-  const c = ЦЕНЫ.цвета[+el.querySelector('.color').value];
+  const c = цветЗаказа();                       // цвет — один на весь заказ (в шапке)
   const isList = !!p.лист;
   const mode = isList ? 'piece' : (el.dataset.mode || 'meter');
 
   // видимость
-  el.querySelector('.other-wrap').classList.toggle('show', !!c.ручной);
   el.querySelector('.mode-row').style.display = isList ? 'none' : 'flex';
   el.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
   el.querySelector('.fld-meter').style.display = (!isList && mode === 'meter') ? 'block' : 'none';
@@ -106,11 +99,11 @@ function calcItem(el, k) {
   // тариф с его наценкой, а ширина берётся с припуском. Припуск даётся ТОЛЬКО отливам
   // (проверено на счетах бухгалтера № 7 и № 8 от 13.07.2026). Цвет на цену клиента не влияет.
   const К = ценаКлиента();
-  const прайсМ2 = r2((c.ручной ? (parseFloat(el.querySelector('.other-price').value) || 0) : c[p.колонка]) * idx);
+  const прайсМ2 = r2((c.ручной ? своя() : c[p.колонка]) * idx);
   const m2 = К ? r2(К.tariff * (1 + (К.markup || 0) / 100)) : прайсМ2;
   const minB = К ? r2(К.minp || 0) : r2(ЦЕНЫ.минималка * idx);
   const wM = (wMM + (К && отливЛи(p) ? (К.gap || 0) : 0)) / 1000;
-  const цвет = c.ручной ? (el.querySelector('.other-name').value || 'цвет уточняется') : c.название;
+  const цвет = c.ручной ? (своёИмя() || 'цвет уточняется') : c.название;
 
   let warn = '';
   if (wMM > ЦЕНЫ.макс_ширина_мм) warn = `Максимальная ширина заготовки — ${ЦЕНЫ.макс_ширина_мм} мм. Уменьшите ширину.`;
@@ -228,7 +221,7 @@ function calcItem(el, k) {
 
   // поля для заявки бухгалтеру: короткое имя изделия + ширина = карточка номенклатуры в 1С
   const цветКод = c.ручной
-    ? (el.querySelector('.other-name').value || '')
+    ? (своёИмя() || '')
     : (/^ral/i.test(c.id) ? c.id.replace(/^ral/i, '') : c.название);
 
   return { наимен, ед, колво, колвоСтр, цена, сумма, ready, invalid: !!warn, раскрой,
@@ -249,6 +242,24 @@ const ценаКлиента = () => (КЛИЕНТ && КЛИЕНТ.tariff > 0) ?
 const отливЛи = p => /отлив/i.test((p.название || '') + ' ' + (p.коротко || ''));
 const ндсПроцент = () => (КЛИЕНТ && КЛИЕНТ.vat != null) ? КЛИЕНТ.vat : ЦЕНЫ.ндс_процент;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+// ── Цвет металла — ОДИН на весь заказ (в шапке, не в каждой позиции) ──
+// Цену всех позиций считаем по этому цвету; «Другой цвет…» открывает поля своей цены.
+let ЦВЕТ_ID = null;
+const цветЗаказа = () => (ЦЕНЫ.цвета.find(c => c.id === ЦВЕТ_ID) || ЦЕНЫ.цвета[0]);
+const своя = () => parseFloat(($('order-own-price') || {}).value) || 0;
+const своёИмя = () => (($('order-own-name') || {}).value || '').trim();
+function рисоватьЦвет() {
+  const sel = $('order-color'); if (!sel) return;
+  sel.innerHTML = ЦЕНЫ.цвета.map(c => `<option value="${esc(c.id)}">${esc(c.название)}</option>`).join('');
+  if (!ЦВЕТ_ID) ЦВЕТ_ID = ЦЕНЫ.цвета[0] ? ЦЕНЫ.цвета[0].id : null;
+  sel.value = ЦВЕТ_ID;
+  переключитьСвою();
+}
+function переключитьСвою() {
+  const c = цветЗаказа();
+  const w = $('order-own-wrap'); if (w) w.classList.toggle('show', !!(c && c.ручной));
+}
 
 function рисоватьКлиентов() {
   const sel = $('client-pick'), было = КЛИЕНТ ? КЛИЕНТ.id : '';
@@ -605,7 +616,7 @@ function позицииДляЗаказа() {
   return (window._rows || []).map(r => r.лист
     ? { тип: 'лист', наимен: r.наимен, ед: 'м²', кол: r.площадьМ2, цена: r.ставкаМ2,
         парам: { база: r.база, разв: r.разв, цветКод: r.цветКод } }
-    : { тип: 'отлив', наимен: r.наимен, ед: r.ед, кол: r.колво, цена: r.цена,
+    : { тип: r.сложн ? 'доборный' : 'отлив', наимен: r.наимен, ед: r.ед, кол: r.колво, цена: r.цена,
         парам: { база: r.база, разв: r.разв, цветКод: r.цветКод } });
 }
 if ($('order-add')) $('order-add').onclick = () => {
@@ -635,5 +646,10 @@ $('raskroy-btn').onclick = () => {
 $('inv-close').onclick = () => $('invoice-overlay').classList.remove('show');
 $('inv-print').onclick = () => window.print();
 $('inv-send').onclick = sendOrder;
+
+// ── Цвет заказа (шапка): список цветов + переключение «своей цены» + пересчёт при смене ──
+рисоватьЦвет();
+$('order-color').onchange = e => { ЦВЕТ_ID = e.target.value; переключитьСвою(); calc(); };
+['order-own-name', 'order-own-price'].forEach(id => { const el = $(id); if (el) el.addEventListener('input', calc); });
 
 addItem();

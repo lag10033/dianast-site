@@ -188,6 +188,16 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   <h1>Калькулятор изделий из жести — <em>смета и счёт за минуту</em></h1>
   <div class="sub">Добавьте позиции заказа, укажите данные — получите смету, готовый счёт и отправьте заказ нам в один клик.</div>
 
+  <div class="card" id="color-card">
+    <h2>Цвет металла — на весь заказ</h2>
+    <label class="f" for="order-color" style="margin-top:6px">Цвет <span>— по нему считается цена всех позиций</span></label>
+    <select id="order-color"></select>
+    <div class="other-wrap" id="order-own-wrap" style="margin-top:10px">
+      <div><label class="f" style="margin-top:0">Название цвета</label><input type="text" id="order-own-name" placeholder="например, RAL 6005"></div>
+      <div><label class="f" style="margin-top:0">Руб/м² без НДС</label><input type="number" id="order-own-price" min="1" step="0.01" inputmode="decimal"></div>
+    </div>
+  </div>
+
   <div id="items"></div>
   <button class="add" id="add" type="button">+ Добавить позицию</button>
 
@@ -269,10 +279,10 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 </div>
 
 <!-- цены.js — единый конфиг цен приложения (лежит в корне DIANAST-app, один на все инструменты) -->
-<script src="../../цены.js?v=2026-08-18a"></script>
+<script src="../../цены.js?v=2026-08-18b"></script>
 <!-- заявка-бухгалтеру.js — общая форма заявки на счёт (та же, что в калькуляторе доборных) -->
 <script src="../../заявка-бухгалтеру.js?v=2026-08-17g"></script>
 <script src="../../заказы.js?v=2026-08-17e"></script>
-<script src="app.js?v=2026-08-17e"></script>
+<script src="app.js?v=2026-08-18b"></script>
 </body>
 </html>

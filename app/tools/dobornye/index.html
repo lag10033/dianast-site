@@ -395,7 +395,12 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 
 <main>
   <h1>Библиотека доборных элементов — <em>вводишь стороны, профиль перестраивается</em></h1>
-  <div class="sub">Выберите элемент, задайте размеры сторон — чертёж профиля обновится, а развёртка (ширина плоской заготовки) посчитается сама. Развёртку переносите в калькулятор раскроя.</div>
+  <div class="sub">Выберите элемент, задайте размеры сторон — чертёж и развёртка (ширина плоской заготовки) посчитаются сами. Отсюда собираете общий заказ и печатаете развёртки-шаблоны для цеха.</div>
+
+  <div style="background:#fff;border:1.5px solid var(--рамка);border-radius:14px;padding:14px;margin-bottom:14px">
+    <button id="assemble-order" type="button" style="width:100%;background:var(--терракота);color:#fff;border:none;border-radius:11px;font-size:15.5px;font-weight:800;padding:14px;cursor:pointer">→ Собрать заказ (отлив · доборный · лист)</button>
+    <div style="font-size:12.5px;color:var(--текст2);margin-top:9px;line-height:1.55">Откроет «Расчёт заказа» — там кнопки <b>+Отлив / +Доборный / +Лист</b> и общий счёт. Нарисованные тут доборные положи в заказ: «🛒 Заказ» → «🛒 В общий заказ». Развёртки-шаблоны на цех печатай там же: «🛒 Заказ» → «🗂 Печать шаблонов разметки».</div>
+  </div>
 
   <div class="card">
     <h2>Раздел</h2>
@@ -2008,6 +2013,10 @@ if(genBtn) genBtn.onclick=()=>{
   const t0=genBtn.textContent; genBtn.textContent='В заказе ✓ ('+n+')';
   setTimeout(()=>{ genBtn.textContent=t0; },1600);
 };
+// «Собрать заказ» — просто открыть «Расчёт заказа» (там +Отлив/+Доборный/+Лист и счёт).
+// Корзину доборных и печать шаблонов разметки НЕ трогаем — они остаются здесь для цеха.
+const assembleBtn=document.getElementById('assemble-order');
+if(assembleBtn) assembleBtn.onclick=()=>{ location.href='../otlivy/index.html'; };
 function drawColorsDB(){
   const sel=document.getElementById('db-color'); if(!sel || typeof ЦЕНЫ==='undefined') return;
   sel.innerHTML = цветаDB().map(c=>'<option value="'+escHtml(c.id)+'">'+escHtml(c.название)+'</option>').join('');

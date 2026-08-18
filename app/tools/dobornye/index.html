@@ -501,6 +501,7 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
       <div class="parts-block-note" id="parts-block" style="display:none"></div>
       <button class="parts-copy" id="parts-copy" type="button">⧉ Скопировать всё для раскроя</button>
       <button class="parts-order" id="parts-order" type="button">🛒 Добавить профиль в заказ</button>
+    <button class="parts-order" id="parts-return" type="button" style="display:none;background:var(--терракота);color:#fff;border-color:var(--терракота)">↩ Вернуть развёртку в расчёт отливов</button>
       <div class="order-flash" id="order-flash">Добавлено в заказ ✓</div>
     </div>
   </div>
@@ -1905,6 +1906,21 @@ document.getElementById('parts-order').onclick=()=>{
     setTimeout(()=>{ f.style.display='none'; b.textContent=t; }, 1400);
   }
 };
+
+// ── Возврат развёртки в единый расчёт отливов (открыто с ?back=otlivy) ──
+// Отливы уводят сюда за развёрткой доборной позиции и ждут её обратно. Пишем развёртку
+// текущего профиля + его имя и возвращаемся; сам расчёт отливов восстановится из снимка.
+(function(){
+  const back = new URLSearchParams(location.search).get('back');
+  const rb = document.getElementById('parts-return');
+  if(back!=='otlivy' || !rb) return;
+  rb.style.display='block';
+  rb.onclick=()=>{
+    try{ localStorage.setItem('dianast_dobornye_return_v1',
+      JSON.stringify({ разв: currentRazv(), имя: getName(cur) })); }catch(e){}
+    location.href='../otlivy/index.html';
+  };
+})();
 
 // ── Клиент и тариф для сборного заказа («В общий заказ» → раздел «Заказы») ──
 // У доборных прайсовой цены нет — считаем как «Заявка бухгалтеру»: (развёртка/1000)×тариф,

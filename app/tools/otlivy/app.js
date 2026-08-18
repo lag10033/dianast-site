@@ -41,6 +41,7 @@ function addItem() {
     </div>
     <label class="f">Ширина заготовки, мм <span>макс. ${ЦЕНЫ.макс_ширина_мм}</span></label>
     <input type="number" class="width" value="200" min="10" max="${ЦЕНЫ.макс_ширина_мм}" step="5" inputmode="numeric">
+    <button class="from-draw" type="button" title="Нарисовать профиль в конструкторе и вернуть развёртку сюда">✎ развёртка из чертежа</button>
     <div class="fld-meter">
       <div class="row2" style="margin-top:2px">
         <div><label class="f">Метраж, м <span>всего</span></label><input type="number" class="meters" value="30" min="0.1" step="0.5" inputmode="decimal"></div>
@@ -63,6 +64,7 @@ function addItem() {
   el.querySelector('.del').onclick = () => {
     if (document.querySelectorAll('.item').length > 1) { el.remove(); calc(); }
   };
+  el.querySelector('.from-draw').onclick = () => вЧертёж(el);
   el.querySelectorAll('.mode-btn').forEach(b => b.onclick = () => {
     el.dataset.mode = b.dataset.m; delete el.dataset.lapTouched; calc();
   });
@@ -93,6 +95,7 @@ function calcItem(el, k) {
   el.querySelector('.fld-meter').style.display = (!isList && mode === 'meter') ? 'block' : 'none';
   el.querySelector('.fld-piece').style.display = (isList || mode === 'piece') ? 'block' : 'none';
   el.querySelector('.plen-label').textContent = isList ? 'Длина 1 шт, мм' : 'Длина 1 шт, м';
+  const fdBtn = el.querySelector('.from-draw'); if (fdBtn) fdBtn.classList.toggle('show', !!p.сложный);
 
   const wMM = Math.max(0, parseFloat(el.querySelector('.width').value) || 0);
   // Цена метра квадратного: обычный прайс — по цвету; выбран клиент со своим тарифом —
@@ -123,7 +126,8 @@ function calcItem(el, k) {
   let раскрой = null;   // заготовки позиции для калькулятора раскроя: {w, l, qty}
   let листМ2 = null, ставкаМ2 = null;   // для общего заказа: плоский лист идёт в м² по цене из прайса
 
-  const базаНаим = `${p.название}, ${цвет}, ширина ${wMM} мм`;
+  const проф = (p.сложный && el.dataset.dobName) ? `«${el.dataset.dobName}» ` : '';
+  const базаНаим = `${проф}${p.название}, ${цвет}, ширина ${wMM} мм`;
 
   if (mode === 'meter') {
     // Ввод: желаемый метраж + длина заготовки. Округляем до ЦЕЛЫХ заготовок,
@@ -547,6 +551,91 @@ async function sendOrder() {
   }
 }
 
+// ── Мост «из чертежа» (отливы ↔ конструктор доборных) ──
+// У доборной позиции — кнопка «развёртка из чертежа». Уходя в конструктор, сохраняем
+// ВЕСЬ расчёт снимком (иначе он теряется при уходе со страницы), на возврате
+// восстанавливаем его и подставляем развёртку в ждущую позицию. Снимок — одноразовый.
+const СНИМОК = 'dianast_otlivy_snapshot_v1';
+const ВОЗВРАТ = 'dianast_dobornye_return_v1';
+
+function вЧертёж(el) {
+  const ждёт = [...document.querySelectorAll('.item')].indexOf(el);
+  сохранитьСнимок(ждёт);
+  location.href = '../dobornye/index.html?back=otlivy';
+}
+
+function сохранитьСнимок(ждёт) {
+  try {
+    const позиции = [...document.querySelectorAll('.item')].map(el => ({
+      pos: el.querySelector('.pos').value, mode: el.dataset.mode || 'meter',
+      lapTouched: el.dataset.lapTouched || '', dobName: el.dataset.dobName || '',
+      width: el.querySelector('.width').value, meters: el.querySelector('.meters').value,
+      zag: el.querySelector('.zag').value, plen: el.querySelector('.plen').value,
+      qty: el.querySelector('.qty').value, lap: el.querySelector('.lap').checked,
+    }));
+    const снимок = {
+      t: Date.now(), ждёт, цвет: ЦВЕТ_ID,
+      своёИмя: ($('order-own-name') || {}).value || '', свояЦена: ($('order-own-price') || {}).value || '',
+      клиент: КЛИЕНТ ? КЛИЕНТ.id : '', имяКл: $('client').value, тел: $('client-phone').value,
+      почта: $('client-email').value, примеч: $('client-note') ? $('client-note').value : '',
+      срочность: $('urgency').value, коэф: $('markup').value, позиции,
+    };
+    localStorage.setItem(СНИМОК, JSON.stringify(снимок));
+  } catch (e) { /* нет места / приватный режим — просто не сохранится */ }
+}
+
+function восстановитьСнимок() {
+  let сн = null, ret = null;
+  try { сн = JSON.parse(localStorage.getItem(СНИМОК) || 'null'); } catch (e) {}
+  try { ret = JSON.parse(localStorage.getItem(ВОЗВРАТ) || 'null'); } catch (e) {}
+  localStorage.removeItem(СНИМОК);                                  // оба ключа одноразовые — стираем
+  localStorage.removeItem(ВОЗВРАТ);                                 // всегда, чтобы не сработали позже
+  if (!сн || !Array.isArray(сн.позиции) || !сн.позиции.length) return false;
+  if (!сн.t || Date.now() - сн.t > 60 * 60 * 1000) return false;    // старше часа — не воскрешаем
+
+  if (сн.цвет) { ЦВЕТ_ID = сн.цвет; рисоватьЦвет(); }
+  const on = $('order-own-name'), op = $('order-own-price');
+  if (on) on.value = сн.своёИмя || '';
+  if (op) op.value = сн.свояЦена || '';
+  $('urgency').value = сн.срочность || '1';
+  $('markup').value = сн.коэф || '1';
+  $('client').value = сн.имяКл || '';
+  $('client-phone').value = сн.тел || '';
+  $('client-email').value = сн.почта || '';
+  if ($('client-note')) $('client-note').value = сн.примеч || '';
+  КЛИЕНТ = сн.клиент ? (справочник().find(c => c.id === сн.клиент) || null) : null;
+  рисоватьКлиентов(); if ($('client-pick')) $('client-pick').value = сн.клиент || '';
+  плашкаКлиента(); кнопкаДобавить();
+
+  сн.позиции.forEach(P => {
+    addItem();
+    const el = $('items').lastElementChild;
+    el.querySelector('.pos').value = P.pos;
+    const pp = ЦЕНЫ.изделия[+P.pos], plenEl = el.querySelector('.plen');
+    if (pp && pp.лист) { plenEl.min = 10; plenEl.step = 10; }
+    el.dataset.mode = P.mode || 'meter';
+    if (P.lapTouched) el.dataset.lapTouched = P.lapTouched;
+    if (P.dobName) el.dataset.dobName = P.dobName;
+    el.querySelector('.width').value = P.width;
+    el.querySelector('.meters').value = P.meters;
+    el.querySelector('.zag').value = P.zag;
+    plenEl.value = P.plen;
+    el.querySelector('.qty').value = P.qty;
+    el.querySelector('.lap').checked = !!P.lap;
+  });
+
+  if (ret && ret.разв) {
+    const items = document.querySelectorAll('.item');
+    const el = items[сн.ждёт] || items[items.length - 1];
+    if (el) {
+      el.querySelector('.width').value = Math.round(ret.разв);
+      if (ret.имя) el.dataset.dobName = ret.имя;
+    }
+  }
+  calc();
+  return true;
+}
+
 // ── Запуск ──
 ЦЕНЫ.срочность.forEach(s => {
   const b = document.createElement('button');
@@ -652,4 +741,5 @@ $('inv-send').onclick = sendOrder;
 $('order-color').onchange = e => { ЦВЕТ_ID = e.target.value; переключитьСвою(); calc(); };
 ['order-own-name', 'order-own-price'].forEach(id => { const el = $(id); if (el) el.addEventListener('input', calc); });
 
-addItem();
+// Есть снимок расчёта (вернулись из чертежа) — восстанавливаем; иначе обычный чистый лист.
+if (!восстановитьСнимок()) addItem();

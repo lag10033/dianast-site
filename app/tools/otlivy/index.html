@@ -89,6 +89,12 @@ select:focus-visible, input:focus-visible, textarea:focus-visible{ outline:none;
 .from-draw{ display:none; margin-top:8px; background:#fff; color:var(--терракота); border:1.5px solid var(--терракота); border-radius:9px; font-size:13px; font-weight:800; padding:8px 12px; }
 .from-draw.show{ display:inline-block; }
 .from-draw:hover{ background:#fdf1ea; }
+.add-row{ display:flex; gap:8px; margin-bottom:6px; }
+.add-row .add{ flex:1; width:auto; margin-bottom:0; padding:12px 6px; }
+.add-warn{ display:none; color:var(--кирпич); font-size:12.5px; font-weight:700; margin-bottom:14px; }
+.add-warn.show{ display:block; }
+.ptype-line{ font-weight:800; font-size:15px; margin:4px 0 2px; color:var(--чёрный); }
+@media (max-width:420px){ .add-row .add{ padding:12px 4px; font-size:13.5px; } }
 .item-sum{
   margin-top:12px; padding-top:10px; border-top:1px dashed var(--рамка);
   display:flex; justify-content:space-between; align-items:baseline; font-size:13px; color:var(--текст2); gap:10px; flex-wrap:wrap;
@@ -202,7 +208,8 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
   </div>
 
   <div id="items"></div>
-  <button class="add" id="add" type="button">+ Добавить позицию</button>
+  <div class="add-row" id="add-row"></div>
+  <div class="add-warn" id="add-warn"></div>
 
   <div class="card">
     <h2>Коэффициенты заказа</h2>
@@ -286,6 +293,6 @@ footer a{ color:var(--терракота); font-weight:700; text-decoration:none
 <!-- заявка-бухгалтеру.js — общая форма заявки на счёт (та же, что в калькуляторе доборных) -->
 <script src="../../заявка-бухгалтеру.js?v=2026-08-17g"></script>
 <script src="../../заказы.js?v=2026-08-17e"></script>
-<script src="app.js?v=2026-08-18c"></script>
+<script src="app.js?v=2026-08-18d"></script>
 </body>
 </html>

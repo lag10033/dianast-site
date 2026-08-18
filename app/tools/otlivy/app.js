@@ -26,15 +26,15 @@ function cutPlan(baseLen, mode, target) {
   return { pieces, pieceLen: baseLen / pieces, split: true };
 }
 
-function addItem() {
+function addItem(posIndex = 0) {
   const el = document.createElement('div');
   el.className = 'item';
   el.dataset.mode = 'meter';
   el.innerHTML = `
     <div class="num">Позиция <span class="n"></span></div>
     <button class="del" type="button" title="Удалить">×</button>
-    <label class="f">Изделие</label>
-    <select class="pos">${ЦЕНЫ.изделия.map((p, i) => `<option value="${i}">${p.название}</option>`).join('')}</select>
+    <select class="pos" style="display:none">${ЦЕНЫ.изделия.map((p, i) => `<option value="${i}">${p.название}</option>`).join('')}</select>
+    <div class="ptype-line"></div>
     <div class="mode-row">
       <button class="chip mode-btn" type="button" data-m="meter">Метраж (погонаж)</button>
       <button class="chip mode-btn" type="button" data-m="piece">Порезка в размер</button>
@@ -80,7 +80,8 @@ function addItem() {
     i.addEventListener('input', calc); i.addEventListener('change', calc);
   });
   $('items').appendChild(el);
-  calc();
+  el.querySelector('.pos').value = String(posIndex);
+  el.querySelector('.pos').dispatchEvent(new Event('change'));   // выставит тип позиции + пересчитает
 }
 
 function calcItem(el, k) {
@@ -96,6 +97,7 @@ function calcItem(el, k) {
   el.querySelector('.fld-piece').style.display = (isList || mode === 'piece') ? 'block' : 'none';
   el.querySelector('.plen-label').textContent = isList ? 'Длина 1 шт, мм' : 'Длина 1 шт, м';
   const fdBtn = el.querySelector('.from-draw'); if (fdBtn) fdBtn.classList.toggle('show', !!p.сложный);
+  const ptl = el.querySelector('.ptype-line'); if (ptl) ptl.textContent = кратко(p);
 
   const wMM = Math.max(0, parseFloat(el.querySelector('.width').value) || 0);
   // Цена метра квадратного: обычный прайс — по цвету; выбран клиент со своим тарифом —
@@ -246,6 +248,8 @@ const ценаКлиента = () => (КЛИЕНТ && КЛИЕНТ.tariff > 0) ?
 const отливЛи = p => /отлив/i.test((p.название || '') + ' ' + (p.коротко || ''));
 const ндсПроцент = () => (КЛИЕНТ && КЛИЕНТ.vat != null) ? КЛИЕНТ.vat : ЦЕНЫ.ндс_процент;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+// короткое имя типа позиции для кнопок «+ …» и подписи в карточке
+const кратко = p => p.лист ? 'Лист' : (p.сложный ? 'Доборный' : 'Отлив');
 
 // ── Цвет металла — ОДИН на весь заказ (в шапке, не в каждой позиции) ──
 // Цену всех позиций считаем по этому цвету; «Другой цвет…» открывает поля своей цены.
@@ -340,8 +344,8 @@ function calc() {
   });
 
   window._invalid = invalid;
-  $('add').disabled = invalid; $('add').style.opacity = invalid ? .45 : 1;
-  $('add').textContent = invalid ? 'Сначала исправьте ошибку в позиции' : '+ Добавить позицию';
+  document.querySelectorAll('.add-row .add').forEach(b => { b.disabled = invalid; b.style.opacity = invalid ? .45 : 1; });
+  const aw = $('add-warn'); if (aw) { aw.textContent = invalid ? 'Сначала исправьте ошибку в позиции выше' : ''; aw.classList.toggle('show', invalid); }
   $('invoice-btn').disabled = invalid; $('invoice-btn').style.opacity = invalid ? .45 : 1;
 
   $('res-body').innerHTML = rows.map((r, i) =>
@@ -672,7 +676,17 @@ $('client-add').onclick = () => {
   const b = $('client-add'); b.style.display = ''; b.textContent = 'Сохранено ✓';
   setTimeout(кнопкаДобавить, 1400);
 };
-$('add').onclick = () => { if (!window._invalid) addItem(); };
+// Кнопки добавления позиции по типу: + Отлив / + Доборный / + Лист (тип задаётся сразу).
+(function () {
+  const row = $('add-row'); if (!row) return;
+  ЦЕНЫ.изделия.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'add'; b.type = 'button'; b.dataset.pos = String(i);
+    b.textContent = '+ ' + кратко(p);
+    b.onclick = () => { if (!window._invalid) addItem(i); };
+    row.appendChild(b);
+  });
+})();
 $('copy').onclick = async () => {
   try { await navigator.clipboard.writeText(window._copyText); }
   catch (e) { const t = document.createElement('textarea'); t.value = window._copyText; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }

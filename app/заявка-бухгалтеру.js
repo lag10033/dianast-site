@@ -795,9 +795,28 @@ const ЗаявкаБухгалтеру = (function () {
     };
 
     $('zb-print').onclick = () => {
-      const w = window.open('', '_blank');
-      if (!w) { alert('Браузер заблокировал новое окно. Разрешите всплывающие окна — или нажмите «Сохранить бланк».'); return; }
-      w.document.write(бланкHtml()); w.document.close();
+      // Бланк показываем в iframe ВНУТРИ страницы: в установленном PWA новые окна (window.open)
+      // блокируются, и раньше счёт «не выставлялся». Печать — через contentWindow.print() (печатает бланк).
+      let ov = document.getElementById('zb-blank');
+      if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'zb-blank';
+        ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:200;background:#fff';
+        ov.innerHTML =
+          '<div style="position:absolute;top:0;left:0;right:0;height:52px;background:#1A1A1A;display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:210">' +
+            '<button id="zb-blank-x" type="button" style="background:none;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">← Закрыть</button>' +
+            '<button id="zb-blank-print" type="button" style="background:#D4521E;border:none;color:#fff;border-radius:9px;font-size:14px;font-weight:800;padding:9px 16px;cursor:pointer;font-family:inherit">🖨 Печать / PDF</button>' +
+          '</div>' +
+          '<iframe id="zb-blank-frame" style="border:0;position:absolute;top:52px;left:0;right:0;bottom:0"></iframe>';
+        document.body.appendChild(ov);
+        document.getElementById('zb-blank-x').onclick = () => { ov.style.display = 'none'; };
+        document.getElementById('zb-blank-print').onclick = () => {
+          const f = document.getElementById('zb-blank-frame');
+          if (f && f.contentWindow) { f.contentWindow.focus(); f.contentWindow.print(); }
+        };
+      }
+      document.getElementById('zb-blank-frame').srcdoc = бланкHtml();
+      ov.style.display = 'block';
     };
     $('zb-save-html').onclick = () => скачать(имяФайла() + '.html', new Blob([бланкHtml()], { type: 'text/html;charset=utf-8' }));
     $('zb-1c').onclick = () => {

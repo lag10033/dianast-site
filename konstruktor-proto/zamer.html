@@ -12,6 +12,11 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;color:var(--dark);background:#faf8f4;padding:24px 16px}
 .wrap{max-width:960px;margin:0 auto}
+/* на компьютере — конструктор во всю ширину экрана (на телефоне/планшете остаётся колонка) */
+@media (min-width:1000px){
+  body{padding:24px 32px}
+  .wrap{max-width:none}
+}
 h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px}
 .sub{color:var(--mid);font-size:14px;margin-bottom:20px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px}
@@ -105,6 +110,7 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
   body.printlayout #ecanvas .eblk .en{font-size:9px;line-height:1.1;overflow:visible;text-overflow:clip}
   body.printlayout #ecanvas .eblk.post .en{display:none}      /* «столб» в 11px блок не влезет никогда */
   body.printlayout #ecanvas .eblk .emod{display:none}         /* подсказка ≈1×2,98 — для экрана */
+  body.printlayout #ecanvas .eblk .emcrow{display:none}       /* «до центра» — экранная подсказка для ввода, не на печать */
   body.printlayout #ecanvas .eblk .em{font-size:11px;width:auto;max-width:100%;text-align:center;padding:0}
   body.printlayout #ecanvas .eblk .emu{display:none}          /* «м» — в шапке уже сказано, что метры */
   body.printlayout #ecanvas .eblk.wicket .em{font-size:9px}   /* калитка ≈1 м — самый узкий блок */
@@ -181,6 +187,14 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 .eblk .edeg{width:38px}
 .eblk .emu{font-size:10px;color:#9a8a6e}
 .eblk .emod{font-size:8.5px;font-weight:600;color:#9a8a6e;margin-top:1px;pointer-events:none}
+.emcrow{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;
+  display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 8px;
+  background:#fff3e8;border:1.5px solid var(--orange);border-radius:7px;white-space:nowrap;z-index:6;box-shadow:0 2px 6px #0002}
+.emcrow::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--orange)}
+.emcrow .emclbl{font-size:9.5px;font-weight:700;color:var(--orange);letter-spacing:.02em;line-height:1.1}
+.emcin{display:flex;align-items:center;gap:3px}
+.emcrow .emu{color:var(--orange);font-weight:700}
+.eblk .emc{width:56px;border:1.5px solid var(--orange);border-radius:5px;text-align:center;font-size:12.5px;font-weight:700;padding:2px;font-family:Inter,sans-serif;background:#fff;color:#333}
 .eblk .elab{width:100%;border:none;background:transparent;text-align:center;font-size:12px;font-style:italic;color:#6b6b6b;outline:none;font-family:Inter,sans-serif}
 .eblk .eturn{font-size:9px;border:1px solid #c9b79a;border-radius:5px;padding:1px 4px;cursor:pointer;margin-top:2px;background:#fff}
 .rz{position:absolute;right:-8px;top:0;bottom:0;width:18px;cursor:ew-resize;touch-action:none}
@@ -839,6 +853,10 @@ function blockHTML(b){
   var cls='eblk '+type+(b.id===EB.sel?' sel':'')+((b.m!=null&&!b.measured&&!fixed)?' est':'')+((type==='span'&&spanBad(b.m))?' warn':'');
   var st='left:'+num(b.x)+'px;top:'+num(b.y)+'px;width:'+w+'px;height:'+num(b.h,46)+'px';
   var tools='<div class="etools"><div class="etool" data-act="copy" title="Копировать">⧉</div><div class="etool" data-act="del" title="Удалить">✕</div></div>';
+  // ворота/калитка: расстояние ДО ЦЕНТРА проёма (как в авто-схеме) — плашка над проёмом, шире узкого блока
+  var centerField=(type==='gate'||type==='wicket')
+    ? '<div class="emcrow"><div class="emclbl">'+(type==='gate'?'🚗':'🚪')+' до центра проёма</div><div class="emcin"><input class="emc" inputmode="decimal" value="'+esc(fmt(centerDist(b)))+'"><span class="emu">м</span></div></div>'
+    : '';
   var inner='';
   if(type==='span'||type==='gate'||type==='wicket'){
     inner='<div class="en">'+esc(b.name||type)+'</div>'
@@ -854,7 +872,40 @@ function blockHTML(b){
         +'<div class="eturn" data-act="turn">'+(b.turn==='right'?'↱ вправо':'↰ влево')+'</div>';
   } else { inner='<input class="elab" value="'+esc(b.text)+'">'; }
   var rz=(b.m!=null&&!fixed)?'<div class="rz" data-rz="1"></div>':'';   // угол не тянут за край — 380 мм фиксированы
-  return '<div class="'+cls+'" data-id="'+esc(b.id)+'" style="'+st+'">'+tools+'<div class="ebody">'+inner+'</div>'+rz+'</div>';
+  return '<div class="'+cls+'" data-id="'+esc(b.id)+'" style="'+st+'">'+tools+centerField+'<div class="ebody">'+inner+'</div>'+rz+'</div>';
+}
+// ── расстояние ДО ЦЕНТРА проёма (как в авто-схеме «до центра проёма») ──
+// Замерщик меряет от угла/центра предыдущего проёма до центра ворот/калитки.
+function rowItems(b){ var runs=orderedRuns(); for(var i=0;i<runs.length;i++){ if(runs[i].items.indexOf(b)>=0) return runs[i].items; } return [b]; }
+function centerDist(b){                          // от начала стороны или центра предыдущего проёма до центра b
+  var items=rowItems(b), i=items.indexOf(b), sum=(b.m||0)/2;
+  for(var k=i-1;k>=0;k--){ var p=items[k];
+    if(p.type==='gate'||p.type==='wicket'){ sum+=(p.m||0)/2; break; }   // остановились на центре предыдущего проёма
+    sum+=(p.m||0); }                              // столбы и пролёты между — целиком
+  return Math.round(sum*1000)/1000;
+}
+function relayoutChain(){                         // уложить блоки каждого ряда встык по их длине, масштаб не трогаем
+  orderedRuns().forEach(function(r){ if(!r.items.length)return; var x=r.items[0].x;
+    r.items.forEach(function(bb){ bb.x=x; x+=blockW(bb); }); });
+}
+function applyCenterDist(b,D){                    // ввели «до центра» = D → сдвигаем проём, длина участка неизменна
+  var cur=centerDist(b), delta=Math.round((D-cur)*1000)/1000;
+  if(!isFinite(delta)||Math.abs(delta)<0.001) return;
+  var items=rowItems(b), i=items.indexOf(b), left=null,right=null;
+  for(var k=i-1;k>=0;k--){ var p=items[k]; if(p.type==='gate'||p.type==='wicket')break; if(p.type==='span'){ left=p; break; } }
+  for(var k2=i+1;k2<items.length;k2++){ var q=items[k2]; if(q.type==='gate'||q.type==='wicket')break; if(q.type==='span'){ right=q; break; } }
+  if(!left){ toast('Слева нет пролёта — двигать нечего'); return; }
+  var nl=Math.round(((left.m||0)+delta)*1000)/1000;
+  if(nl<0.3){ toast('Левый пролёт стал бы меньше 0,3 м'); return; }
+  if(right){                                       // забираем слева, возвращаем справа → участок тот же
+    var nr=Math.round(((right.m||0)-delta)*1000)/1000;
+    if(nr<0.3){ toast('Правый пролёт стал бы меньше 0,3 м'); return; }
+    left.m=nl; right.m=nr; right.measured=true;
+  } else {                                         // справа торец — компенсировать нечем, длина участка сдвинется
+    left.m=nl; toast('Справа край забора — общая длина изменится');
+  }
+  left.measured=true; EB.touched=true;
+  relayoutChain(); renumber(); totals(); renderEditor();
 }
 function renderEditor(){
   if(!ecanvas)return;
@@ -924,6 +975,13 @@ function renderBrick(){
 function refreshNames(){
   if(!ecanvas)return;
   EB.blocks.forEach(function(b){ var n=ecanvas.querySelector('.eblk[data-id="'+b.id+'"] .en'); if(n&&b.type!=='label') n.textContent=(b.name||b.type); });
+}
+function refreshCenterDists(){       // после сдвига/растяжки/правки ширины — обновить показ «до центра» у ворот/калиток
+  if(!ecanvas)return;
+  EB.blocks.forEach(function(b){ if(b.type!=='gate'&&b.type!=='wicket')return;
+    var el=ecanvas.querySelector('.eblk[data-id="'+b.id+'"] .emc');
+    if(el&&document.activeElement!==el) el.value=fmt(centerDist(b));   // поле в фокусе не трогаем — человек как раз вводит
+  });
 }
 function selectBlock(id){ EB.sel=id;
   if(!ecanvas)return;
@@ -1206,11 +1264,11 @@ function endDrag(e){ if(!drag)return; var d=drag; drag=null; document.body.style
   var lv=d.node.querySelector('.mlive'); if(lv)lv.remove();
   if(!d.moved)return;
   EB.touched=true;                         // блок двигали/тянули — это ручная работа
-  if(d.mode==='move'){ d.b.x=d._x; d.b.y=d._y; d.node.style.left=d._x+'px'; d.node.style.top=d._y+'px'; renumber(); drawRuler(); }
+  if(d.mode==='move'){ d.b.x=d._x; d.b.y=d._y; d.node.style.left=d._x+'px'; d.node.style.top=d._y+'px'; renumber(); drawRuler(); refreshCenterDists(); }
   else { d.b.m=d._m; d.b.measured=true; d.node.style.width=mpx(d._m)+'px'; d.node.classList.remove('est');
     d.node.classList.toggle('warn', d.b.type==='span'&&spanBad(d.b.m));
     var inp=d.node.querySelector('.em'); if(inp)inp.value=fmt(d._m);
-    var mod=d.node.querySelector('.emod'); if(mod)mod.textContent=moduleReadout(d._m); totals(); drawRuler(); } }
+    var mod=d.node.querySelector('.emod'); if(mod)mod.textContent=moduleReadout(d._m); totals(); drawRuler(); refreshCenterDists(); } }
 
 function bindCanvas(){
   ecanvas.addEventListener('pointerdown',function(e){
@@ -1230,15 +1288,20 @@ function bindCanvas(){
     var node=e.target.closest('.eblk'); if(!node)return; var b=byId(node.dataset.id); if(!b)return;
     EB.touched=true;                       // раскладку правят руками — при пересборке предложим её вернуть
     if(e.target.classList.contains('em')){ var m=parseM(e.target.value); if(m!=null&&m>0){ b.m=Math.min(Math.round(m*100)/100,MAXM); b.measured=true;
-      node.style.width=mpx(b.m)+'px'; node.classList.remove('est'); node.classList.toggle('warn', b.type==='span'&&spanBad(b.m)); var mod=node.querySelector('.emod'); if(mod)mod.textContent=moduleReadout(b.m); totals(); drawRuler(); } }
+      node.style.width=mpx(b.m)+'px'; node.classList.remove('est'); node.classList.toggle('warn', b.type==='span'&&spanBad(b.m)); var mod=node.querySelector('.emod'); if(mod)mod.textContent=moduleReadout(b.m); totals(); drawRuler(); refreshCenterDists(); } }
     else if(e.target.classList.contains('edeg')){ var d=parseInt(e.target.value,10); if(!isNaN(d))b.deg=d; }
     else if(e.target.classList.contains('elab')){ b.text=e.target.value; }
+    // «до центра» не пересчитываем на каждую цифру (сбросило бы фокус) — применяем на blur/Enter
   });
   ecanvas.addEventListener('blur',function(e){
     var t=e.target; if(!t||!t.classList||!t.closest)return; var node=t.closest('.eblk'); if(!node)return; var b=byId(node.dataset.id); if(!b)return;
     if(t.classList.contains('em')) t.value=fmt(b.m);
     else if(t.classList.contains('edeg')) t.value=b.deg;
+    else if(t.classList.contains('emc')){ var d=parseM(t.value); if(d!=null&&d>0) applyCenterDist(b,d); else t.value=fmt(centerDist(b)); }
   },true);
+  ecanvas.addEventListener('keydown',function(e){    // Enter в «до центра» = применить сразу
+    if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('emc')){ e.preventDefault(); e.target.blur(); }
+  });
   ecanvas.addEventListener('click',function(e){
     var t=e.target.closest('[data-act]');
     if(t){ var node=t.closest('.eblk'); var b=byId(node.dataset.id); if(!b)return; var a=t.dataset.act;

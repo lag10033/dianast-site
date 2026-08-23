@@ -489,6 +489,185 @@ ok('очень длинный участок (200 м) считается', layou
   ok('пустая ссылка не применяется', P.decodeShare('') === null);
 }
 
+/* 17. Пересборка куска забора при вводе «до центра» (задача 23.08.2026).
+   Редактор должен вести себя как авто-схема: число пролётов и их длины
+   подбираются заново по кирпичу, центр проёма встаёт ровно на введённое место,
+   длина стороны не меняется. */
+{
+  const R = (v) => Math.round(v * 1000) / 1000;
+  const isModule = (m) => P.MODS.concat(P.MODS_WIDE).some((x) => Math.abs(x - m) < 0.0011);
+  function rowOf() { return P.orderedRuns()[0].items; }
+  function rowSum(items) { return R(items.reduce((a, b) => a + (b.m || 0), 0)); }
+  function spansOf(items) { return items.filter((b) => b.type === 'span').map((b) => R(b.m)); }
+  // куски забора между проёмами (и от торцов) — по ним проверяем разбивку
+  function pieces(items) {
+    const out = []; let cur = [];
+    items.forEach((b) => {
+      if (b.type === 'gate' || b.type === 'wicket') { out.push(cur); cur = []; }
+      else if (b.type === 'span') cur.push(R(b.m));
+    });
+    out.push(cur); return out;
+  }
+
+  // planSegment: кусок из n пролётов по 2,98 и n+1 столбов должен разложиться точно
+  for (let n = 1; n <= 5; n++) {
+    const L = R(n * 2.98 + (n + 1) * P.POST);
+    const p = P.planSegment(L);
+    ok(`кусок ${L} м раскладывается на ${n} пролётов ровно`, !!p && p.n === n && Math.abs(p.rest) < 0.0005,
+       p ? `n=${p.n}, остаток ${p.rest}` : 'null');
+  }
+  near('кусок в один столб — пролётов нет', (P.planSegment(P.POST) || {}).n, 0);
+  eq('слишком короткий кусок не раскладывается', P.planSegment(0.2), null);
+
+  // основной сценарий: участок 30 м, ворота ставим на 9,00 м до центра
+  build({ len: 30 });
+  const before = rowSum(rowOf());
+  const spansBefore = spansOf(rowOf()).length;
+  const postsBefore = P.brickCounts().g.posts;
+  P.applyCenterDist(rowOf().find((b) => b.type === 'gate'), 9.0);
+  const after = rowOf();
+  near('длина стороны после пересчёта не изменилась', rowSum(after), before, 0.002);
+  near('центр ворот встал ровно на введённое', P.centerDist(after.find((b) => b.type === 'gate')), 9.0, 0.002);
+  ok('расчёт кирпича видит новые столбы', P.brickCounts().g.posts === after.filter((b) => b.type === 'post' || b.type === 'corner').length);
+
+  // главное требование: при заметном сдвиге проёма меняется САМО ЧИСЛО пролётов
+  const counts = [7.5, 9.0, 10.5, 13.5].map((D) => {
+    build({ len: 30 });
+    P.applyCenterDist(rowOf().find((b) => b.type === 'gate'), D);
+    const t = rowOf().find((b) => b.type === 'gate');
+    return { D, cd: R(P.centerDist(t)), left: pieces(rowOf())[0].length, sum: rowSum(rowOf()) };
+  });
+  ok('число пролётов до ворот подстраивается под расстояние',
+     new Set(counts.map((c) => c.left)).size >= 3,
+     counts.map((c) => `${c.D}м→${c.left}пр`).join(', '));
+  ok('чем дальше ворота, тем больше пролётов слева',
+     counts.every((c, i) => i === 0 || c.left >= counts[i - 1].left),
+     counts.map((c) => c.left).join('<='));
+  counts.forEach((c) => {
+    near(`центр ворот точен при ${c.D} м`, c.cd, c.D, 0.002);
+    near(`длина стороны цела при ${c.D} м`, c.sum, 30, 0.002);
+  });
+  // раньше при 7,5 м движок отказывал: набор модулей был обрезан снизу
+  ok('короткий кусок раскладывается модулями 2,1–2,4 м', counts[0].cd === 7.5, `центр ${counts[0].cd}`);
+
+  // разбивка внутри куска: максимум два модуля + максимум один доборный пролёт
+  let badPiece = null, badSpan = null;
+  pieces(after).forEach((ms, idx) => {
+    const nonMod = ms.filter((m) => !isModule(m));
+    if (nonMod.length > 1) badPiece = `кусок ${idx}: доборных ${nonMod.length} (${nonMod.join(',')})`;
+    const mods = Array.from(new Set(ms.filter(isModule)));
+    if (mods.length > 2) badPiece = `кусок ${idx}: разных модулей ${mods.length}`;
+    ms.forEach((m) => { if (m > P.SPAN_MAX + 0.001 || m < 1.9) badSpan = String(m); });
+  });
+  ok('в куске не больше двух модулей и одного доборного пролёта', !badPiece, badPiece || '');
+  ok('все пролёты в допустимых пределах', !badSpan, badSpan ? `пролёт ${badSpan}` : '');
+
+  // свип: длина стороны обязана сохраняться всегда, центр — либо точный, либо честный отказ
+  let sumBroke = 0, centerBroke = 0, cases = 0;
+  const saveToast = P.toast; P.toast = function () {};
+  [28, 30, 33, 36, 40].forEach((len) => {
+    [['gate', 'one', 0], ['wicket', 'one', 0], ['gate', 'two', 0], ['gate', 'one', 14]].forEach(([type, gates, side]) => {
+      for (let D = 6; D <= 13; D += 0.5) {
+        build({ len, gates, side });
+        const items = rowOf(); const t = items.find((b) => b.type === type); if (!t) continue;
+        const s0 = rowSum(items);
+        P.applyCenterDist(t, D);
+        const it2 = rowOf(); const t2 = it2.find((b) => b.type === type);
+        cases++;
+        if (Math.abs(rowSum(it2) - s0) > 0.002) sumBroke++;
+        const cd = P.centerDist(t2);
+        // либо центр ровно на месте, либо движок отказал и ничего не тронул
+        if (Math.abs(cd - D) > 0.002 && Math.abs(rowSum(it2) - s0) > 0.002) centerBroke++;
+      }
+    });
+  });
+  P.toast = saveToast;
+  ok(`длина стороны цела во всех ${cases} случаях`, sumBroke === 0, `сломалась в ${sumBroke}`);
+  ok('центр либо точный, либо честный отказ', centerBroke === 0, `нарушений ${centerBroke}`);
+
+  // отказ, когда пролёт физически не влезает: раскладка остаётся прежней
+  build({ len: 30 });
+  const keep = rowSum(rowOf()), keepSpans = spansOf(rowOf()).join(',');
+  const q = P.toast; P.toast = function () {};
+  P.applyCenterDist(rowOf().find((b) => b.type === 'gate'), 2.1);   // ворота 4 м — слева не остаётся места
+  P.toast = q;
+  near('при невозможном расстоянии длина не поехала', rowSum(rowOf()), keep, 0.002);
+  eq('при невозможном расстоянии раскладка не тронута', spansOf(rowOf()).join(','), keepSpans);
+}
+
+/* 18. Привязка крайних столбов и общая длина на замыкающем столбе (23.08.2026).
+   Длину участка меряют либо от КРАЯ крайнего столба, либо от его ЦЕНТРА —
+   во втором случае забор выходит за рулетку на половину столба с этой стороны. */
+{
+  const R = (v) => Math.round(v * 1000) / 1000;
+  function rowOf(i) { return P.orderedRuns()[i || 0].items; }
+  function rowSum(items) { return R(items.reduce((a, b) => a + (b.m || 0), 0)); }
+
+  near('половина столба — 190 мм', P.POST / 2, 0.19);
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
+  near('от края: прибавки нет', P.anchorPad('L') + P.anchorPad('R'), 0);
+  P.S.anchorL = 'center';
+  near('от центра слева: +190 мм', P.anchorPad('L'), 0.19);
+  P.S.anchorR = 'center';
+  near('от центра с двух сторон: +380 мм', P.anchorPad('L') + P.anchorPad('R'), 0.38);
+
+  // габарит забора растёт на полстолба с каждой стороны, замер остаётся прежним
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
+  build({ len: 30 });
+  near('по краям: забор ровно 30 м', rowSum(rowOf()), 30, 0.002);
+  P.S.anchorL = 'center'; build({ len: 30 });
+  near('первый столб по центру: забор 30,19 м', rowSum(rowOf()), 30.19, 0.002);
+  P.S.anchorR = 'center'; build({ len: 30 });
+  near('оба по центру: забор 30,38 м', rowSum(rowOf()), 30.38, 0.002);
+
+  // на замыкающем столбе показывается ровно то, что покажет рулетка
+  P.calcRowEnds();
+  const lastId = rowOf()[rowOf().length - 1].id;
+  near('на последнем столбе — исходный замер 30 м', P._rowEnds[lastId], 30, 0.002);
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge'; build({ len: 30 });
+  P.calcRowEnds();
+  near('по краям на последнем столбе тоже 30 м', P._rowEnds[rowOf()[rowOf().length - 1].id], 30, 0.002);
+
+  // ввод общей длины пересобирает хвост забора и синхронизирует замер на Шаге 2
+  const quiet = P.toast; P.toast = function () {};
+  build({ len: 30 });
+  P.calcRowEnds();
+  const last = rowOf()[rowOf().length - 1];
+  const gateBefore = P.centerDist(rowOf().find((b) => b.type === 'gate'));
+  P.applyTotalDist(last, 34);
+  P.toast = quiet;
+  near('после ввода 34 м забор стал 34 м', rowSum(rowOf()), 34, 0.002);
+  near('замер на Шаге 2 обновился', P.S.plotLen, 34, 0.002);
+  near('проёмы не сдвинулись', P.centerDist(rowOf().find((b) => b.type === 'gate')), gateBefore, 0.002);
+  ok('раскладку не надо пересобирать заново', P.EB.dirty === false);
+
+  // угловой участок: своя длина у каждой стороны
+  build({ len: 30, side: 14 });
+  P.calcRowEnds();
+  const runs = P.orderedRuns();
+  eq('у углового участка две стороны', runs.length, 2);
+  const endF = runs[0].items[runs[0].items.length - 1];
+  const endS = runs[1].items[runs[1].items.length - 1];
+  eq('фасад замыкает угловой столб', endF.type, 'corner');
+  near('на угле — длина фасада 30 м', P._rowEnds[endF.id], 30, 0.002);
+  near('на конце боковой — её длина 14 м', P._rowEnds[endS.id], 14, 0.002);
+  const q2 = P.toast; P.toast = function () {};
+  P.applyTotalDist(endS, 16);
+  P.toast = q2;
+  near('боковая стала 16 м', rowSum(rowOf(1)), 16, 0.002);
+  near('замер боковой на Шаге 2 обновился', P.S.sideLen, 16, 0.002);
+  near('фасад при этом не тронут', rowSum(rowOf(0)), 30, 0.002);
+
+  // привязки переживают ссылку-расчёт
+  P.S.anchorL = 'center'; P.S.anchorR = 'edge';
+  const code = P.encodeShare(P.shareState());
+  P.S.anchorL = 'edge'; P.S.anchorR = 'center';
+  P.applyShare(P.decodeShare(code));
+  eq('первый столб из ссылки', P.S.anchorL, 'center');
+  eq('последний столб из ссылки', P.S.anchorR, 'edge');
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
+}
+
 /* ── итог ─────────────────────────────────────────────────────────────────── */
 console.log(`\nПройдено: ${passed}   Провалено: ${failed}\n`);
 if (failed) {

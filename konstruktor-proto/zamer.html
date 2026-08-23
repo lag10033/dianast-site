@@ -901,7 +901,7 @@ function blockHTML(b){
   var tools='<div class="etools"><div class="etool" data-act="copy" title="Копировать">⧉</div><div class="etool" data-act="del" title="Удалить">✕</div></div>';
   // ворота/калитка: расстояние ДО ЦЕНТРА проёма (как в авто-схеме) — плашка над проёмом, шире узкого блока
   var centerField=(type==='gate'||type==='wicket')
-    ? '<div class="emcrow"><div class="emclbl">'+(type==='gate'?'🚗':'🚪')+' до центра проёма</div><div class="emcin"><input class="emc" inputmode="decimal" value="'+esc(fmt(centerDist(b)))+'"><span class="emu">м</span></div></div>'
+    ? '<div class="emcrow"><div class="emclbl">'+(type==='gate'?'🚗':'🚪')+' от начала до центра</div><div class="emcin"><input class="emc" inputmode="decimal" value="'+esc(fmt(centerDist(b)))+'"><span class="emu">м</span></div></div>'
     : '';
   var inner='';
   if(type==='span'||type==='gate'||type==='wicket'){
@@ -927,11 +927,13 @@ function blockHTML(b){
 // ── расстояние ДО ЦЕНТРА проёма (как в авто-схеме «до центра проёма») ──
 // Замерщик меряет от угла/центра предыдущего проёма до центра ворот/калитки.
 function rowItems(b){ var runs=orderedRuns(); for(var i=0;i<runs.length;i++){ if(runs[i].items.indexOf(b)>=0) return runs[i].items; } return [b]; }
-function centerDist(b){                          // от начала стороны или центра предыдущего проёма до центра b
+// Замерщик всегда меряет ОТ НАЧАЛА ЗАБОРА до центра ворот и отдельно от начала
+// забора до центра калитки (Андрей 23.08.2026). Точка отсчёта — та же, что и
+// у общей длины: край первого столба или его середина (выбор на Шаге 4).
+function centerDist(b){
   var items=rowItems(b), i=items.indexOf(b), sum=(b.m||0)/2;
-  for(var k=i-1;k>=0;k--){ var p=items[k];
-    if(p.type==='gate'||p.type==='wicket'){ sum+=(p.m||0)/2; break; }   // остановились на центре предыдущего проёма
-    sum+=(p.m||0); }                              // столбы и пролёты между — целиком
+  for(var k=i-1;k>=0;k--) sum+=(items[k].m||0);
+  if(rowIndexOf(b)===0) sum-=anchorPad('L');
   return Math.round(sum*1000)/1000;
 }
 // Последний столб стороны показывает ВСЮ её длину — так же, как проём показывает
@@ -1152,11 +1154,12 @@ function applyCenterDist(b,D){
   for(var k2=i+1;k2<items.length;k2++){ if(items[k2].type==='gate'||items[k2].type==='wicket'){ ni=k2; break; } }
   var A=(pi>=0)?Math.round((pos[pi]+(items[pi].m||0))*1000)/1000:0;   // левая граница пересобираемого куска
   var B=(ni>=0)?Math.round(pos[ni]*1000)/1000:T;                      // правая граница
-  var Cbase=(pi>=0)?(pos[pi]+(items[pi].m||0)/2):0;                   // от чего меряем: угол или центр соседа
-  var C=Math.round((Cbase+D)*1000)/1000;                              // куда встаёт центр проёма
+  var Cbase=(rowIndexOf(b)===0)?anchorPad('L'):0;                     // сдвиг точки отсчёта с Шага 4
+  var C=Math.round((D+Cbase)*1000)/1000;                              // центр проёма от начала забора
   var w0=b.m||0;
   if(C-w0/2<A-0.001||C+w0/2>B+0.001){
-    toast('Не помещается: между соседями всего '+fmt(B-A)+' м'); return;
+    toast('Не помещается: от начала забора этот проём должен быть между '
+      +fmt(A+w0/2-Cbase)+' и '+fmt(B-w0/2-Cbase)+' м'); return;
   }
   var fit=fitAround(A,B,C,w0,false);
   if(!fit){

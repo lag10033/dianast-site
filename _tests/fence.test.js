@@ -692,6 +692,53 @@ ok('очень длинный участок (200 м) считается', layou
   P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
 }
 
+/* 19. Расстояния до проёмов — всегда ОТ НАЧАЛА ЗАБОРА (Андрей 23.08.2026).
+   Замерщик даёт: от начала забора до центра ворот и отдельно от начала забора
+   до центра калитки. Не цепочкой от предыдущего проёма. */
+{
+  const R = (v) => Math.round(v * 1000) / 1000;
+  function rowOf() { return P.orderedRuns()[0].items; }
+  function rowSum() { return R(rowOf().reduce((a, b) => a + (b.m || 0), 0)); }
+  function absCenter(t) { let x = 0; for (const b of rowOf()) { if (b === t) return R(x + (b.m || 0) / 2); x += (b.m || 0); } return null; }
+
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
+  build({ len: 30 });
+  const gate = rowOf().find((b) => b.type === 'gate');
+  const wicket = rowOf().find((b) => b.type === 'wicket');
+  near('до ворот — от начала забора', P.centerDist(gate), absCenter(gate), 0.002);
+  near('до калитки — тоже от начала забора', P.centerDist(wicket), absCenter(wicket), 0.002);
+  ok('до калитки больше, чем до ворот (не цепочка)', P.centerDist(wicket) > P.centerDist(gate) + 4,
+     `ворота ${P.centerDist(gate)}, калитка ${P.centerDist(wicket)}`);
+
+  // задаём оба расстояния по очереди — каждое от начала, соседний проём не едет
+  const quiet = P.toast; P.toast = function () {};
+  P.applyCenterDist(rowOf().find((b) => b.type === 'gate'), 8);
+  const wAfterGate = P.centerDist(rowOf().find((b) => b.type === 'wicket'));
+  near('ворота встали на 8 м от начала', P.centerDist(rowOf().find((b) => b.type === 'gate')), 8, 0.002);
+  P.applyCenterDist(rowOf().find((b) => b.type === 'wicket'), 21);
+  P.toast = quiet;
+  near('калитка встала на 21 м от начала', P.centerDist(rowOf().find((b) => b.type === 'wicket')), 21, 0.002);
+  near('ворота при этом остались на 8 м', P.centerDist(rowOf().find((b) => b.type === 'gate')), 8, 0.002);
+  near('длина забора не поехала', rowSum(), 30, 0.002);
+  ok('расстояние до калитки менялось только по нашему вводу', Math.abs(wAfterGate - 21) > 0.5,
+     `после ворот было ${wAfterGate}`);
+
+  // калитку нельзя поставить левее ворот — движок отказывает и ничего не трогает
+  const before = rowSum(), wKeep = P.centerDist(rowOf().find((b) => b.type === 'wicket'));
+  const q2 = P.toast; P.toast = function () {};
+  P.applyCenterDist(rowOf().find((b) => b.type === 'wicket'), 5);
+  P.toast = q2;
+  near('после невозможного расстояния длина цела', rowSum(), before, 0.002);
+  near('калитка осталась на месте', P.centerDist(rowOf().find((b) => b.type === 'wicket')), wKeep, 0.002);
+
+  // мерили от центра первого столба — точка отсчёта сдвигается на полстолба
+  P.S.anchorL = 'center';
+  build({ len: 30 });
+  const g2 = rowOf().find((b) => b.type === 'gate');
+  near('от центра столба: расстояние на 190 мм меньше габаритного', P.centerDist(g2), R(absCenter(g2) - 0.19), 0.002);
+  P.S.anchorL = 'edge';
+}
+
 /* ── итог ─────────────────────────────────────────────────────────────────── */
 console.log(`\nПройдено: ${passed}   Провалено: ${failed}\n`);
 if (failed) {

@@ -197,6 +197,20 @@ h1{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;margin-bot
 .emcrow .emclbl{font-size:9.5px;font-weight:700;color:var(--orange);letter-spacing:.02em;line-height:1.1}
 .emcin{display:flex;align-items:center;gap:3px}
 .emcrow .emu{color:var(--orange);font-weight:700}
+/* размерная линия стороны: засечки стоят ровно в той точке, откуда берётся длина */
+.dimline{position:absolute;height:0;border-top:1.5px solid var(--post);pointer-events:none;z-index:3}
+.dimline::before,.dimline::after{content:"";position:absolute;top:-5.5px;width:0;height:12px;border-left:1.5px solid var(--post)}
+.dimline::before{left:0}
+.dimline::after{right:0}
+.dimtxt{position:absolute;left:50%;transform:translateX(-50%);top:-8px;background:#faf8f4;padding:0 7px;
+  font-size:10.5px;font-weight:700;color:#4a3c28;white-space:nowrap;border-radius:4px}
+.dimtick{position:absolute;border-left:1.5px dashed var(--orange);pointer-events:none;z-index:3}
+.dimtick.full{border-left-color:var(--post)}          /* габарит забора — тёмным */
+.dimline.meas{border-top-color:var(--orange)}         /* как мерили — оранжевым */
+.dimline.meas::before,.dimline.meas::after{border-left-color:var(--orange)}
+.dimtxt.meas{color:var(--orange)}
+.dimdot{position:absolute;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;
+  background:var(--orange);pointer-events:none;z-index:5;box-shadow:0 0 0 1.5px #fff}
 .emcrow.etot{left:auto;right:0;transform:none;background:#efe9dd;border-color:var(--post)}
 .emcrow.etot::after{left:auto;right:10px;border-top-color:var(--post)}
 .emcrow.etot .emclbl,.emcrow.etot .emu{color:#4a3c28}
@@ -925,14 +939,15 @@ function centerDist(b){                          // от начала сторо
 // привязки первого столба до точки привязки последнего.
 var _rowEnds={};
 function calcRowEnds(){
+  // Длина забора — всегда от НАЧАЛА первого столба до КОНЦА последнего, как бы её
+  // ни мерили рулеткой. Это и есть сумма блоков стороны.
   _rowEnds={};
-  var runs=orderedRuns();
-  runs.forEach(function(r,ri){
+  orderedRuns().forEach(function(r){
     if(!r.items.length) return;
     var last=r.items[r.items.length-1];
     if(last.type!=='post'&&last.type!=='corner') return;
     var sum=0; r.items.forEach(function(x){ sum+=(x.m||0); });
-    _rowEnds[last.id]=Math.round((sum-(ri===0?anchorPad('L'):0)-(ri===runs.length-1?anchorPad('R'):0))*1000)/1000;
+    _rowEnds[last.id]=Math.round(sum*1000)/1000;
   });
 }
 // ближайшая длина хвоста, при которой он ложится по кирпичу без мелкого огрызка
@@ -956,7 +971,7 @@ function applyTotalDist(b,D){
   var padL=(ri===0?anchorPad('L'):0), padR=(ri===runs.length-1?anchorPad('R'):0);
   var cur=0; items.forEach(function(x){ cur+=(x.m||0); });
   cur=Math.round(cur*1000)/1000;
-  var delta=Math.round((D+padL+padR-cur)*1000)/1000;
+  var delta=Math.round((D-cur)*1000)/1000;      // D — габарит забора, его и добиваемся
   if(Math.abs(delta)<0.001) return;
   var li=-1;
   for(var k=items.length-1;k>=0;k--){ if(items[k].type==='gate'||items[k].type==='wicket'){ li=k; break; } }
@@ -980,8 +995,9 @@ function applyTotalDist(b,D){
   newRow.forEach(function(bb){ if(!inOld[bb.id]) EB.blocks.push(bb); });
   EB.undo=null; if(EB.sel&&!inNew[EB.sel]) EB.sel=null;
   EB.touched=true;
-  // замер на Шаге 2 обязан совпасть с тем, что человек только что вписал
-  if(ri===0) S.plotLen=D; else if(ri===runs.length-1) S.sideLen=D;
+  // на Шаге 2 живёт ЗАМЕР — из габарита вычитаем то, что осталось за рулеткой
+  var meas=Math.round((D-padL-padR)*1000)/1000;
+  if(ri===0) S.plotLen=meas; else if(ri===runs.length-1) S.sideLen=meas;
   renderDims(); EB.builtSig=schemaSig(); EB.dirty=false;
   relayoutChain(); renumber(); totals(); renderEditor();
   var msg='Хвост забора: '+wasTail+' → '+spanDesc(newTail);
@@ -1176,11 +1192,52 @@ function applyCenterDist(b,D){
   }
   toast(msg);
 }
+// Размерная линия стороны. Засечка и точка стоят ровно там, откуда берётся длина:
+// у края крайнего столба или по его середине — чтобы выбор на Шаге 4 был виден глазами.
+function dimHTML(){
+  var runs=orderedRuns(), out='';
+  runs.forEach(function(r,ri){
+    if(!r.items.length) return;
+    var first=r.items[0], last=r.items[r.items.length-1];
+    var firstRow=(ri===0), lastRow=(ri===runs.length-1);
+    var padL=(firstRow&&S.anchorL==='center')?blockW(first)/2:0;
+    var padR=(lastRow&&S.anchorR==='center')?blockW(last)/2:0;
+    var gx1=Math.round(first.x), gx2=Math.round(last.x+blockW(last));            // весь забор: начало первого столба → конец последнего
+    var mx1=Math.round(first.x+padL), mx2=Math.round(last.x+blockW(last)-padR);  // как мерили рулеткой
+    if(gx2-gx1<24) return;
+    var top=1e9, bottom=0;
+    r.items.forEach(function(b){ top=Math.min(top,b.y); bottom=Math.max(bottom,b.y+b.h); });
+    top=Math.round(top);
+    var full=_rowEnds[last.id];                        // габарит стороны
+    var meas=(full!=null)?Math.round((full-(firstRow?anchorPad('L'):0)-(lastRow?anchorPad('R'):0))*1000)/1000:null;
+    var lTxt=firstRow?(S.anchorL==='center'?'от центра':'от начала'):'от угла';
+    var rTxt=lastRow?(S.anchorR==='center'?'до центра':'до конца'):'до угла';
+    var y=Math.round(bottom+18);
+    if(mx1>gx1+1||mx2<gx2-1){                          // мерили не по габариту — показываем обе линии
+      out+='<div class="dimtick meas" style="left:'+mx1+'px;top:'+top+'px;height:'+(y-top)+'px"></div>'
+         + '<div class="dimtick meas" style="left:'+mx2+'px;top:'+top+'px;height:'+(y-top)+'px"></div>'
+         + '<div class="dimdot" style="left:'+mx1+'px;top:'+(top+12)+'px"></div>'
+         + '<div class="dimdot" style="left:'+mx2+'px;top:'+(top+12)+'px"></div>'
+         + '<div class="dimline meas" style="left:'+mx1+'px;top:'+y+'px;width:'+(mx2-mx1)+'px">'
+         + '<span class="dimtxt meas">'+(meas!=null?esc(fmt(meas))+' м · ':'')+'как мерили: '+esc(lTxt)+' → '+esc(rTxt)+'</span></div>';
+      y+=24;
+    } else {                                           // мерили ровно по забору — точки стоят на его краях
+      out+='<div class="dimdot" style="left:'+gx1+'px;top:'+(top+12)+'px"></div>'
+         + '<div class="dimdot" style="left:'+gx2+'px;top:'+(top+12)+'px"></div>';
+    }
+    out+='<div class="dimtick full" style="left:'+gx1+'px;top:'+top+'px;height:'+(y-top)+'px"></div>'
+       + '<div class="dimtick full" style="left:'+gx2+'px;top:'+top+'px;height:'+(y-top)+'px"></div>'
+       + '<div class="dimline" style="left:'+gx1+'px;top:'+y+'px;width:'+(gx2-gx1)+'px">'
+       + '<span class="dimtxt">'+(full!=null?esc(fmt(full))+' м · ':'')+'весь забор: от начала первого столба до конца последнего</span></div>';
+  });
+  return out;
+}
 function renderEditor(){
   if(!ecanvas)return;
   calcRowEnds();                       // какой столб замыкает сторону и что на нём написать
   var h='<div class="eruler" id="eruler"></div>';
   EB.blocks.forEach(function(b){ h+=blockHTML(b); });
+  h+=dimHTML();                        // размерные линии — поверх блоков, кликам не мешают
   ecanvas.innerHTML=h; drawRuler(); updatePrintBtn();   // подпись кнопки печати не должна врать после удаления блоков
 }
 function drawRuler(){
@@ -1478,7 +1535,7 @@ function beforePrintLayout(){
   EB.blocks.forEach(function(b){ maxX=Math.max(maxX,b.x+blockW(b)); maxY=Math.max(maxY,b.y+b.h); });
   var ruler=document.getElementById('eruler');       // линейка шире блоков — до метра лишку
   if(ruler) maxX=Math.max(maxX,parseFloat(ruler.style.width)||0);
-  var w=maxX+20, h=maxY+20;
+  var w=maxX+20, h=maxY+20+58;        // +58 — полоса под размерные линии стороны
   // растягиваем на всю ширину листа, а не только ужимаем: иначе размер на бумаге
   // зависит от случайного зума в редакторе и половина A4 пустует
   var s=Math.min(PRINT_W_PX/Math.max(w,1), PRINT_H_PX/Math.max(h,1));

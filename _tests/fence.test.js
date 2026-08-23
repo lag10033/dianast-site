@@ -620,13 +620,26 @@ ok('очень длинный участок (200 м) считается', layou
   P.S.anchorR = 'center'; build({ len: 30 });
   near('оба по центру: забор 30,38 м', rowSum(rowOf()), 30.38, 0.002);
 
-  // на замыкающем столбе показывается ровно то, что покажет рулетка
+  // на замыкающем столбе — ДЛИНА ЗАБОРА: от начала первого столба до конца
+  // последнего, как бы её ни мерили (Андрей 23.08.2026)
   P.calcRowEnds();
   const lastId = rowOf()[rowOf().length - 1].id;
-  near('на последнем столбе — исходный замер 30 м', P._rowEnds[lastId], 30, 0.002);
+  near('мерили по центрам — забор всё равно 30,38 м', P._rowEnds[lastId], 30.38, 0.002);
   P.S.anchorL = 'edge'; P.S.anchorR = 'edge'; build({ len: 30 });
   P.calcRowEnds();
-  near('по краям на последнем столбе тоже 30 м', P._rowEnds[rowOf()[rowOf().length - 1].id], 30, 0.002);
+  near('мерили по краям — забор 30,00 м', P._rowEnds[rowOf()[rowOf().length - 1].id], 30, 0.002);
+
+  // все четыре сочетания привязок дают свой габарит, а замер остаётся 30 м
+  [['edge', 'edge', 30], ['center', 'center', 30.38], ['edge', 'center', 30.19], ['center', 'edge', 30.19]]
+    .forEach(([aL, aR, want]) => {
+      P.S.anchorL = aL; P.S.anchorR = aR;
+      build({ len: 30 });
+      P.calcRowEnds();
+      const id = rowOf()[rowOf().length - 1].id;
+      near(`${aL}→${aR}: забор ${want} м при замере 30 м`, P._rowEnds[id], want, 0.002);
+      near(`${aL}→${aR}: сумма блоков сходится с длиной забора`, rowSum(rowOf()), want, 0.002);
+    });
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
 
   // ввод общей длины пересобирает хвост забора и синхронизирует замер на Шаге 2
   const quiet = P.toast; P.toast = function () {};
@@ -639,6 +652,17 @@ ok('очень длинный участок (200 м) считается', layou
   near('после ввода 34 м забор стал 34 м', rowSum(rowOf()), 34, 0.002);
   near('замер на Шаге 2 обновился', P.S.plotLen, 34, 0.002);
   near('проёмы не сдвинулись', P.centerDist(rowOf().find((b) => b.type === 'gate')), gateBefore, 0.002);
+
+  // если мерили по центрам, вписанный габарит 34 м означает замер 33,62 м
+  P.S.anchorL = 'center'; P.S.anchorR = 'center';
+  build({ len: 30 });
+  P.calcRowEnds();
+  const q3 = P.toast; P.toast = function () {};
+  P.applyTotalDist(rowOf()[rowOf().length - 1], 34);
+  P.toast = q3;
+  near('вписали габарит 34 м — забор ровно 34 м', rowSum(rowOf()), 34, 0.002);
+  near('замер при этом 33,62 м (минус два полстолба)', P.S.plotLen, 33.62, 0.002);
+  P.S.anchorL = 'edge'; P.S.anchorR = 'edge';
   ok('раскладку не надо пересобирать заново', P.EB.dirty === false);
 
   // угловой участок: своя длина у каждой стороны

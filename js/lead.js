@@ -32,6 +32,25 @@ function phoneMask(el){ el.value = phoneFormat(phoneDigitsOf(el.value)); }
 // Поле, внутри которого «+375 » — часть значения
 function phoneMaskFull(el){ el.value = '+375 ' + phoneFormat(phoneDigitsOf(el.value)); }
 
+// Согласие на обработку данных. Формы, собранные без тега <form> (кнопка с
+// onclick), браузер не валидирует — атрибут required на чекбоксе там молчит.
+// Идём вверх от кнопки до контейнера, где лежит галочка, и проверяем её сами.
+// Если галочки рядом нет — не блокируем отправку, чтобы не сломать форму.
+function consentOk(el){
+  var node = el;
+  while (node && node !== document.body) {
+    var box = node.querySelector && node.querySelector('input[name="consent"]');
+    if (box) {
+      if (box.checked) return true;
+      try { box.focus(); } catch (e) {}
+      alert('Отметьте согласие на обработку персональных данных');
+      return false;
+    }
+    node = node.parentNode;
+  }
+  return true;
+}
+
 function sendLead(text, onOk, onErr){
   onOk = onOk || function(){};
   onErr = onErr || function(){};

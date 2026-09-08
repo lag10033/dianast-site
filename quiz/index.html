@@ -1397,7 +1397,7 @@ button { font-family: inherit; cursor: pointer; }
           <input type="tel" class="inp-full" id="phone" placeholder="+375 29 123-45-67" oninput="formatPhone()" onfocus="formatPhone()">
           <p class="inp-error" id="phoneError">Введите номер: +375 и 9 цифр</p>
         </div>
-        <p class="consent">Нажимая «Получить расчёт», вы соглашаетесь с обработкой персональных данных.</p>
+        <p class="consent"><label style="display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer;text-align:left"><input type="checkbox" name="consent" id="quizConsent" style="margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:#D4521E;cursor:pointer"><span>Согласен на <a href="/politika/" target="_blank" rel="noopener" style="color:#E8600A;text-decoration:underline">обработку персональных данных</a></span></label></p>
       </div>
     </div>
 
@@ -1862,6 +1862,10 @@ function goBack() {
 // ── Submit ─────────────────────────────────────────────
 
 function submitQuiz(advance) {
+  // Согласие обязательно: квиз шлёт заявку из JS, атрибут required браузер здесь не проверяет.
+  var qc = document.getElementById('quizConsent');
+  if (qc && !qc.checked) { qc.focus(); alert('Отметьте согласие на обработку персональных данных'); return; }
+
   if(typeof ym==='function'){ym(110181067,'reachGoal','quiz_submit');}
   var btn = document.getElementById('btnNext');
   btn.disabled = true;

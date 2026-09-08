@@ -299,7 +299,7 @@ footer{position:relative;background:#111;padding:25px 5%}
         </div>
         <button type="submit" style="width:100%;background:#D4521E;color:white;border:none;border-radius:8px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#b83d10'" onmouseout="this.style.background='#D4521E'">Скачать бесплатно →</button>
       </form>
-      <p style="font-size:11px;color:#BDBDBD;text-align:center;margin-top:14px">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</p>
+      <p style="font-size:11px;color:#BDBDBD;text-align:center;margin-top:14px"><label style="display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer;text-align:left"><input type="checkbox" name="consent" required style="margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:#D4521E;cursor:pointer"><span>Согласен на <a href="/politika/" target="_blank" rel="noopener" style="color:#E8600A;text-decoration:underline">обработку персональных данных</a></span></label></p>
     </div>
     <button onclick="closeLeadModal()" style="position:absolute;top:14px;right:18px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
   </div>
@@ -314,9 +314,10 @@ function submitLead(e){
   if(typeof ym==='function'){ym(110181067,'reachGoal','lead_form');}
   var name=document.getElementById('leadName').value;
   var phone=document.getElementById('leadPhone').value;
-  // Send email notification
-  var link=document.createElement('a');
-  link.href='mailto:lag10033@gmail.com?subject=Новая заявка — 10 ошибок&body=Имя: '+encodeURIComponent(name)+'%0AТелефон: '+encodeURIComponent(phone);
+  // Заявка уходит в CRM и Telegram той же функцией, что и остальные формы сайта.
+  // До 08.09.2026 здесь создавалась ссылка mailto, по которой никто не кликал:
+  // человек видел «менеджер свяжется», а заявка не уходила никуда.
+  sendLead('\u{1F4E5} Заявка «10 ошибок при строительстве забора»\n\nИмя: ' + (name||'не указано') + '\nТелефон: ' + phone);
   // Trigger download
   var a=document.createElement('a');
   a.href='assets/10-oshibok-zabor.html';
@@ -386,7 +387,7 @@ function submitLead(e){
         </div>
       </div>
       <button class="btn-calc" onclick="sendHeroForm(event)">Отправить заявку →</button>
-      <div style="font-size:11px;color:var(--mid);margin-top:10px;text-align:center">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</div>
+      <div style="font-size:11px;color:var(--mid);margin-top:10px;text-align:center"><label style="display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer;text-align:left"><input type="checkbox" name="consent" required style="margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:#D4521E;cursor:pointer"><span>Согласен на <a href="/politika/" target="_blank" rel="noopener" style="color:#E8600A;text-decoration:underline">обработку персональных данных</a></span></label></div>
     </div>
 </section>
 
@@ -1113,7 +1114,7 @@ calcFence();
       </div>
 
       <button class="btn-form" onclick="sendForm(event)">Отправить заявку →</button>
-      <div class="form-note">Нажимая кнопку, вы соглашаетесь на обработку персональных данных</div>
+      <div class="form-note"><label style="display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer;text-align:left"><input type="checkbox" name="consent" required style="margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:#D4521E;cursor:pointer"><span>Согласен на <a href="/politika/" target="_blank" rel="noopener" style="color:#E8600A;text-decoration:underline">обработку персональных данных</a></span></label></div>
     </div>
   </div>
 </section>
@@ -1276,6 +1277,11 @@ details > summary:hover{color:#E8600A}
 <a href="/stykovka-stolba-i-prodlenki/" style="font-size:13px;color:rgba(255,255,255,0.75);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:4px">Стыковка столба и продлёнки</a>
 </div>
 </div>
+<!-- legal-footer -->
+<div style="max-width:1200px;margin:28px auto 0;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.12);font-size:13px;line-height:1.7;color:rgba(255,255,255,0.55);text-align:center">
+  ЧПТУП «Дианаст», УНП 291123367 · 225306, г. Кобрин, ул. Никольская, 64К · <a href="tel:+375297974362" style="color:rgba(255,255,255,0.75);text-decoration:none">+375 29 797-43-62</a><br>
+  <a href="/politika/" style="color:rgba(255,255,255,0.75);text-decoration:underline">Политика обработки персональных данных</a>
+</div>
 </footer>
 
 <script>
@@ -1366,6 +1372,7 @@ function sendHeroForm(e){
   var name = document.getElementById('hero-name').value.trim();
   var phone = '+375' + document.getElementById('hero-phone').value.replace(/\D/g,'');
   if(phone === '+375'){alert('Введите номер телефона');return;}
+  if(!consentOk(e.target)) return;
   var btn = e.target; btn.disabled = true; btn.textContent = 'Отправляем...';
   var text = '\u{1F4CB} Заявка с главной страницы\n\nИмя: ' + (name||'не указано') + '\nТелефон: ' + phone;
   sendLead(text, function(){
@@ -1381,6 +1388,7 @@ function sendForm(e){
   var name = document.querySelector('.contact-form input[type=text]').value.trim();
   var phone = '+375' + document.getElementById('contact-phone').value.replace(/\D/g,'');
   if(!name || phone === '+375'){alert('Пожалуйста, заполните имя и телефон.');return;}
+  if(!consentOk(e.target)) return;
   var btn = e.target; btn.disabled = true; btn.textContent = 'Отправляем...';
   var text = '\u{1F4DE} Заявка из формы обратной связи\n\nИмя: ' + name + '\nТелефон: ' + phone;
   sendLead(text, function(){

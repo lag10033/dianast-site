@@ -189,7 +189,8 @@ footer a{color:var(--mid)}
     <label for="f-org">Город и название цеха <span style="font-weight:400;color:var(--mid)">(по желанию)</span></label>
     <input id="f-org" name="org" placeholder="Гомель, ИП Иванов">
     <input class="hp" name="hp" tabindex="-1" autocomplete="off">
-    <div style="margin-top:20px"><button class="btn" type="submit" id="f-btn">Получить пробный доступ</button></div>
+    <div style="margin-top:20px"><p style="font-size:12px;color:#7a7268;margin-top:12px;text-align:left"><label style="display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="checkbox" name="consent" required id="progConsent" style="margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:#D4521E;cursor:pointer"><span>Согласен на <a href="/politika/" target="_blank" rel="noopener" style="color:#E8600A;text-decoration:underline">обработку персональных данных</a></span></label></p>
+<button class="btn" type="submit" id="f-btn">Получить пробный доступ</button></div>
     <div id="f-status"></div>
   </form>
 </div></section>
@@ -197,7 +198,12 @@ footer a{color:var(--mid)}
 <footer><div class="wrap">
   DIANAST · Кобрин, ул. Никольская, 64К · <a href="tel:+375297974362">+375 29 797-43-62</a> · <a href="mailto:mvpdom@yandex.ru">mvpdom@yandex.ru</a><br>
   Программа «Рабочее место жестянщика» · <a href="/">dianast.by</a>
-</div></footer>
+</div><!-- legal-footer -->
+<div style="max-width:1200px;margin:28px auto 0;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.12);font-size:13px;line-height:1.7;color:rgba(255,255,255,0.55);text-align:center">
+  ЧПТУП «Дианаст», УНП 291123367 · 225306, г. Кобрин, ул. Никольская, 64К · <a href="tel:+375297974362" style="color:rgba(255,255,255,0.75);text-decoration:none">+375 29 797-43-62</a><br>
+  <a href="/politika/" style="color:rgba(255,255,255,0.75);text-decoration:underline">Политика обработки персональных данных</a>
+</div>
+</footer>
 
 <script>
 document.getElementById('lead-form').addEventListener('submit', async function (e) {
